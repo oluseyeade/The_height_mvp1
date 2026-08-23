@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Apartment Image Gallery | Operations Desk{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-dark text-light">
+  <div class="container py-3">
+    
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+      <div>
+        <span class="badge bg-gold text-dark font-monospace text-uppercase px-3 py-1 mb-2">ADMINISTRATION</span>
+        <h2 class="fw-bold text-white font-serif mb-0"><i class="fas fa-images text-gold me-2"></i> Apartment Image Gallery Management</h2>
+        <p class="small text-muted mb-0">Upload, view, and manage high-resolution gallery images for each apartment suite.</p>
+      </div>
+      <div>
+        <a href="{{ url_for('admin_panel.dashboard') }}" class="btn btn-outline-gold btn-sm me-2">
+          <i class="fas fa-arrow-left me-1"></i> Dashboard
+        </a>
+      </div>
+    </div>
+
+    <!-- Upload Card Form -->
+    <div class="glass-card p-4 border-gold mb-5">
+      <h5 class="fw-bold text-gold mb-3"><i class="fas fa-cloud-upload-alt me-2"></i> Upload New Suite Images</h5>
+      
+      <div id="galleryAlert" class="d-none alert" role="alert"></div>
+
+      <div id="uploadProgressContainer" class="progress bg-dark border border-secondary mb-3 d-none" style="height: 20px;">
+        <div id="uploadProgressBar" class="progress-bar bg-gold text-dark fw-bold" role="progressbar" style="width: 0%;">0%</div>
+      </div>
+
+      <form id="galleryUploadForm" action="{{ url_for('admin_panel.manage_gallery') }}" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <div class="row g-3 align-items-end">
+          <div class="col-md-5">
+            <label class="form-label small text-gold fw-bold">Target Apartment Suite *</label>
+            <select name="apartment_id" class="form-select bg-dark text-white border-secondary" required>
+              <option value="" disabled selected>-- Select Apartment Suite --</option>
+              {% for apt in apartments %}
+                <option value="{{ apt.apartment_id }}">{{ apt.display_title }} (Category: {{ apt.category.name if apt.category else 'General' }})</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-5">
+            <label class="form-label small text-gold fw-bold">Select Image Files (Multiple allowed) *</label>
+            <input type="file" name="images" class="form-control bg-dark text-white border-secondary" multiple accept="image/png, image/jpeg, image/webp" required>
+            <span class="form-text small text-muted">Allowed formats: JPEG, PNG, WEBP. Max size: 16 MB.</span>
+          </div>
+
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-gold w-100 fw-bold">
+              <i class="fas fa-upload me-1"></i> Upload
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Existing Gallery Images by Apartment -->
+    <h4 class="fw-bold text-white font-serif mb-4"><i class="fas fa-photo-video text-gold me-2"></i> Current Apartment Suite Galleries</h4>
+
+    {% for apt in apartments %}
+      <div class="glass-card p-4 border-secondary mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom border-secondary pb-2">
+          <div>
+            <h5 class="fw-bold text-white mb-0">{{ apt.display_title }}</h5>
+            <span class="small text-gold">{{ apt.category.name if apt.category else 'Category' }} · {{ apt.images|length }} Image(s) stored</span>
+          </div>
+        </div>
+
+        {% if apt.images %}
+          <div class="row g-3">
+            {% for img in apt.images %}
+              <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card bg-dark border-secondary h-100 text-light overflow-hidden position-relative">
+                  <img src="{{ url_for('static', filename=img.image_url) if not img.image_url.startswith('http') else img.image_url }}" class="card-img-top" style="height: 175px; object-fit: contain; background-color: #08090c;" alt="Gallery Image">
+                  
+                  {% if img.is_cover %}
+                    <span class="badge bg-gold text-dark position-absolute top-0 start-0 m-2 fw-bold"><i class="fas fa-star me-1"></i> Cover</span>
+                  {% endif %}
+
+                  <div class="card-body p-2 d-flex justify-content-between align-items-center">
+                    {% if not img.is_cover %}
+                      <form action="{{ url_for('admin_panel.set_cover_image', image_id=img.image_id) }}" method="POST" class="d-inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-outline-warning btn-sm py-0 px-2 small">
+                          <i class="fas fa-star me-1"></i> Set Cover
+                        </button>
+                      </form>
+                    {% else %}
+                      <span class="small text-gold fw-bold">Primary</span>
+                    {% endif %}
+
+                    <form action="{{ url_for('admin_panel.delete_image', image_id=img.image_id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this image?');">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <button type="submit" class="btn btn-outline-danger btn-sm py-0 px-2 small">
+                        <i class="fas fa-trash me-1"></i> Delete
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="small text-muted mb-0">No gallery images uploaded for this suite yet. Primary cover falls back to default image.</p>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var form = document.getElementById('galleryUploadForm');
+  var alertBox = document.getElementById('galleryAlert');
+  var progressBar = document.getElementById('uploadProgressBar');
+  var progressContainer = document.getElementById('uploadProgressContainer');
+
+  if (!form) return;
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    if (alertBox) {
+      alertBox.className = 'd-none alert';
+      alertBox.innerHTML = '';
+    }
+
+    var formData = new FormData(form);
+    var xhr = new XMLHttpRequest();
+
+    if (progressContainer && progressBar) {
+      progressContainer.classList.remove('d-none');
+      progressBar.style.width = '0%';
+      progressBar.textContent = '0%';
+    }
+
+    if (window.showGlobalLoading) {
+      window.showGlobalLoading('Uploading Suite Images', 'Validating format & processing file transfer...');
+    }
+
+    xhr.upload.addEventListener('progress', function(e) {
+      if (e.lengthComputable && progressBar) {
+        var percent = Math.round((e.loaded / e.total) * 100);
+        progressBar.style.width = percent + '%';
+        progressBar.textContent = percent + '%';
+      }
+    });
+
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (window.hideGlobalLoading) window.hideGlobalLoading();
+        if (progressContainer) progressContainer.classList.add('d-none');
+
+        var res = {};
+        try {
+          res = JSON.parse(xhr.responseText);
+        } catch(err) {
+          res = { success: false, message: 'Server returned an invalid response.' };
+        }
+
+        if (xhr.status === 200 && res.success) {
+          if (alertBox) {
+            alertBox.className = 'alert alert-success mt-3';
+            alertBox.innerHTML = '<i class="fas fa-check-circle me-2"></i>' + (res.message || 'Image uploaded successfully!') + ' Refreshing gallery...';
+            alertBox.classList.remove('d-none');
+          }
+          setTimeout(function() {
+            window.location.reload();
+          }, 1000);
+        } else if (xhr.status === 401) {
+          if (res.redirect) {
+            window.location.href = res.redirect;
+          } else {
+            window.location.href = "{{ url_for('auth.login') }}";
+          }
+        } else {
+          if (alertBox) {
+            alertBox.className = 'alert alert-danger mt-3';
+            alertBox.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i> Upload Failed: ' + (res.message || 'An error occurred during file upload.');
+            alertBox.classList.remove('d-none');
+          }
+        }
+      }
+    };
+
+    var csrfInput = form.querySelector('input[name="csrf_token"]');
+    var metaCsrf = document.querySelector('meta[name="csrf-token"]');
+    var csrfToken = (csrfInput ? csrfInput.value : '') || (metaCsrf ? metaCsrf.getAttribute('content') : '');
+
+    xhr.open('POST', form.action, true);
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    xhr.setRequestHeader('Accept', 'application/json');
+    if (csrfToken) {
+      xhr.setRequestHeader('X-CSRFToken', csrfToken);
+    }
+    xhr.send(formData);
+  });
+});
+</script>
+{% endblock %}

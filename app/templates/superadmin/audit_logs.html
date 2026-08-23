@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}System Audit Logs & Activity Monitoring | The Height Apartment{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container-fluid px-lg-5">
+    
+    <!-- Executive Header -->
+    <div class="glass-card p-4 mb-4 border-gold d-flex flex-wrap justify-content-between align-items-center">
+      <div>
+        <span class="badge bg-gold text-dark font-monospace text-uppercase px-3 py-1 mb-1">SECURITY &amp; COMPLIANCE PORTAL</span>
+        <h2 class="display-6 fw-bold text-white mb-0 font-serif">System Audit Trail &amp; Admin Activity Logs</h2>
+        <p class="small text-muted mb-0">Immutable Audit Trail Monitoring All Administrative Operations, Module Actions, Timestamps &amp; IP Addresses</p>
+      </div>
+      <div class="mt-3 mt-md-0 d-flex gap-2">
+        <a href="{{ url_for('superadmin_panel.export_audit_logs') }}" class="btn btn-outline-gold"><i class="fas fa-file-csv me-1"></i> Export Logs CSV</a>
+        <a href="{{ url_for('superadmin_panel.dashboard') }}" class="btn btn-gold"><i class="fas fa-arrow-left me-1"></i> Dashboard</a>
+      </div>
+    </div>
+
+    <!-- KPI Metric Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-gold">
+          <i class="fas fa-list-alt text-gold fs-3 mb-1"></i>
+          <div class="small text-muted text-uppercase fw-bold">Total Recorded Logs</div>
+          <h4 class="fw-bold text-white font-serif mb-0">{{ metrics.total_logs }}</h4>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-gold">
+          <i class="fas fa-calendar-check text-success fs-3 mb-1"></i>
+          <div class="small text-muted text-uppercase fw-bold">Booking Operations</div>
+          <h4 class="fw-bold text-success font-serif mb-0">{{ metrics.booking_logs }}</h4>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-gold">
+          <i class="fas fa-star text-warning fs-3 mb-1"></i>
+          <div class="small text-muted text-uppercase fw-bold">Review Moderations</div>
+          <h4 class="fw-bold text-warning font-serif mb-0">{{ metrics.review_logs }}</h4>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-gold">
+          <i class="fas fa-shield-alt text-info fs-3 mb-1"></i>
+          <div class="small text-muted text-uppercase fw-bold">Security &amp; Auth Logs</div>
+          <h4 class="fw-bold text-info font-monospace mb-0">{{ metrics.security_logs }}</h4>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter & Search Controls -->
+    <div class="glass-card p-4 border-gold mb-4">
+      <form action="{{ url_for('superadmin_panel.view_audit_logs') }}" method="GET" class="row g-3 align-items-end">
+        <div class="col-lg-6 col-md-6">
+          <label class="form-label text-gold small fw-bold mb-1"><i class="fas fa-search me-1"></i> Search Log Keyword</label>
+          <input type="text" name="search" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="Activity type, description, action name..." value="{{ search_query }}">
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <label class="form-label text-gold small fw-bold mb-1"><i class="fas fa-cubes me-1"></i> Module Filter</label>
+          <select name="module" class="form-select form-select-sm bg-dark text-white border-secondary">
+            <option value="" {% if not module_filter %}selected{% endif %}>All System Modules</option>
+            <option value="BOOKINGS" {% if module_filter == 'BOOKINGS' %}selected{% endif %}>BOOKINGS</option>
+            <option value="REVIEWS" {% if module_filter == 'REVIEWS' %}selected{% endif %}>REVIEWS</option>
+            <option value="CORPORATE" {% if module_filter == 'CORPORATE' %}selected{% endif %}>CORPORATE</option>
+            <option value="COMMISSIONS" {% if module_filter == 'COMMISSIONS' %}selected{% endif %}>COMMISSIONS</option>
+            <option value="INSPECTIONS" {% if module_filter == 'INSPECTIONS' %}selected{% endif %}>INSPECTIONS</option>
+            <option value="REFUNDS" {% if module_filter == 'REFUNDS' %}selected{% endif %}>REFUNDS</option>
+            <option value="SECURITY" {% if module_filter == 'SECURITY' %}selected{% endif %}>SECURITY</option>
+          </select>
+        </div>
+
+        <div class="col-lg-2 col-md-12 d-flex gap-2">
+          <button type="submit" class="btn btn-sm btn-gold flex-grow-1"><i class="fas fa-filter me-1"></i> Filter</button>
+          <a href="{{ url_for('superadmin_panel.view_audit_logs') }}" class="btn btn-sm btn-outline-light"><i class="fas fa-sync-alt me-1"></i> Reset</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Master Audit Log Table -->
+    <div class="glass-card p-4 border-gold mb-4">
+      <div class="table-responsive">
+        <table class="table table-marriott align-middle">
+          <thead>
+            <tr>
+              <th>Log ID &amp; Time</th>
+              <th>Performer User</th>
+              <th>Module</th>
+              <th>Activity Type</th>
+              <th>Action Code</th>
+              <th>Audit Description</th>
+              <th>IP Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if logs %}
+              {% for l in logs %}
+                <tr>
+                  <td>
+                    <strong class="text-gold font-monospace d-block">LOG-{{ l.log_id }}</strong>
+                    <span class="small text-muted opacity-75">{{ l.created_at.strftime('%b %d, %Y %H:%M:%S') if l.created_at else '' }}</span>
+                  </td>
+
+                  <td>
+                    <span class="badge bg-secondary font-monospace text-light"><i class="fas fa-user-circle me-1"></i> User ID: {{ l.user_id or 'System' }}</span>
+                  </td>
+
+                  <td>
+                    <span class="badge bg-dark border border-secondary text-gold font-monospace px-2 py-1">{{ l.module }}</span>
+                  </td>
+
+                  <td>
+                    <strong class="text-light small font-monospace d-block">{{ l.activity_type }}</strong>
+                  </td>
+
+                  <td>
+                    <span class="badge bg-info text-dark font-monospace px-2 py-1">{{ l.action }}</span>
+                  </td>
+
+                  <td>
+                    <p class="small text-white mb-0 text-truncate" style="max-width: 350px;" title="{{ l.description }}">
+                      {{ l.description }}
+                    </p>
+                  </td>
+
+                  <td>
+                    <span class="small text-muted font-monospace"><i class="fas fa-network-wired me-1"></i> {{ l.ip_address or '127.0.0.1' }}</span>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="7" class="text-center py-5 text-muted">
+                  <i class="fas fa-search fs-1 d-block mb-3 text-gold opacity-50"></i>
+                  <h5>No audit logs found.</h5>
+                  <p class="small mb-0">Try resetting filters or searching with different keywords.</p>
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Server-Side Pagination -->
+      {% if pagination and pagination.pages > 1 %}
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 pt-3 border-top border-secondary gap-3">
+          <div class="small text-muted">
+            Showing {{ pagination.items|length }} of {{ pagination.total }} total audit logs (Page {{ pagination.page }} of {{ pagination.pages }})
+          </div>
+
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+              <a class="page-link bg-dark text-gold border-secondary" href="{{ url_for('superadmin_panel.view_audit_logs', page=pagination.prev_num, search=search_query, module=module_filter) }}">
+                <i class="fas fa-chevron-left"></i> Previous
+              </a>
+            </li>
+
+            {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+              {% if page_num %}
+                <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                  <a class="page-link {% if page_num == pagination.page %}bg-gold text-dark border-gold fw-bold{% else %}bg-dark text-gold border-secondary{% endif %}" href="{{ url_for('superadmin_panel.view_audit_logs', page=page_num, search=search_query, module=module_filter) }}">
+                    {{ page_num }}
+                  </a>
+                </li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link bg-dark text-muted border-secondary">...</span></li>
+              {% endif %}
+            {% endfor %}
+
+            <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+              <a class="page-link bg-dark text-gold border-secondary" href="{{ url_for('superadmin_panel.view_audit_logs', page=pagination.next_num, search=search_query, module=module_filter) }}">
+                Next <i class="fas fa-chevron-right"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Guest Login | The Height Apartment{% endblock %}
+
+{% block content %}
+<section class="py-5 min-vh-80 d-flex align-items-center">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-5">
+        <div class="glass-card p-5">
+          <div class="text-center mb-4">
+            <img src="{{ url_for('static', filename='images/Brandlogo.png') }}" alt="The Height Premium Apartments" class="img-fluid mb-3" style="height: 54px; object-fit: contain;">
+            <h3 class="fw-bold text-white font-serif">Welcome Back</h3>
+            <p class="small text-muted">Sign in to manage your bookings and profile.</p>
+          </div>
+
+          <form method="POST">
+            {{ form.hidden_tag() }}
+            
+            <div class="mb-3">
+              <label class="form-label small text-gold fw-bold">Email Address</label>
+              {{ form.email(class="form-control bg-dark text-white border-secondary", placeholder="you@example.com") }}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small text-gold fw-bold">Password</label>
+              {{ form.password(class="form-control bg-dark text-white border-secondary") }}
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="form-check">
+                {{ form.remember(class="form-check-input") }}
+                <label class="form-check-label small text-muted">Remember me</label>
+              </div>
+              <a href="#" class="small text-gold text-decoration-none">Forgot password?</a>
+            </div>
+
+            {{ form.submit(class="btn btn-gold w-100 py-2 fw-bold") }}
+          </form>
+
+          <div class="text-center mt-4 pt-3 border-top border-secondary border-opacity-25 small text-muted">
+            Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-gold fw-bold text-decoration-none">Register here</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

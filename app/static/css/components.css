@@ -1,0 +1,261 @@
+/* ==========================================================================
+   THE HEIGHT APARTMENT & SUITES — AUTHORITATIVE COMPONENTS STYLESHEET
+   Location: app/static/css/components.css
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. BUTTON COMPONENTS
+   -------------------------------------------------------------------------- */
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold-light, #f4cf76) 0%, var(--gold-primary, #d19828) 100%);
+  color: #000000 !important;
+  font-weight: 600;
+  border: none;
+  padding: 0.75rem 1.75rem;
+  border-radius: 8px;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(209, 152, 40, 0.3);
+}
+
+.btn-gold:hover,
+.btn-gold:focus {
+  background: linear-gradient(135deg, #ffffff 0%, var(--gold-light, #f4cf76) 100%);
+  color: #000000 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(209, 152, 40, 0.5);
+}
+
+.btn-outline-gold {
+  border: 1px solid var(--gold-primary, #d19828);
+  color: var(--gold-primary, #d19828) !important;
+  background: transparent;
+  font-weight: 500;
+  padding: 0.75rem 1.75rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-gold:hover,
+.btn-outline-gold:focus {
+  background: var(--gold-primary, #d19828);
+  color: #000000 !important;
+  border-color: var(--gold-primary, #d19828);
+  box-shadow: 0 4px 15px rgba(209, 152, 40, 0.3);
+}
+
+.btn-glass {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 0.6rem 1.4rem;
+  transition: all 0.3s ease;
+}
+
+.btn-glass:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: var(--gold-light, #f4cf76);
+  border-color: var(--gold-primary, #d19828);
+}
+
+/* --------------------------------------------------------------------------
+   2. BADGES & ROLE TAGS
+   -------------------------------------------------------------------------- */
+.badge-role {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.badge-superadmin {
+  background: rgba(220, 53, 69, 0.2);
+  color: #ff6b6b;
+  border: 1px solid rgba(220, 53, 69, 0.4);
+}
+
+.badge-admin {
+  background: rgba(13, 110, 253, 0.2);
+  color: #6ea8fe;
+  border: 1px solid rgba(13, 110, 253, 0.4);
+}
+
+.badge-agent {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffda6a;
+  border: 1px solid rgba(255, 193, 7, 0.4);
+}
+
+.badge-user {
+  background: rgba(25, 135, 84, 0.2);
+  color: #75b798;
+  border: 1px solid rgba(25, 135, 84, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   3. PRICE TAG PILLS & COUNTERS
+   -------------------------------------------------------------------------- */
+.price-tag {
+  background-color: rgba(10, 10, 12, 0.85);
+  color: var(--gold-primary, #d19828);
+  padding: 0.4rem 1rem;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: 1px solid rgba(209, 152, 40, 0.4);
+  display: inline-block;
+}
+
+/* --------------------------------------------------------------------------
+   4. GLASSMORPHISM CARDS & PANELS
+   -------------------------------------------------------------------------- */
+.glass-card {
+  background: rgba(18, 18, 22, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(209, 152, 40, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(209, 152, 40, 0.4);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+}
+
+.glass-panel {
+  background: rgba(15, 15, 18, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   5. DASHBOARD STAT CARDS & WIDGETS
+   -------------------------------------------------------------------------- */
+.stat-card {
+  background: rgba(20, 20, 26, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  border-color: var(--gold-primary, #d19828);
+  transform: translateY(-3px);
+}
+
+.stat-card .stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(209, 152, 40, 0.15);
+  color: var(--gold-primary, #d19828);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   6. CUSTOM FORMS & INPUTS
+   -------------------------------------------------------------------------- */
+.form-control-custom,
+.form-select-custom {
+  background: rgba(10, 10, 14, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+}
+
+.form-control-custom:focus,
+.form-select-custom:focus {
+  background: rgba(15, 15, 20, 0.95);
+  border-color: var(--gold-primary, #d19828);
+  box-shadow: 0 0 0 0.25rem rgba(209, 152, 40, 0.25);
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   7. CUSTOM TABLES & BADGES
+   -------------------------------------------------------------------------- */
+.table-custom {
+  color: #e0e0e0;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.table-custom th {
+  background: rgba(10, 10, 14, 0.95);
+  color: var(--gold-primary, #d19828);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}
+
+/* --------------------------------------------------------------------------
+   8. RESPONSIVE UTILITIES & ANIMATIONS
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .glass-card {
+    padding: 1.25rem !important;
+  }
+  .btn-gold,
+  .btn-outline-gold {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   9. GLOBAL LOADING OVERLAY & SPINNER
+   -------------------------------------------------------------------------- */
+.global-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(11, 12, 16, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.loading-card {
+  min-width: 280px;
+  max-width: 90vw;
+  border: 1px solid rgba(209, 152, 40, 0.4) !important;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.8) !important;
+}
+
+.spinner-border.text-gold {
+  color: var(--gold-primary, #d19828) !important;
+}
+
+/* --------------------------------------------------------------------------
+   10. PRIVACY & COOKIE CONSENT BANNER
+   -------------------------------------------------------------------------- */
+.cookie-consent-banner {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 9999;
+  background: rgba(15, 15, 18, 0.95) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8) !important;
+  max-width: 1200px;
+  margin: 0 auto;
+}

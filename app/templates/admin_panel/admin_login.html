@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}The Height Apartment Administration | Secure Portal Login{% endblock %}
+
+{% block content %}
+<section class="py-5 d-flex align-items-center" style="min-height: 80vh;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-5 col-md-8">
+        
+        <!-- Marriott Glass-Card Admin Login Component -->
+        <div class="glass-card p-5 border-gold shadow-lg">
+          
+          <div class="text-center mb-4">
+            <div class="text-center mb-3">
+              <img src="{{ url_for('static', filename='images/Brandlogo.png') }}" alt="The Height Premium Apartments" class="img-fluid" style="height: 60px; object-fit: contain;">
+            </div>
+            <span class="badge bg-danger text-white font-monospace text-uppercase px-3 py-1 mb-2">SECURE MANAGEMENT ACCESS</span>
+            <h2 class="display-6 fw-bold text-white font-serif mb-1">The Height Apartment Administration</h2>
+            <p class="small text-muted">Authorized SuperAdmin &amp; Admin Personnel Only</p>
+          </div>
+
+          <form action="{{ url_for('admin_panel.admin_login') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="mb-3">
+              <label class="form-label small text-gold fw-bold">Administrative Email *</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark border-secondary text-gold"><i class="fas fa-user-shield"></i></span>
+                <input type="email" name="email" class="form-control bg-dark text-white border-secondary" placeholder="admin@theheightapartment.com" required autofocus>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label small text-gold fw-bold">Password *</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark border-secondary text-gold"><i class="fas fa-lock"></i></span>
+                <input type="password" name="password" id="adminPasswordInput" class="form-control bg-dark text-white border-secondary" placeholder="••••••••••••" required>
+                <button type="button" class="btn btn-outline-secondary border-secondary text-gold" onclick="toggleAdminPassword()"><i class="fas fa-eye" id="togglePasswordIcon"></i></button>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-gold btn-lg w-100 py-3 text-uppercase fw-bold">
+              <i class="fas fa-sign-in-alt me-2"></i> Sign In to Admin Portal
+            </button>
+          </form>
+
+          <div class="mt-4 pt-3 border-top border-secondary text-center">
+            <a href="{{ url_for('public.index') }}" class="small text-muted text-decoration-none">
+              <i class="fas fa-arrow-left me-1"></i> Return to Main Public Site
+            </a>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  function toggleAdminPassword() {
+    const input = document.getElementById('adminPasswordInput');
+    const icon = document.getElementById('togglePasswordIcon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.className = 'fas fa-eye-slash';
+    } else {
+      input.type = 'password';
+      icon.className = 'fas fa-eye';
+    }
+  }
+</script>
+{% endblock %}

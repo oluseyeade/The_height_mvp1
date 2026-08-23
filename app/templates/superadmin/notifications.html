@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+
+{% block title %}SuperAdmin Centralized Notification Center | The Height Apartment{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container-fluid px-lg-5">
+    
+    <!-- Executive Header -->
+    <div class="glass-card p-4 mb-4 border-gold d-flex flex-wrap justify-content-between align-items-center">
+      <div>
+        <span class="badge bg-gold text-dark font-monospace text-uppercase px-3 py-1 mb-1">EXECUTIVE ATTENTION SYSTEM</span>
+        <h2 class="display-6 fw-bold text-white mb-0 font-serif">Centralized SuperAdmin Notification Center</h2>
+        <p class="small text-muted mb-0">Unified Real-Time Event Oversight Across Admin, Agent, Inspection, Booking, Corporate, Review &amp; Audit Portals</p>
+      </div>
+      <div class="mt-3 mt-md-0 d-flex gap-2">
+        <a href="{{ url_for('superadmin_panel.dashboard') }}" class="btn btn-gold"><i class="fas fa-arrow-left me-1"></i> Executive Dashboard</a>
+      </div>
+    </div>
+
+    <!-- KPI Metric Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-gold">
+          <i class="fas fa-bell text-gold fs-3 mb-1"></i>
+          <div class="small text-muted text-uppercase fw-bold">Total Events Logged</div>
+          <h4 class="fw-bold text-white font-serif mb-0">{{ metrics.total_notifications }}</h4>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-gold">
+          <i class="fas fa-envelope-open text-warning fs-3 mb-1"></i>
+          <div class="small text-muted text-uppercase fw-bold">Unread Notifications</div>
+          <h4 class="fw-bold text-warning font-serif mb-0">{{ metrics.unread_count }}</h4>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-gold">
+          <i class="fas fa-exclamation-circle text-danger fs-3 mb-1"></i>
+          <div class="small text-muted text-uppercase fw-bold">Action Required</div>
+          <h4 class="fw-bold text-danger font-serif mb-0">{{ metrics.action_required_count }}</h4>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-gold">
+          <i class="fas fa-radiation text-danger fs-3 mb-1"></i>
+          <div class="small text-muted text-uppercase fw-bold">Critical Priority Alerts</div>
+          <h4 class="fw-bold text-danger font-monospace mb-0">{{ metrics.critical_count }}</h4>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter & Search Controls -->
+    <div class="glass-card p-4 border-gold mb-4">
+      <form action="{{ url_for('superadmin_panel.view_notifications') }}" method="GET" class="row g-3 align-items-end">
+        <div class="col-lg-3 col-md-6">
+          <label class="form-label text-gold small fw-bold mb-1"><i class="fas fa-search me-1"></i> Search Keyword</label>
+          <input type="text" name="search" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="Event title, message..." value="{{ search_query }}">
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+          <label class="form-label text-gold small fw-bold mb-1"><i class="fas fa-cubes me-1"></i> Source Portal</label>
+          <select name="portal" class="form-select form-select-sm bg-dark text-white border-secondary">
+            <option value="ALL" {% if portal_filter == 'ALL' or not portal_filter %}selected{% endif %}>All Portals</option>
+            <option value="ADMIN" {% if portal_filter == 'ADMIN' %}selected{% endif %}>ADMIN ACCOUNTS</option>
+            <option value="AGENTS" {% if portal_filter == 'AGENTS' %}selected{% endif %}>AGENT REQUESTS</option>
+            <option value="INSPECTIONS" {% if portal_filter == 'INSPECTIONS' %}selected{% endif %}>ROOM INSPECTIONS</option>
+            <option value="BOOKINGS" {% if portal_filter == 'BOOKINGS' %}selected{% endif %}>BOOKING PORTAL</option>
+            <option value="CORPORATE" {% if portal_filter == 'CORPORATE' %}selected{% endif %}>CORPORATE PORTAL</option>
+            <option value="REVIEWS" {% if portal_filter == 'REVIEWS' %}selected{% endif %}>REVIEWS PORTAL</option>
+            <option value="AUDIT" {% if portal_filter == 'AUDIT' %}selected{% endif %}>AUDIT TRAIL</option>
+          </select>
+        </div>
+
+        <div class="col-lg-2 col-md-6">
+          <label class="form-label text-gold small fw-bold mb-1"><i class="fas fa-layer-group me-1"></i> Priority</label>
+          <select name="priority" class="form-select form-select-sm bg-dark text-white border-secondary">
+            <option value="ALL" {% if priority_filter == 'ALL' or not priority_filter %}selected{% endif %}>All Priorities</option>
+            <option value="CRITICAL" {% if priority_filter == 'CRITICAL' %}selected{% endif %}>CRITICAL</option>
+            <option value="HIGH" {% if priority_filter == 'HIGH' %}selected{% endif %}>HIGH</option>
+            <option value="MEDIUM" {% if priority_filter == 'MEDIUM' %}selected{% endif %}>MEDIUM</option>
+            <option value="LOW" {% if priority_filter == 'LOW' %}selected{% endif %}>LOW</option>
+          </select>
+        </div>
+
+        <div class="col-lg-2 col-md-6">
+          <label class="form-label text-gold small fw-bold mb-1"><i class="fas fa-info-circle me-1"></i> Status</label>
+          <select name="status" class="form-select form-select-sm bg-dark text-white border-secondary">
+            <option value="ALL" {% if status_filter == 'ALL' or not status_filter %}selected{% endif %}>All Statuses</option>
+            <option value="UNREAD" {% if status_filter == 'UNREAD' %}selected{% endif %}>UNREAD</option>
+            <option value="READ" {% if status_filter == 'READ' %}selected{% endif %}>READ</option>
+            <option value="ACTION_REQUIRED" {% if status_filter == 'ACTION_REQUIRED' %}selected{% endif %}>ACTION REQUIRED</option>
+            <option value="RESOLVED" {% if status_filter == 'RESOLVED' %}selected{% endif %}>RESOLVED</option>
+          </select>
+        </div>
+
+        <div class="col-lg-2 col-md-12 d-flex gap-2">
+          <button type="submit" class="btn btn-sm btn-gold flex-grow-1"><i class="fas fa-filter me-1"></i> Filter</button>
+          <a href="{{ url_for('superadmin_panel.view_notifications') }}" class="btn btn-sm btn-outline-light"><i class="fas fa-sync-alt me-1"></i> Reset</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Master Notifications Table -->
+    <div class="glass-card p-4 border-gold mb-4">
+      <div class="table-responsive">
+        <table class="table table-marriott align-middle">
+          <thead>
+            <tr>
+              <th>Priority &amp; Portal</th>
+              <th>Notification Event &amp; Details</th>
+              <th>Status State</th>
+              <th>Timestamp</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if notifications %}
+              {% for n in notifications %}
+                <tr class="{% if not n.is_read %}bg-gold bg-opacity-10{% endif %}">
+                  <td>
+                    <!-- Priority Badge -->
+                    {% if n.priority == 'CRITICAL' %}
+                      <span class="badge bg-danger text-white font-monospace px-2 py-1 mb-1 d-inline-block"><i class="fas fa-exclamation-triangle me-1"></i> CRITICAL</span>
+                    {% elif n.priority == 'HIGH' %}
+                      <span class="badge bg-warning text-dark font-monospace px-2 py-1 mb-1 d-inline-block"><i class="fas fa-exclamation-circle me-1"></i> HIGH</span>
+                    {% elif n.priority == 'MEDIUM' %}
+                      <span class="badge bg-info text-dark font-monospace px-2 py-1 mb-1 d-inline-block"><i class="fas fa-info-circle me-1"></i> MEDIUM</span>
+                    {% else %}
+                      <span class="badge bg-secondary text-light font-monospace px-2 py-1 mb-1 d-inline-block"><i class="fas fa-bell me-1"></i> LOW</span>
+                    {% endif %}
+
+                    <!-- Portal Source Badge -->
+                    <span class="badge bg-dark border border-secondary text-gold font-monospace d-block text-uppercase py-1" style="max-width: 140px;">
+                      <i class="fas fa-cube me-1"></i> {{ n.portal }}
+                    </span>
+                  </td>
+
+                  <td>
+                    <strong class="text-white d-block fs-6 mb-1">{{ n.title }}</strong>
+                    <p class="small text-light mb-0" style="max-width: 450px;">{{ n.message }}</p>
+                    {% if n.related_type and n.related_id %}
+                      <span class="small text-muted font-monospace opacity-75 mt-1 d-block"><i class="fas fa-link me-1"></i> Related Record: {{ n.related_type }} #{{ n.related_id }}</span>
+                    {% endif %}
+                  </td>
+
+                  <td>
+                    {% if n.status == 'RESOLVED' %}
+                      <span class="badge bg-success px-2 py-1"><i class="fas fa-check-double me-1"></i> RESOLVED</span>
+                    {% elif n.status == 'ACTION_REQUIRED' or n.requires_action %}
+                      <span class="badge bg-danger px-2 py-1"><i class="fas fa-tasks me-1"></i> ACTION REQUIRED</span>
+                    {% elif n.is_read %}
+                      <span class="badge bg-secondary px-2 py-1"><i class="fas fa-envelope-open me-1"></i> READ</span>
+                    {% else %}
+                      <span class="badge bg-warning text-dark px-2 py-1"><i class="fas fa-envelope me-1"></i> UNREAD</span>
+                    {% endif %}
+                  </td>
+
+                  <td>
+                    <span class="small text-muted font-monospace opacity-75">{{ n.created_at.strftime('%b %d, %Y %H:%M') if n.created_at else '' }}</span>
+                  </td>
+
+                  <td class="text-end">
+                    <div class="d-flex justify-content-end gap-1 flex-wrap">
+                      {% if n.action_url %}
+                        <a href="{{ url_for('superadmin_panel.mark_notification_read', notification_id=n.id, redirect_to_action=1) }}" class="btn btn-sm btn-gold py-1 px-2" title="Inspect Record &amp; Mark Read">
+                          <i class="fas fa-external-link-alt me-1"></i> View Record
+                        </a>
+                      {% endif %}
+
+                      {% if not n.is_read %}
+                        <form action="{{ url_for('superadmin_panel.mark_notification_read', notification_id=n.id) }}" method="POST" class="d-inline">
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                          <button type="submit" class="btn btn-sm btn-outline-light py-1 px-2" title="Mark as Read">
+                            <i class="fas fa-check"></i>
+                          </button>
+                        </form>
+                      {% else %}
+                        <form action="{{ url_for('superadmin_panel.mark_notification_unread', notification_id=n.id) }}" method="POST" class="d-inline">
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                          <button type="submit" class="btn btn-sm btn-outline-secondary py-1 px-2" title="Mark as Unread">
+                            <i class="fas fa-envelope"></i>
+                          </button>
+                        </form>
+                      {% endif %}
+
+                      {% if n.requires_action and n.status != 'RESOLVED' %}
+                        <form action="{{ url_for('superadmin_panel.resolve_notification', notification_id=n.id) }}" method="POST" class="d-inline">
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                          <button type="submit" class="btn btn-sm btn-success py-1 px-2" title="Resolve Action Required">
+                            <i class="fas fa-check-double me-1"></i> Resolve
+                          </button>
+                        </form>
+                      {% endif %}
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="5" class="text-center py-5 text-muted">
+                  <i class="fas fa-bell-slash fs-1 d-block mb-3 text-gold opacity-50"></i>
+                  <h5>No notification events found.</h5>
+                  <p class="small mb-0">All system portals are operating smoothly with zero pending alerts.</p>
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Server-Side Pagination -->
+      {% if pagination and pagination.pages > 1 %}
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 pt-3 border-top border-secondary gap-3">
+          <div class="small text-muted">
+            Showing {{ pagination.items|length }} of {{ pagination.total }} total notifications (Page {{ pagination.page }} of {{ pagination.pages }})
+          </div>
+
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+              <a class="page-link bg-dark text-gold border-secondary" href="{{ url_for('superadmin_panel.view_notifications', page=pagination.prev_num, search=search_query, portal=portal_filter, priority=priority_filter, status=status_filter) }}">
+                <i class="fas fa-chevron-left"></i> Previous
+              </a>
+            </li>
+
+            {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+              {% if page_num %}
+                <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                  <a class="page-link {% if page_num == pagination.page %}bg-gold text-dark border-gold fw-bold{% else %}bg-dark text-gold border-secondary{% endif %}" href="{{ url_for('superadmin_panel.view_notifications', page=page_num, search=search_query, portal=portal_filter, priority=priority_filter, status=status_filter) }}">
+                    {{ page_num }}
+                  </a>
+                </li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link bg-dark text-muted border-secondary">...</span></li>
+              {% endif %}
+            {% endfor %}
+
+            <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+              <a class="page-link bg-dark text-gold border-secondary" href="{{ url_for('superadmin_panel.view_notifications', page=pagination.next_num, search=search_query, portal=portal_filter, priority=priority_filter, status=status_filter) }}">
+                Next <i class="fas fa-chevron-right"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

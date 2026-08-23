@@ -1,0 +1,136 @@
+<!-- Privacy-Conscious Cookie & Consent Management Banner -->
+<div id="cookieConsentBanner" class="cookie-consent-banner glass-card border-gold p-4 text-light d-none" role="dialog" aria-label="Privacy & Cookie Consent">
+  <div class="container">
+    <div class="row align-items-center g-3">
+      <div class="col-lg-7">
+        <h6 class="fw-bold text-gold mb-1"><i class="fas fa-cookie-bite me-2"></i> Privacy & Cookie Preferences</h6>
+        <p class="small text-muted mb-0">
+          We use essential cookies to maintain your booking session and security. With your consent, we also use analytics and performance cookies to improve your experience and measure advertising effectiveness.
+        </p>
+      </div>
+      <div class="col-lg-5 text-lg-end">
+        <button type="button" id="btnAcceptAllCookies" class="btn btn-gold btn-sm me-2 fw-bold">
+          <i class="fas fa-check me-1"></i> Accept All
+        </button>
+        <button type="button" id="btnRejectOptionalCookies" class="btn btn-outline-light btn-sm me-2">
+          Necessary Only
+        </button>
+        <button type="button" data-bs-toggle="modal" data-bs-target="#cookiePreferencesModal" class="btn btn-link text-gold btn-sm small text-decoration-none">
+          Manage Preferences
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cookie Preferences Modal -->
+<div class="modal fade" id="cookiePreferencesModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-card text-light border-gold p-3">
+      <div class="modal-header border-secondary">
+        <h5 class="modal-title text-gold"><i class="fas fa-sliders-h me-2"></i> Cookie Preferences</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body small">
+        <div class="mb-3 p-3 bg-dark rounded border border-secondary">
+          <div class="d-flex justify-content-between align-items-center">
+            <strong class="text-white">Strictly Necessary Cookies</strong>
+            <span class="badge bg-gold text-dark">Always Active</span>
+          </div>
+          <p class="text-muted small mb-0 mt-1">Required for authentication, session security, CSRF protection, and apartment booking capability.</p>
+        </div>
+
+        <div class="mb-3 p-3 bg-dark rounded border border-secondary">
+          <div class="d-flex justify-content-between align-items-center">
+            <strong class="text-white">Analytics & Performance Cookies</strong>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="consentAnalyticsCheck">
+            </div>
+          </div>
+          <p class="text-muted small mb-0 mt-1">Allows us to analyze site usage and improve service quality via Google Analytics (anonymized).</p>
+        </div>
+
+        <div class="mb-3 p-3 bg-dark rounded border border-secondary">
+          <div class="d-flex justify-content-between align-items-center">
+            <strong class="text-white">Advertising & Marketing Cookies</strong>
+            <div class="form-check form-switch">
+              <input class="form-check-input" type="checkbox" id="consentAdsCheck">
+            </div>
+          </div>
+          <p class="text-muted small mb-0 mt-1">Used to measure campaign conversions and serve relevant accommodation recommendations.</p>
+        </div>
+      </div>
+      <div class="modal-footer border-secondary">
+        <button type="button" id="btnSaveCookiePreferences" class="btn btn-gold w-100 fw-bold" data-bs-dismiss="modal">
+          Save Preferences
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    'use strict';
+
+    function updateGoogleConsent(analytics, ads) {
+      if (typeof window.gtag === 'function') {
+        window.gtag('consent', 'update', {
+          'analytics_storage': analytics ? 'granted' : 'denied',
+          'ad_storage': ads ? 'granted' : 'denied',
+          'ad_user_data': ads ? 'granted' : 'denied',
+          'ad_personalization': ads ? 'granted' : 'denied'
+        });
+      }
+    }
+
+    function applyConsentState(analytics, ads) {
+      var state = { analytics: !!analytics, ads: !!ads, timestamp: new Date().toISOString() };
+      localStorage.setItem('height_cookie_consent', JSON.stringify(state));
+      updateGoogleConsent(state.analytics, state.ads);
+
+      var banner = document.getElementById('cookieConsentBanner');
+      if (banner) banner.classList.add('d-none');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var saved = localStorage.getItem('height_cookie_consent');
+      if (saved) {
+        try {
+          var parsed = JSON.parse(saved);
+          updateGoogleConsent(parsed.analytics, parsed.ads);
+          var chkAnalytics = document.getElementById('consentAnalyticsCheck');
+          var chkAds = document.getElementById('consentAdsCheck');
+          if (chkAnalytics) chkAnalytics.checked = !!parsed.analytics;
+          if (chkAds) chkAds.checked = !!parsed.ads;
+        } catch(e) {}
+      } else {
+        var banner = document.getElementById('cookieConsentBanner');
+        if (banner) banner.classList.remove('d-none');
+      }
+
+      var btnAcceptAll = document.getElementById('btnAcceptAllCookies');
+      if (btnAcceptAll) {
+        btnAcceptAll.addEventListener('click', function() {
+          applyConsentState(true, true);
+        });
+      }
+
+      var btnReject = document.getElementById('btnRejectOptionalCookies');
+      if (btnReject) {
+        btnReject.addEventListener('click', function() {
+          applyConsentState(false, false);
+        });
+      }
+
+      var btnSave = document.getElementById('btnSaveCookiePreferences');
+      if (btnSave) {
+        btnSave.addEventListener('click', function() {
+          var analyticsVal = document.getElementById('consentAnalyticsCheck').checked;
+          var adsVal = document.getElementById('consentAdsCheck').checked;
+          applyConsentState(analyticsVal, adsVal);
+        });
+      }
+    });
+  })();
+</script>

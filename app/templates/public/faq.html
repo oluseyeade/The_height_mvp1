@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Frequently Asked Questions (FAQ) | The Height Apartment{% endblock %}
+
+{% block content %}
+
+<!-- Hero Banner -->
+<section class="py-5 text-center position-relative" style="background: linear-gradient(180deg, rgba(11,12,16,0.7) 0%, rgba(11,12,16,0.95) 100%), url('https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;">
+  <div class="container py-4">
+    <span class="hero-badge mb-3 d-inline-block"><i class="fas fa-question-circle me-2"></i> HELP &amp; FAQS</span>
+    <h1 class="display-4 fw-bold text-white mb-2">Frequently Asked Questions</h1>
+    <p class="lead text-gold font-heading max-w-700 mx-auto">
+      Find quick answers to common questions about staying at The Height Premium Apartments, Ikeja, Lagos.
+    </p>
+  </div>
+</section>
+
+<!-- FAQ Content -->
+<section class="py-5">
+  <div class="container max-w-900">
+    
+    <div class="accordion accordion-flush" id="faqAccordion">
+      
+      <!-- FAQ 1 -->
+      <div class="accordion-item glass-card mb-3 border-gold rounded-3 overflow-hidden">
+        <h2 class="accordion-header" id="faqHeading1">
+          <button class="accordion-button bg-dark text-gold fw-bold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="false" aria-controls="faqCollapse1">
+            <i class="fas fa-plane-arrival me-2"></i> Where is The Height Apartment located?
+          </button>
+        </h2>
+        <div id="faqCollapse1" class="accordion-collapse collapse" aria-labelledby="faqHeading1" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-light small">
+            We are located at <strong>6 Olorunadaba Street, Off Hassan Oyo Street, Dopemu, Ikeja, Lagos, Nigeria</strong>. We are strategically situated just a short drive from Murtala Muhammed International Airport, making us ideal for corporate travellers, expatriates, and leisure guests.
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ 2 -->
+      <div class="accordion-item glass-card mb-3 border-gold rounded-3 overflow-hidden">
+        <h2 class="accordion-header" id="faqHeading2">
+          <button class="accordion-button bg-dark text-gold fw-bold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+            <i class="fas fa-bolt me-2"></i> Do you guarantee 24/7 electricity and internet?
+          </button>
+        </h2>
+        <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-light small">
+            Yes! We provide 24/7 uninterrupted power with backup soundproof generators and continuous high-speed Starlink Wi-Fi internet across all suites so your work, video calls, and relaxation never stop.
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ 3 -->
+      <div class="accordion-item glass-card mb-3 border-gold rounded-3 overflow-hidden">
+        <h2 class="accordion-header" id="faqHeading3">
+          <button class="accordion-button bg-dark text-gold fw-bold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+            <i class="fas fa-shield-alt me-2"></i> What is the Refundable Caution Fee requirement?
+          </button>
+        </h2>
+        <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-light small">
+            A refundable <strong>₦50,000 caution fee</strong> is included in your total booking payment. This amount is refundable after checkout, subject to inspection of the apartment and compliance with the applicable terms and conditions.
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ 4 -->
+      <div class="accordion-item glass-card mb-3 border-gold rounded-3 overflow-hidden">
+        <h2 class="accordion-header" id="faqHeading4">
+          <button class="accordion-button bg-dark text-gold fw-bold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4" aria-expanded="false" aria-controls="faqCollapse4">
+            <i class="fas fa-building me-2"></i> How do corporate stays and invoicing work?
+          </button>
+        </h2>
+        <div id="faqCollapse4" class="accordion-collapse collapse" aria-labelledby="faqHeading4" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-light small">
+            Corporate clients submit requests on our dedicated <a href="{{ url_for('corporate.corporate_stays') }}" class="text-gold">Corporate Stays</a> page. We provide negotiated volume rates, extended-stay discounts, SCUML-compliant receipts, and dedicated account manager support on WhatsApp (0904 513 5890).
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ 5 -->
+      <div class="accordion-item glass-card mb-3 border-gold rounded-3 overflow-hidden">
+        <h2 class="accordion-header" id="faqHeading5">
+          <button class="accordion-button bg-dark text-gold fw-bold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse5" aria-expanded="false" aria-controls="faqCollapse5">
+            <i class="fas fa-clock me-2"></i> What are your standard check-in and check-out times?
+          </button>
+        </h2>
+        <div id="faqCollapse5" class="accordion-collapse collapse" aria-labelledby="faqHeading5" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-light small">
+            Standard check-in starts at <strong>2:00 PM</strong>, and check-out is by <strong>12:00 PM (Noon)</strong>. Early check-in or late check-out can be requested subject to suite availability.
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ 6 -->
+      <div class="accordion-item glass-card mb-3 border-gold rounded-3 overflow-hidden">
+        <h2 class="accordion-header" id="faqHeading6">
+          <button class="accordion-button bg-dark text-gold fw-bold collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse6" aria-expanded="false" aria-controls="faqCollapse6">
+            <i class="fas fa-ban me-2"></i> What is your cancellation policy?
+          </button>
+        </h2>
+        <div id="faqCollapse6" class="accordion-collapse collapse" aria-labelledby="faqHeading6" data-bs-parent="#faqAccordion">
+          <div class="accordion-body text-light small">
+            We enforce a <strong>Moderate Cancellation Policy</strong>. Full refund for cancellations made up to 5 days before check-in. Cancellations within 5 days forfeit the first night's fee. Full details can be reviewed on our <a href="{{ url_for('public.cancellation_policy') }}" class="text-gold">Cancellation Policy</a> page.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

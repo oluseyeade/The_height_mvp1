@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+
+{% block title %}Onboard New Property | The Height Apartment SuperAdmin{% endblock %}
+
+{% block content %}
+<!-- Include Leaflet CSS & JS for Interactive Location Selection -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<section class="py-5">
+  <div class="container-fluid px-lg-5">
+    
+    <!-- Header Control Bar -->
+    <div class="glass-card p-4 mb-4 border-gold d-flex flex-wrap justify-content-between align-items-center">
+      <div>
+        <span class="badge bg-gold text-dark font-monospace text-uppercase px-3 py-1 mb-1">SUPERADMIN EXECUTIVE ONBOARDING</span>
+        <h2 class="display-6 fw-bold text-white mb-0 font-serif">Add New Luxury Property Listing</h2>
+        <p class="small text-muted mb-0">Configure basic details, address, exact coordinates, rooms, amenities, and unlimited high-res property images.</p>
+      </div>
+      <div class="mt-3 mt-md-0 d-flex gap-2">
+        <a href="{{ url_for('superadmin_panel.dashboard') }}" class="btn btn-outline-light"><i class="fas fa-arrow-left me-1"></i> Dashboard</a>
+      </div>
+    </div>
+
+    <!-- Multi-Section Onboarding Form -->
+    <form action="{{ url_for('superadmin_panel.add_property') }}" method="POST" enctype="multipart/form-data" id="addPropertyForm">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+      <div class="row g-4">
+        
+        <!-- Left Column: Form Sections -->
+        <div class="col-lg-8">
+          
+          <!-- SECTION 1: Basic Property Details -->
+          <div class="glass-card p-4 border-gold mb-4">
+            <h5 class="text-gold font-serif fw-bold mb-3">
+              <i class="fas fa-info-circle me-2"></i> 1. Basic Property Details
+            </h5>
+
+            <div class="row g-3">
+              <div class="col-md-8">
+                <label class="form-label text-gold small fw-bold">Property Title / Suite Name *</label>
+                <input type="text" name="title" class="form-control bg-dark text-white border-secondary" placeholder="e.g. 3-Bedrooms Presidential Suite" required>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label text-gold small fw-bold">Property Category *</label>
+                <select name="category_id" class="form-select bg-dark text-white border-secondary" required>
+                  <option value="">Select Category...</option>
+                  {% for cat in categories %}
+                    <option value="{{ cat.category_id }}">{{ cat.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label text-gold small fw-bold">Detailed Property Description *</label>
+                <textarea name="description" class="form-control bg-dark text-white border-secondary" rows="4" placeholder="Describe the luxury features, layout, view, and unique guest experience..." required></textarea>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label text-gold small fw-bold">Price Per Night (₦) *</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-secondary border-secondary text-gold fw-bold">₦</span>
+                  <input type="number" step="0.01" name="price_per_night" class="form-control bg-dark text-white border-secondary" placeholder="180000.00" required>
+                </div>
+              </div>
+
+              <div class="col-md-2 col-6">
+                <label class="form-label text-gold small fw-bold">Bedrooms</label>
+                <input type="number" name="bedrooms" class="form-control bg-dark text-white border-secondary" value="1" min="1">
+              </div>
+
+              <div class="col-md-2 col-6">
+                <label class="form-label text-gold small fw-bold">Bathrooms</label>
+                <input type="number" name="bathrooms" class="form-control bg-dark text-white border-secondary" value="1" min="1">
+              </div>
+
+              <div class="col-md-2 col-6">
+                <label class="form-label text-gold small fw-bold">Max Occupants</label>
+                <input type="number" name="capacity" class="form-control bg-dark text-white border-secondary" value="2" min="1">
+              </div>
+
+              <div class="col-md-2 col-6">
+                <label class="form-label text-gold small fw-bold">Square Feet</label>
+                <input type="number" name="square_feet" class="form-control bg-dark text-white border-secondary" placeholder="1200">
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 2 & 3: Address & Exact Coordinates (Interactive Map) -->
+          <div class="glass-card p-4 border-gold mb-4">
+            <h5 class="text-gold font-serif fw-bold mb-3">
+              <i class="fas fa-map-marked-alt me-2"></i> 2. Property Address &amp; Exact Map Location
+            </h5>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label text-gold small fw-bold">Street Address</label>
+                <input type="text" name="address" id="propAddress" class="form-control bg-dark text-white border-secondary" placeholder="6 Olorunadaba Street, Off Hassan Oyo Street">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label text-gold small fw-bold">Neighborhood / Area</label>
+                <input type="text" name="neighborhood" id="propArea" class="form-control bg-dark text-white border-secondary" placeholder="Dopemu, Ikeja">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label text-gold small fw-bold">City</label>
+                <input type="text" name="city" class="form-control bg-dark text-white border-secondary" value="Ikeja, Lagos">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label text-gold small fw-bold">State</label>
+                <input type="text" name="state" class="form-control bg-dark text-white border-secondary" value="Lagos State">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label text-gold small fw-bold">Country</label>
+                <input type="text" name="country" class="form-control bg-dark text-white border-secondary" value="Nigeria">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label text-gold small fw-bold">Latitude Coordinates</label>
+                <input type="text" name="latitude" id="propLat" class="form-control bg-dark text-white border-secondary font-monospace" value="6.6125" readonly>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label text-gold small fw-bold">Longitude Coordinates</label>
+                <input type="text" name="longitude" id="propLng" class="form-control bg-dark text-white border-secondary font-monospace" value="3.3150" readonly>
+              </div>
+
+              <!-- Interactive Map Picker -->
+              <div class="col-12 mt-3">
+                <label class="form-label text-gold small fw-bold mb-1"><i class="fas fa-crosshairs me-1"></i> Drag Marker to Pin Exact Location</label>
+                <div id="leafletMapPicker" style="height: 280px; border-radius: 8px; border: 1px solid var(--accent-gold);"></div>
+                <small class="text-muted mt-1 d-block">Click anywhere on the map or drag the pin to automatically set exact latitude and longitude.</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 4: Facilities & Amenities (Font Awesome Selector) -->
+          <div class="glass-card p-4 border-gold mb-4">
+            <h5 class="text-gold font-serif fw-bold mb-3">
+              <i class="fas fa-concierge-bell me-2"></i> 3. Available Facilities &amp; Amenities
+            </h5>
+            <p class="small text-muted mb-3">Select all amenities included with this property listing:</p>
+
+            <div class="row g-3">
+              {% for am in amenities %}
+                <div class="col-md-4 col-6">
+                  <div class="p-2 border border-secondary rounded bg-dark bg-opacity-50 d-flex align-items-center gap-2">
+                    <input class="form-check-input mt-0" type="checkbox" name="amenities" value="{{ am.amenity_id }}" id="amenity{{ am.amenity_id }}">
+                    <label class="form-check-label text-white small cursor-pointer" for="amenity{{ am.amenity_id }}">
+                      <i class="{{ am.icon }} text-gold me-1"></i> {{ am.name }}
+                    </label>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- SECTION 5: Multi-Image Upload & Categorization -->
+          <div class="glass-card p-4 border-gold mb-4">
+            <h5 class="text-gold font-serif fw-bold mb-3">
+              <i class="fas fa-images me-2"></i> 4. Property Images Upload (Unlimited .JPG / .PNG)
+            </h5>
+            <p class="small text-muted mb-3">Select multiple high-resolution photos. Backend enforces file integrity and secure storage isolation.</p>
+
+            <div class="mb-3">
+              <label class="form-label text-gold small fw-bold">Select Image Files *</label>
+              <input type="file" name="images" id="imageInput" class="form-control bg-dark text-white border-secondary" multiple accept=".jpg,.jpeg,.png" onchange="handleImagePreviews(this)">
+            </div>
+
+            <!-- Image Preview Grid -->
+            <div id="imagePreviewContainer" class="row g-3 mt-2">
+              <div class="col-12 text-center text-muted py-3">
+                <i class="fas fa-cloud-upload-alt fs-2 d-block text-gold opacity-50 mb-1"></i>
+                <span class="small">No images selected yet. Choose files above to see live previews.</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Status & Submit Controls -->
+        <div class="col-lg-4">
+          
+          <div class="glass-card p-4 border-gold sticky-top" style="top: 100px;">
+            <h5 class="text-gold font-serif fw-bold mb-3">
+              <i class="fas fa-toggle-on me-2"></i> Status &amp; Onboarding Review
+            </h5>
+
+            <div class="mb-3">
+              <label class="form-label text-gold small fw-bold">Initial Listing Status</label>
+              <select name="status" class="form-select bg-dark text-white border-secondary">
+                <option value="available" selected>Available (Ready for Booking)</option>
+                <option value="unavailable">Unavailable / Maintenance</option>
+                <option value="draft">Draft (Hidden from Frontend)</option>
+              </select>
+            </div>
+
+            <div class="form-check form-switch mb-4">
+              <input class="form-check-input" type="checkbox" name="is_featured" value="1" id="isFeaturedSwitch">
+              <label class="form-check-label text-white fw-bold" for="isFeaturedSwitch">
+                <i class="fas fa-star text-gold me-1"></i> Feature on Homepage
+              </label>
+            </div>
+
+            <hr class="border-secondary my-4">
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-gold btn-lg fw-bold">
+                <i class="fas fa-check-circle me-1"></i> Save &amp; Publish Listing
+              </button>
+              <a href="{{ url_for('superadmin_panel.dashboard') }}" class="btn btn-outline-light">Cancel</a>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Leaflet Map & Preview Script -->
+<script>
+  let map, marker;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Default location: Dopemu, Ikeja (6.6125, 3.3150)
+    const initialLat = 6.6125;
+    const initialLng = 3.3150;
+
+    map = L.map('leafletMapPicker').setView([initialLat, initialLng], 15);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    marker = L.marker([initialLat, initialLng], {draggable: true}).addTo(map);
+
+    marker.on('dragend', function(e) {
+      const latlng = marker.getLatLng();
+      document.getElementById('propLat').value = latlng.lat.toFixed(6);
+      document.getElementById('propLng').value = latlng.lng.toFixed(6);
+    });
+
+    map.on('click', function(e) {
+      marker.setLatLng(e.latlng);
+      document.getElementById('propLat').value = e.latlng.lat.toFixed(6);
+      document.getElementById('propLng').value = e.latlng.lng.toFixed(6);
+    });
+  });
+
+  function handleImagePreviews(input) {
+    const container = document.getElementById('imagePreviewContainer');
+    container.innerHTML = '';
+
+    if (!input.files || input.files.length === 0) {
+      container.innerHTML = '<div class="col-12 text-center text-muted py-3"><span class="small">No images selected.</span></div>';
+      return;
+    }
+
+    Array.from(input.files).forEach((file, index) => {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const col = document.createElement('div');
+        col.className = 'col-md-4 col-6';
+        col.innerHTML = `
+          <div class="card bg-dark border-secondary h-100 text-light overflow-hidden">
+            <img src="${e.target.result}" class="card-img-top" style="height: 110px; object-fit: cover;">
+            <div class="card-body p-2">
+              <div class="form-check mb-1">
+                <input class="form-check-input" type="radio" name="cover_image_index" value="${index}" id="cover${index}" ${index === 0 ? 'checked' : ''}>
+                <label class="form-check-label small text-gold fw-bold" for="cover${index}">Set as Cover</label>
+              </div>
+              <input type="text" name="caption_${index}" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="Caption (e.g. Living Room)">
+            </div>
+          </div>
+        `;
+        container.appendChild(col);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+</script>
+{% endblock %}

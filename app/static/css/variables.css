@@ -1,0 +1,33 @@
+:root {
+  /* Brand Palette - Marriott-Class Luxury Hospitality */
+  --bg-black: #0B0B0B;
+  --bg-charcoal: #161616;
+  --bg-surface: #1E1E1E;
+  --bg-glass: rgba(22, 22, 22, 0.85);
+
+  --text-white: #FFFFFF;
+  --text-light: #E0E0E0;
+  --text-muted: #9E9E9E;
+  --text-gold: #D19828;
+
+  --accent-gold: #D19828;
+  --gold-light: #E5B24D;
+  --gold-dark: #A6731B;
+  --gold-glow: 0 4px 20px rgba(209, 152, 40, 0.25);
+  --gold-gradient: linear-gradient(135deg, #D19828 0%, #E5B24D 50%, #A6731B 100%);
+
+  --border-subtle: rgba(209, 152, 40, 0.2);
+  --border-muted: rgba(255, 255, 255, 0.1);
+
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Inter', 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 50px;
+
+  --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  --shadow-dark: 0 15px 35px rgba(0, 0, 0, 0.6);
+  --shadow-gold: 0 10px 30px rgba(209, 152, 40, 0.2);
+}

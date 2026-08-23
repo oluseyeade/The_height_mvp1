@@ -1,41 +1,48 @@
-# Secrets
+# ==============================================================================
+# Git Ignore Specifications for The Height Application
+# ==============================================================================
+
+# Environment & Secret Files (CRITICAL)
 .env
 .env.*
 !.env.example
 
-# Python
+# Byte-compiled / Python Cache
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
 
-# Virtual environments
+# Virtual Environments
 .venv/
 venv/
 ENV/
 env/
 
-# Local application data
-instance/
-*.db
-*.sqlite
-*.sqlite3
-
-# IDE
+# IDE & OS Metadata
 .vscode/
 .idea/
-
-# OS
 .DS_Store
 Thumbs.db
 
-# Logs
+# Databases & SQLite Files
+*.db
+*.sqlite
+*.sqlite3
+the_height_apartment.db
+instance/
+
+# Application Uploads, Receipts & Generated QR Codes
+app/static/uploads/*
+!app/static/uploads/.gitkeep
+app/static/qrcodes/*
+!app/static/qrcodes/.gitkeep
+
+# System & Application Log Files
 *.log
+logs/
 
-# Build artifacts
-build/
-dist/
-*.egg-info/
-
-# Test/cache
-.pytest_cache/
+# Coverage & Test Output
 .coverage
 htmlcov/
+.pytest_cache/

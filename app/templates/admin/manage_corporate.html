@@ -1,0 +1,448 @@
+{% extends 'base.html' %}
+
+{% block title %}Corporate Booking Requests Management | The Height Apartment{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container-fluid px-lg-5">
+    
+    <!-- Executive Header -->
+    <div class="glass-card p-4 mb-4 border-gold d-flex flex-wrap justify-content-between align-items-center">
+      <div>
+        <span class="badge bg-gold text-dark font-monospace text-uppercase px-3 py-1 mb-1">CORPORATE ACCOUNTS PORTAL</span>
+        <h2 class="display-6 fw-bold text-white mb-0 font-serif">Corporate Booking Request Management</h2>
+        <p class="small text-muted mb-0">Centralized Oversight for Corporate Stays, Quotations, Approvals, Assignments &amp; Verified Conversions</p>
+      </div>
+      <div class="mt-3 mt-md-0 d-flex gap-2">
+        <a href="{{ url_for('admin_panel.export_corporate') }}" class="btn btn-outline-gold"><i class="fas fa-file-csv me-1"></i> Export CSV</a>
+        <a href="{{ url_for('admin_panel.manage_bookings') }}" class="btn btn-outline-gold"><i class="fas fa-calendar-check me-1"></i> Bookings Portal</a>
+        <a href="{{ url_for('admin_panel.dashboard') }}" class="btn btn-gold"><i class="fas fa-arrow-left me-1"></i> Dashboard</a>
+      </div>
+    </div>
+
+    <!-- KPI Metric Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-gold">
+          <i class="fas fa-briefcase text-gold fs-3 mb-1"></i>
+          <div class="small text-muted text-uppercase fw-bold">Total Requests</div>
+          <h4 class="fw-bold text-white font-serif mb-0">{{ metrics.total_requests }}</h4>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-gold">
+          <i class="fas fa-bell text-warning fs-3 mb-1"></i>
+          <div class="small text-muted text-uppercase fw-bold">New Requests</div>
+          <h4 class="fw-bold text-warning font-serif mb-0">{{ metrics.new_requests }}</h4>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-gold">
+          <i class="fas fa-file-invoice-dollar text-info fs-3 mb-1"></i>
+          <div class="small text-muted text-uppercase fw-bold">Quoted &amp; In Review</div>
+          <h4 class="fw-bold text-info font-serif mb-0">{{ metrics.under_review }}</h4>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-gold">
+          <i class="fas fa-coins text-success fs-3 mb-1"></i>
+          <div class="small text-muted text-uppercase fw-bold">Corporate Revenue</div>
+          <h4 class="fw-bold text-success font-monospace mb-0">₦{{ "{:,.2f}".format(metrics.total_revenue) }}</h4>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter & Search Controls -->
+    <div class="glass-card p-4 border-gold mb-4">
+      <form action="{{ url_for('admin_panel.manage_corporate') }}" method="GET" class="row g-3 align-items-end">
+        <div class="col-lg-4 col-md-6">
+          <label class="form-label text-gold small fw-bold mb-1"><i class="fas fa-search me-1"></i> Search Keyword</label>
+          <input type="text" name="search" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="Company, contact person, email, phone..." value="{{ search_query }}">
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+          <label class="form-label text-gold small fw-bold mb-1"><i class="fas fa-filter me-1"></i> Request Status</label>
+          <select name="status" class="form-select form-select-sm bg-dark text-white border-secondary">
+            <option value="all" {% if status_filter == 'all' or not status_filter %}selected{% endif %}>All Request Statuses</option>
+            <option value="new" {% if status_filter == 'new' %}selected{% endif %}>New Request</option>
+            <option value="under_review" {% if status_filter == 'under_review' %}selected{% endif %}>Under Review</option>
+            <option value="quotation_sent" {% if status_filter == 'quotation_sent' %}selected{% endif %}>Quotation Sent</option>
+            <option value="awaiting_payment" {% if status_filter == 'awaiting_payment' %}selected{% endif %}>Awaiting Payment</option>
+            <option value="confirmed" {% if status_filter == 'confirmed' %}selected{% endif %}>Reservation Confirmed</option>
+            <option value="completed" {% if status_filter == 'completed' %}selected{% endif %}>Completed</option>
+            <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+            <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+          </select>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+          <label class="form-label text-gold small fw-bold mb-1"><i class="fas fa-user-shield me-1"></i> Assigned Admin</label>
+          <select name="assigned_to" class="form-select form-select-sm bg-dark text-white border-secondary">
+            <option value="">All Admins</option>
+            {% for adm in admins %}
+              <option value="{{ adm.user_id }}" {% if assigned_filter == adm.user_id %}selected{% endif %}>{{ adm.full_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-lg-2 col-md-6 d-flex gap-2">
+          <button type="submit" class="btn btn-sm btn-gold flex-grow-1"><i class="fas fa-filter me-1"></i> Filter</button>
+          <a href="{{ url_for('admin_panel.manage_corporate') }}" class="btn btn-sm btn-outline-light"><i class="fas fa-sync-alt me-1"></i> Reset</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Master Corporate Requests Table -->
+    <div class="glass-card p-4 border-gold mb-4">
+      <div class="table-responsive">
+        <table class="table table-marriott align-middle">
+          <thead>
+            <tr>
+              <th>Request ID &amp; Date</th>
+              <th>Company &amp; Contact</th>
+              <th>Stay Requirements</th>
+              <th>Quotation &amp; Amounts</th>
+              <th>Assigned Admin</th>
+              <th>Request Status</th>
+              <th>Payment Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if enquiries %}
+              {% for e in enquiries %}
+                {% set num_nights = (e.check_out - e.check_in).days if e.check_in and e.check_out else 1 %}
+                <tr>
+                  <td>
+                    <strong class="text-gold font-monospace d-block">CORP-{{ e.enquiry_id }}</strong>
+                    <span class="small text-muted opacity-75">{{ e.created_at.strftime('%b %d, %Y %H:%M') if e.created_at else '' }}</span>
+                  </td>
+
+                  <td>
+                    <strong class="text-white d-block">{{ e.company_name }}</strong>
+                    <span class="small text-gold d-block"><i class="fas fa-user me-1"></i> {{ e.contact_person }}</span>
+                    <span class="small text-muted d-block"><i class="fas fa-envelope me-1"></i> {{ e.email }}</span>
+                    <span class="small text-muted d-block"><i class="fas fa-phone me-1"></i> {{ e.phone }}</span>
+                  </td>
+
+                  <td>
+                    <span class="d-block text-light small"><i class="fas fa-sign-in-alt text-success me-1"></i> {{ e.check_in.strftime('%d %b %Y') if e.check_in else '' }}</span>
+                    <span class="d-block text-light small"><i class="fas fa-sign-out-alt text-danger me-1"></i> {{ e.check_out.strftime('%d %b %Y') if e.check_out else '' }}</span>
+                    <span class="badge bg-secondary font-monospace mt-1">{{ num_nights }} Night(s)</span>
+                    <span class="badge bg-dark border border-secondary text-gold font-monospace ms-1">{{ e.suite_count or 1 }} Suite(s) / {{ e.guest_count or 1 }} Guest(s)</span>
+                  </td>
+
+                  <td>
+                    <strong class="text-gold font-monospace d-block">₦{{ "{:,.2f}".format(e.quoted_amount or 0.00) }}</strong>
+                    <span class="small text-info d-block">Caution: ₦{{ "{:,.2f}".format(e.caution_fee or 50000.00) }}</span>
+                    {% if e.quotes %}
+                      <span class="badge bg-info text-dark font-monospace mt-1"><i class="fas fa-file-invoice me-1"></i> Quote Sent</span>
+                    {% endif %}
+                  </td>
+
+                  <td>
+                    {% if e.assigned_admin %}
+                      <span class="badge bg-secondary text-light font-monospace"><i class="fas fa-user-shield me-1"></i> {{ e.assigned_admin.full_name }}</span>
+                    {% else %}
+                      <span class="badge bg-warning text-dark font-monospace"><i class="fas fa-exclamation-circle me-1"></i> Unassigned</span>
+                    {% endif %}
+                  </td>
+
+                  <td>
+                    {% if e.status == 'new' %}
+                      <span class="badge bg-warning text-dark px-2 py-1"><i class="fas fa-bell me-1"></i> New Request</span>
+                    {% elif e.status == 'under_review' %}
+                      <span class="badge bg-info text-dark px-2 py-1"><i class="fas fa-search me-1"></i> Under Review</span>
+                    {% elif e.status == 'quotation_sent' %}
+                      <span class="badge bg-primary text-white px-2 py-1"><i class="fas fa-paper-plane me-1"></i> Quotation Sent</span>
+                    {% elif e.status == 'awaiting_payment' %}
+                      <span class="badge bg-warning text-dark px-2 py-1"><i class="fas fa-clock me-1"></i> Awaiting Payment</span>
+                    {% elif e.status in ['confirmed', 'approved'] %}
+                      <span class="badge bg-success text-white px-2 py-1"><i class="fas fa-check me-1"></i> Confirmed</span>
+                    {% elif e.status in ['completed', 'checked_out'] %}
+                      <span class="badge bg-success text-white px-2 py-1"><i class="fas fa-check-double me-1"></i> Completed</span>
+                    {% elif e.status == 'rejected' %}
+                      <span class="badge bg-danger text-white px-2 py-1"><i class="fas fa-times me-1"></i> Rejected</span>
+                    {% elif e.status == 'cancelled' %}
+                      <span class="badge bg-danger text-white px-2 py-1"><i class="fas fa-ban me-1"></i> Cancelled</span>
+                    {% else %}
+                      <span class="badge bg-secondary px-2 py-1">{{ e.status }}</span>
+                    {% endif %}
+                  </td>
+
+                  <td>
+                    {% if e.payment_status in ['VERIFIED', 'PAID', 'verified'] %}
+                      <span class="badge bg-success font-monospace px-2 py-1"><i class="fas fa-check-circle me-1"></i> Verified</span>
+                    {% else %}
+                      <span class="badge bg-warning text-dark font-monospace px-2 py-1"><i class="fas fa-hourglass-half me-1"></i> Pending</span>
+                    {% endif %}
+                  </td>
+
+                  <td class="text-end">
+                    <div class="dropdown">
+                      <button class="btn btn-sm btn-gold dropdown-toggle py-1 px-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Actions
+                      </button>
+                      <ul class="dropdown-menu dropdown-menu-end bg-dark border-gold shadow">
+                        <li>
+                          <button class="dropdown-item text-light" type="button" data-bs-toggle="modal" data-bs-target="#viewCorporateModal{{ e.enquiry_id }}">
+                            <i class="fas fa-eye text-gold me-2"></i> View Details
+                          </button>
+                        </li>
+
+                        <li>
+                          <button class="dropdown-item text-light" type="button" data-bs-toggle="modal" data-bs-target="#sendQuoteModal{{ e.enquiry_id }}">
+                            <i class="fas fa-file-invoice text-info me-2"></i> Send Quotation
+                          </button>
+                        </li>
+
+                        <li>
+                          <button class="dropdown-item text-light" type="button" data-bs-toggle="modal" data-bs-target="#assignAdminModal{{ e.enquiry_id }}">
+                            <i class="fas fa-user-plus text-warning me-2"></i> Assign Admin
+                          </button>
+                        </li>
+
+                        <li><hr class="dropdown-divider border-secondary"></li>
+
+                        <!-- Status Workflow Actions -->
+                        {% if e.status != 'confirmed' %}
+                          <li>
+                            <button class="dropdown-item text-success" type="button" data-bs-toggle="modal" data-bs-target="#convertBookingModal{{ e.enquiry_id }}">
+                              <i class="fas fa-check-circle me-2"></i> Confirm &amp; Reserve Suite
+                            </button>
+                          </li>
+                        {% endif %}
+
+                        {% if e.status != 'rejected' %}
+                          <li>
+                            <form action="{{ url_for('admin_panel.update_corporate_status', enquiry_id=e.enquiry_id) }}" method="POST" onsubmit="return confirm('Reject this corporate booking request?');">
+                              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                              <input type="hidden" name="status" value="rejected">
+                              <button type="submit" class="dropdown-item text-danger"><i class="fas fa-times-circle me-2"></i> Reject Request</button>
+                            </form>
+                          </li>
+                        {% endif %}
+
+                      </ul>
+                    </div>
+
+                    <!-- Modal 1: View Corporate Details -->
+                    <div class="modal fade text-start" id="viewCorporateModal{{ e.enquiry_id }}" tabindex="-1" aria-hidden="true">
+                      <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content bg-dark border-gold text-light">
+                          <div class="modal-header border-secondary">
+                            <h5 class="modal-title font-serif text-gold"><i class="fas fa-briefcase me-2"></i> Corporate Request Audit Details: CORP-{{ e.enquiry_id }}</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="row g-3">
+                              <div class="col-md-6">
+                                <h6 class="text-gold fw-bold font-monospace border-bottom border-secondary pb-1">Company &amp; Contact Info</h6>
+                                <p class="mb-1"><strong>Company Name:</strong> {{ e.company_name }}</p>
+                                <p class="mb-1"><strong>Contact Person:</strong> {{ e.contact_person }}</p>
+                                <p class="mb-1"><strong>Email:</strong> {{ e.email }}</p>
+                                <p class="mb-1"><strong>Phone:</strong> {{ e.phone }}</p>
+                                <p class="mb-1"><strong>Budget Range:</strong> {{ e.budget_range or 'Standard Luxury Rate' }}</p>
+                              </div>
+
+                              <div class="col-md-6">
+                                <h6 class="text-gold fw-bold font-monospace border-bottom border-secondary pb-1">Stay Requirements</h6>
+                                <p class="mb-1"><strong>Check-in:</strong> {{ e.check_in.strftime('%A, %d %B %Y') if e.check_in else '' }}</p>
+                                <p class="mb-1"><strong>Check-out:</strong> {{ e.check_out.strftime('%A, %d %B %Y') if e.check_out else '' }}</p>
+                                <p class="mb-1"><strong>Duration:</strong> {{ num_nights }} Night(s)</p>
+                                <p class="mb-1"><strong>Suites / Guests:</strong> {{ e.suite_count or 1 }} Suite(s) for {{ e.guest_count or 1 }} Guest(s)</p>
+                                <p class="mb-1"><strong>Assigned Admin:</strong> {{ e.assigned_admin.full_name if e.assigned_admin else 'Unassigned' }}</p>
+                              </div>
+
+                              <div class="col-12"><hr class="border-secondary my-2"></div>
+
+                              <div class="col-md-6">
+                                <h6 class="text-gold fw-bold font-monospace border-bottom border-secondary pb-1">Quotation &amp; Financials</h6>
+                                <p class="mb-1"><strong>Quoted Room Rate:</strong> ₦{{ "{:,.2f}".format(e.quoted_amount or 0.00) }}</p>
+                                <p class="mb-1 text-warning"><strong>Caution Fee:</strong> ₦{{ "{:,.2f}".format(e.caution_fee or 50000.00) }}</p>
+                                <p class="mb-1 fs-5 font-monospace text-gold fw-bold"><strong>Total Value:</strong> ₦{{ "{:,.2f}".format(e.total_amount or (e.quoted_amount + e.caution_fee)) }}</p>
+                              </div>
+
+                              <div class="col-md-6">
+                                <h6 class="text-gold fw-bold font-monospace border-bottom border-secondary pb-1">Status &amp; Verification</h6>
+                                <p class="mb-1"><strong>Workflow Status:</strong> <span class="badge bg-gold text-dark">{{ e.status }}</span></p>
+                                <p class="mb-1"><strong>Payment Status:</strong> {{ e.payment_status }}</p>
+                                <p class="mb-1"><strong>Submitted Date:</strong> {{ e.created_at.strftime('%Y-%m-%d %H:%M:%S') if e.created_at else '' }}</p>
+                              </div>
+
+                              {% if e.special_requests %}
+                                <div class="col-12">
+                                  <h6 class="text-gold fw-bold font-monospace mb-1">Corporate Special Requests</h6>
+                                  <div class="p-2 bg-secondary bg-opacity-20 rounded border border-secondary text-light small">{{ e.special_requests }}</div>
+                                </div>
+                              {% endif %}
+                            </div>
+                          </div>
+                          <div class="modal-footer border-secondary">
+                            <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Modal 2: Send Quotation -->
+                    <div class="modal fade text-start" id="sendQuoteModal{{ e.enquiry_id }}" tabindex="-1" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content bg-dark border-gold text-light">
+                          <form action="{{ url_for('admin_panel.send_corporate_quote', enquiry_id=e.enquiry_id) }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="modal-header border-secondary">
+                              <h5 class="modal-title font-serif text-gold"><i class="fas fa-file-invoice me-2"></i> Generate Corporate Quotation: CORP-{{ e.enquiry_id }}</h5>
+                              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <div class="mb-3">
+                                <label class="form-label text-gold small fw-bold">Room Rate Amount (NGN)</label>
+                                <input type="number" step="0.01" name="amount" class="form-control bg-dark text-white border-secondary" required value="{{ e.quoted_amount or 180000.00 }}">
+                              </div>
+                              <div class="mb-3">
+                                <label class="form-label text-gold small fw-bold">Corporate Discount (NGN)</label>
+                                <input type="number" step="0.01" name="discount" class="form-control bg-dark text-white border-secondary" value="0.00">
+                              </div>
+                              <div class="mb-3">
+                                <label class="form-label text-gold small fw-bold">Room / Suite Category</label>
+                                <input type="text" name="room_type" class="form-control bg-dark text-white border-secondary" value="3-Bedrooms Premium Suite">
+                              </div>
+                              <div class="mb-3">
+                                <label class="form-label text-gold small fw-bold">Quote Validity (Days)</label>
+                                <input type="number" name="valid_days" class="form-control bg-dark text-white border-secondary" value="7">
+                              </div>
+                              <div class="mb-3">
+                                <label class="form-label text-gold small fw-bold">Payment &amp; Stay Terms</label>
+                                <textarea name="terms" class="form-control bg-dark text-white border-secondary" rows="2">Full payment required 48h prior to check-in. Includes 24/7 Power Guarantee, Starlink Wi-Fi &amp; Airport Transfer.</textarea>
+                              </div>
+                            </div>
+                            <div class="modal-footer border-secondary">
+                              <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                              <button type="submit" class="btn btn-gold"><i class="fas fa-paper-plane me-1"></i> Send Quotation</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Modal 3: Assign Admin -->
+                    <div class="modal fade text-start" id="assignAdminModal{{ e.enquiry_id }}" tabindex="-1" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content bg-dark border-gold text-light">
+                          <form action="{{ url_for('admin_panel.assign_corporate', enquiry_id=e.enquiry_id) }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="modal-header border-secondary">
+                              <h5 class="modal-title font-serif text-gold"><i class="fas fa-user-plus me-2"></i> Assign Corporate Request: CORP-{{ e.enquiry_id }}</h5>
+                              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <label class="form-label text-gold small fw-bold">Select Assignee Admin</label>
+                              <select name="admin_id" class="form-select bg-dark text-white border-secondary" required>
+                                <option value="">Select Admin User...</option>
+                                {% for adm in admins %}
+                                  <option value="{{ adm.user_id }}" {% if e.assigned_to == adm.user_id %}selected{% endif %}>{{ adm.full_name }} ({{ adm.email }})</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                            <div class="modal-footer border-secondary">
+                              <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                              <button type="submit" class="btn btn-gold">Assign Request</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Modal 4: Convert to Confirmed Booking -->
+                    <div class="modal fade text-start" id="convertBookingModal{{ e.enquiry_id }}" tabindex="-1" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content bg-dark border-gold text-light">
+                          <form action="{{ url_for('admin_panel.convert_corporate_booking', enquiry_id=e.enquiry_id) }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="modal-header border-secondary">
+                              <h5 class="modal-title font-serif text-gold"><i class="fas fa-check-circle me-2"></i> Confirm Reservation &amp; Reserve Suite: CORP-{{ e.enquiry_id }}</h5>
+                              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <div class="mb-3">
+                                <label class="form-label text-gold small fw-bold">Assign Primary Suite</label>
+                                <select name="apartment_id" class="form-select bg-dark text-white border-secondary" required>
+                                  {% for apt in apartments %}
+                                    <option value="{{ apt.apartment_id }}">{{ apt.title }} (₦{{ "{:,.2f}".format(apt.price_per_night) }}/night)</option>
+                                  {% endfor %}
+                                </select>
+                              </div>
+                              <div class="mb-3">
+                                <label class="form-label text-gold small fw-bold">Verified Payment / Paystack Reference</label>
+                                <input type="text" name="payment_reference" class="form-control bg-dark text-white border-secondary" placeholder="e.g. PAY-CORP-GTB123456" required>
+                              </div>
+                              <p class="small text-muted mb-0"><i class="fas fa-info-circle text-info me-1"></i> Converting this request will automatically reserve calendar dates, create a verified payment, and generate a branded receipt.</p>
+                            </div>
+                            <div class="modal-footer border-secondary">
+                              <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                              <button type="submit" class="btn btn-success"><i class="fas fa-check me-1"></i> Confirm &amp; Reserve Suite</button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="8" class="text-center py-5 text-muted">
+                  <i class="fas fa-folder-open fs-1 d-block mb-3 text-gold opacity-50"></i>
+                  <h5>No corporate booking requests found.</h5>
+                  <p class="small mb-0">Try resetting filters or searching with different keywords.</p>
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Server-Side Pagination -->
+      {% if pagination and pagination.pages > 1 %}
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 pt-3 border-top border-secondary gap-3">
+          <div class="small text-muted">
+            Showing {{ pagination.items|length }} of {{ pagination.total }} total corporate requests (Page {{ pagination.page }} of {{ pagination.pages }})
+          </div>
+
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+              <a class="page-link bg-dark text-gold border-secondary" href="{{ url_for('admin_panel.manage_corporate', page=pagination.prev_num, search=search_query, status=status_filter, assigned_to=assigned_filter) }}">
+                <i class="fas fa-chevron-left"></i> Previous
+              </a>
+            </li>
+
+            {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+              {% if page_num %}
+                <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                  <a class="page-link {% if page_num == pagination.page %}bg-gold text-dark border-gold fw-bold{% else %}bg-dark text-gold border-secondary{% endif %}" href="{{ url_for('admin_panel.manage_corporate', page=page_num, search=search_query, status=status_filter, assigned_to=assigned_filter) }}">
+                    {{ page_num }}
+                  </a>
+                </li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link bg-dark text-muted border-secondary">...</span></li>
+              {% endif %}
+            {% endfor %}
+
+            <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+              <a class="page-link bg-dark text-gold border-secondary" href="{{ url_for('admin_panel.manage_corporate', page=pagination.next_num, search=search_query, status=status_filter, assigned_to=assigned_filter) }}">
+                Next <i class="fas fa-chevron-right"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

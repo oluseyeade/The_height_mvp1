@@ -1,0 +1,35 @@
+# Environment & Secret files
+.env
+.env.*
+!.env.example
+
+# Git repository
+.git
+.gitignore
+.github
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Local development / temporary files
+scratch/
+*.log
+instance/
+.vscode/
+.idea/
+
+# Local uploaded files / media
+app/static/uploads/*
+!app/static/uploads/**/.gitkeep
+app/static/qrcodes/*
+!app/static/qrcodes/**/.gitkeep

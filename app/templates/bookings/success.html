@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Payment Successful — Reservation Confirmed | The Height Apartment{% endblock %}
+
+{% block content %}
+<section class="py-5 bg-dark text-white font-sans min-vh-100 d-flex align-items-center">
+  <div class="container py-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center">
+        
+        <!-- Animated Success Badge -->
+        <div class="mb-4">
+          <div class="d-inline-flex align-items-center justify-content-center bg-gold text-dark rounded-circle shadow-lg" style="width: 90px; height: 90px;">
+            <i class="fas fa-check-circle fs-1"></i>
+          </div>
+        </div>
+
+        <h2 class="fw-bold text-white mb-2 font-serif">Payment Successful &amp; Reservation Confirmed</h2>
+        <p class="text-gold lead mb-4">Your payment has been successfully verified. Your reservation is now fully confirmed!</p>
+
+        <!-- Detailed Booking Confirmation Card -->
+        <div class="glass-card p-4 p-md-5 border-gold text-start mb-4 shadow-lg rounded-3">
+          <div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom border-secondary">
+            <div>
+              <div class="small text-muted text-uppercase fw-bold">Booking Reference</div>
+              <div class="font-monospace fs-4 fw-bold text-gold">{{ booking.booking_ref }}</div>
+            </div>
+            <span class="badge bg-success px-3 py-2 text-uppercase fs-6">CONFIRMED</span>
+          </div>
+
+          <div class="row g-4 mb-4">
+            <div class="col-md-6">
+              <div class="small text-muted text-uppercase">Reserved Apartment</div>
+              <div class="fw-bold text-white fs-5">{{ booking.apartment.title if booking.apartment else 'Premium Suite' }}</div>
+            </div>
+            <div class="col-md-6">
+              <div class="small text-muted text-uppercase">Primary Guest</div>
+              <div class="fw-bold text-white fs-5">{{ booking.guest_name or 'Guest' }}</div>
+            </div>
+            <div class="col-md-4 col-6">
+              <div class="small text-muted text-uppercase">Check-In Date</div>
+              <div class="fw-bold text-gold font-monospace">{{ booking.check_in.strftime('%d %b %Y') }}</div>
+            </div>
+            <div class="col-md-4 col-6">
+              <div class="small text-muted text-uppercase">Check-Out Date</div>
+              <div class="fw-bold text-gold font-monospace">{{ booking.check_out.strftime('%d %b %Y') }}</div>
+            </div>
+            <div class="col-md-4 col-6">
+              <div class="small text-muted text-uppercase">Total Guests</div>
+              <div class="fw-bold text-white">{{ booking.guest_count }} Guest(s)</div>
+            </div>
+            <div class="col-md-4 col-6">
+              <div class="small text-muted text-uppercase">Apartment Amount</div>
+              <div class="fw-bold text-white font-monospace">₦{{ "{:,.2f}".format(apt_booking_amount) }}</div>
+            </div>
+            <div class="col-md-4 col-6">
+              <div class="small text-muted text-uppercase">Caution Fee</div>
+              <div class="fw-bold text-gold font-monospace">₦{{ "{:,.2f}".format(caution_fee) }}</div>
+            </div>
+            <div class="col-md-4 col-12">
+              <div class="small text-muted text-uppercase">Total Paid</div>
+              <div class="fw-bold text-gold font-monospace fs-5">₦{{ "{:,.2f}".format(total_paid) }}</div>
+            </div>
+          </div>
+
+          <!-- Refundable Caution Fee Notice -->
+          <div class="alert bg-dark border-gold text-light small mb-0">
+            <i class="fas fa-shield-alt text-gold me-2"></i>
+            <strong>Refundable Caution Fee:</strong> A refundable ₦50,000 caution fee is included in your total booking payment. This amount is refundable after checkout, subject to inspection of the apartment and compliance with applicable terms &amp; conditions.
+          </div>
+        </div>
+
+        <!-- Quick Action Buttons -->
+        <div class="row g-3 justify-content-center">
+          <div class="col-md-3 col-6">
+            <a href="{{ url_for('bookings.detail', booking_ref=booking.booking_ref) }}" class="btn btn-gold w-100 py-3 fw-bold">
+              <i class="fas fa-eye me-2"></i> View Booking
+            </a>
+          </div>
+          {% if receipt %}
+            <div class="col-md-3 col-6">
+              <a href="{{ url_for('receipts.view_receipt', receipt_number=receipt.receipt_number) }}" class="btn btn-outline-gold w-100 py-3 fw-bold">
+                <i class="fas fa-receipt me-2"></i> Receipt
+              </a>
+            </div>
+          {% endif %}
+          <div class="col-md-3 col-6">
+            <a href="https://www.google.com/maps/search/?api=1&query=The+Height+Apartment+Lagos" target="_blank" class="btn btn-outline-gold w-100 py-3 fw-bold">
+              <i class="fas fa-map-marker-alt me-2"></i> Directions
+            </a>
+          </div>
+          <div class="col-md-3 col-6">
+            <a href="{{ url_for('public.index') }}" class="btn btn-dark border-secondary text-light w-100 py-3 fw-bold">
+              <i class="fas fa-home me-2"></i> Return Home
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

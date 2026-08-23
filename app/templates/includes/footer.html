@@ -1,0 +1,79 @@
+<footer class="footer-marriott text-white">
+  <div class="container">
+    <div class="row g-5">
+      
+      <!-- Company / Info Column -->
+      <div class="col-lg-3 col-md-6">
+        <a class="navbar-brand text-decoration-none d-inline-block mb-3" href="{{ url_for('public.index') }}">
+          <img src="{{ url_for('static', filename='images/Brandlogo.png') }}" alt="The Height Premium Apartments" class="img-fluid mb-3" style="height: 60px; object-fit: contain;">
+        </a>
+        <p class="small text-white mb-3 opacity-90">
+          Boutique collection of luxury serviced apartments in Ikeja, Lagos — crafted for corporate executives, project teams, and travelers expecting Booking.com-class excellence.
+        </p>
+        <p class="small text-gold font-monospace mb-0">
+          <i class="fas fa-shield-alt text-gold me-1"></i> CAC BN7684830 | SCUML Registered
+        </p>
+      </div>
+
+      <!-- About Section -->
+      <div class="col-lg-2 col-6">
+        <h6 class="text-gold font-serif fw-bold text-uppercase tracking-wider mb-3">About</h6>
+        <ul class="list-unstyled small">
+          <li class="mb-2"><a href="{{ url_for('public.index') }}#about" class="text-white text-decoration-none">About Us</a></li>
+          <li class="mb-2"><a href="{{ url_for('public.index') }}#story" class="text-white text-decoration-none">Our Story</a></li>
+          <li class="mb-2"><a href="{{ url_for('public.index') }}#mission" class="text-white text-decoration-none">Mission</a></li>
+          <li class="mb-2"><a href="{{ url_for('public.index') }}#vision" class="text-white text-decoration-none">Vision</a></li>
+          <li class="mb-2"><a href="{{ url_for('public.index') }}#why-us" class="text-white text-decoration-none">Why Choose Us</a></li>
+        </ul>
+      </div>
+
+      <!-- Corporate Section -->
+      <div class="col-lg-2 col-6">
+        <h6 class="text-gold font-serif fw-bold text-uppercase tracking-wider mb-3">Corporate</h6>
+        <ul class="list-unstyled small">
+          <li class="mb-2"><a href="{{ url_for('corporate.corporate_stays') }}" class="text-white text-decoration-none">Corporate Stays</a></li>
+          <li class="mb-2"><a href="{{ url_for('corporate.corporate_stays') }}#corporate-form" class="text-white text-decoration-none">Corporate Partnership</a></li>
+          <li class="mb-2"><a href="{{ url_for('corporate.corporate_stays') }}#corporate-form" class="text-white text-decoration-none">Corporate Booking</a></li>
+          <li class="mb-2"><a href="{{ url_for('public.cancellation_policy') }}" class="text-white text-decoration-none">Corporate Policies</a></li>
+        </ul>
+      </div>
+
+      <!-- Support Section -->
+      <div class="col-lg-2 col-6">
+        <h6 class="text-gold font-serif fw-bold text-uppercase tracking-wider mb-3">Support</h6>
+        <ul class="list-unstyled small">
+          <li class="mb-2"><a href="{{ url_for('public.faq') }}" class="text-white text-decoration-none">FAQ</a></li>
+          <li class="mb-2"><a href="{{ url_for('public.contact') }}#ndpr" class="text-white text-decoration-none">Privacy Policy</a></li>
+          <li class="mb-2"><a href="{{ url_for('public.cancellation_policy') }}" class="text-white text-decoration-none">Terms &amp; Conditions</a></li>
+          <li class="mb-2"><a href="{{ url_for('public.house_rules') }}" class="text-white text-decoration-none">House Rules</a></li>
+          <li class="mb-2"><a href="{{ url_for('public.contact') }}" class="text-white text-decoration-none">Help Desk</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact & Social Column -->
+      <div class="col-lg-3 col-md-6">
+        <h6 class="text-gold font-serif fw-bold text-uppercase tracking-wider mb-3">Contact &amp; Connect</h6>
+        <p class="small text-white mb-2"><i class="fas fa-map-marker-alt text-gold me-2"></i> 6 Olorunadaba Street, Off Hassan Oyo Street, Dopemu, Ikeja, Lagos</p>
+        <p class="small text-white mb-2"><i class="fas fa-phone text-gold me-2"></i> <a href="tel:+2349045135890" class="text-white text-decoration-none">0904 513 5890</a></p>
+        <p class="small text-white mb-3"><i class="fas fa-envelope text-gold me-2"></i> theheightapartments@icloud.com</p>
+
+        <div class="d-flex gap-3 mt-3">
+          <a href="https://instagram.com/TheHeightApts" target="_blank" class="text-gold fs-5" title="Instagram @TheHeightApts"><i class="fab fa-instagram"></i></a>
+          <a href="https://facebook.com/TheHeightApts" target="_blank" class="text-gold fs-5" title="Facebook @TheHeightApts"><i class="fab fa-facebook-f"></i></a>
+          <a href="https://tiktok.com/@TheHeightApts" target="_blank" class="text-gold fs-5" title="TikTok @TheHeightApts"><i class="fab fa-tiktok"></i></a>
+          <a href="https://wa.me/2349045135890" target="_blank" class="text-gold fs-5" title="WhatsApp Us"><i class="fab fa-whatsapp"></i></a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Gold Divider Line -->
+    <div class="footer-divider"></div>
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small text-white">
+      <div class="text-gold">&copy; 2026 The Height Apartment. All rights reserved. (CAC BN7684830)</div>
+      <div class="mt-2 mt-md-0 font-monospace text-gold">#StayTheHeight | Dopemu, Ikeja, Lagos</div>
+    </div>
+
+  </div>
+</footer>

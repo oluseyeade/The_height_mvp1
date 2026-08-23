@@ -1,17 +1,36 @@
 FROM python:3.12-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-	PYTHONUNBUFFERED=1 \
-	PORT=5050
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    FLASK_ENV=production \
+    FLASK_CONFIG=production
 
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    gcc \
+    libmariadb-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN groupadd -g 10001 appgroup && \
+    useradd -u 10001 -g appgroup -s /bin/bash -m appuser
+
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip \
-	&& pip install --no-cache-dir -r requirements.txt
+
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-EXPOSE 5050
+RUN mkdir -p \
+    /app/app/static/uploads \
+    /app/app/static/qrcodes && \
+    chown -R appuser:appgroup /app
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5050", "--workers", "1", "--access-logfile", "-", "wsgi:application"]
+USER appuser
+
+EXPOSE 5000
+
+CMD ["gunicorn", "--config", "gunicorn.conf.py", "app:create_app()"]

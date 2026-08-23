@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+
+{% block title %}Agent Portal & Referral Programme | The Height Apartment{% endblock %}
+
+{% block content %}
+
+<!-- Agent Hero Banner -->
+<section class="py-5 text-center position-relative" style="background: linear-gradient(180deg, rgba(11,12,16,0.7) 0%, rgba(11,12,16,0.95) 100%), url('https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;">
+  <div class="container py-5">
+    <span class="hero-badge mb-3 d-inline-block"><i class="fas fa-handshake me-2"></i> Referral Partnership Program</span>
+    <h1 class="display-4 fw-bold text-white mb-3">Agent Referral Programme</h1>
+    <p class="lead text-gold font-heading max-w-700 mx-auto">
+      Earn 10% commission on room charges for every verified guest referral at The Height Premium Apartments, Ikeja, Lagos.
+    </p>
+  </div>
+</section>
+
+<!-- Main Agent Registration & Policy Layout -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-5">
+      
+      <!-- Referral Policy & Terms Document -->
+      <div class="col-lg-6">
+        <div class="glass-card p-4 h-100 border-gold referral-terms-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="fw-bold text-gold mb-0"><i class="fas fa-file-contract me-2"></i> Terms &amp; Conditions</h4>
+            <span class="badge bg-gold text-dark">Agent Policy</span>
+          </div>
+          <p class="small text-muted mb-3">Every agent must accept these terms before participating in the referral programme.</p>
+          
+          <div class="terms-scroll-box text-light">
+            <h6 class="text-gold fw-bold">1. Commission &amp; How It Is Earned</h6>
+            <p class="small text-muted">
+              Commission is 10% of the room charge only, and excludes refundable caution deposits, taxes, fees, and ancillary charges. Earned only after the guest completes a fully paid stay. No commission is payable on cancelled or refunded bookings.
+            </p>
+
+            <h6 class="text-gold fw-bold mt-3">2. Referral Attribution — Whose Guest Is It?</h6>
+            <p class="small text-muted">
+              Credited only where the agent's unique referral code or link is used at booking, or within 30 days of the guest first using that link. Excludes corporate accounts, existing guests in our system, or bookings for the agent's immediate household.
+            </p>
+
+            <h6 class="text-gold fw-bold mt-3">3. Payment of Commission</h6>
+            <p class="small text-muted">
+              Paid manually via bank transfer within 7 working days of guest check-out, or in a consolidated monthly run by the 7th of the following month. Paid strictly to a bank account in the agent's registered name.
+            </p>
+
+            <h6 class="text-gold fw-bold mt-3">4. Agent Conduct &amp; Brand Protection</h6>
+            <p class="small text-muted">
+              Agents act as independent referrers only. Agents must not advertise misleading prices, re-list apartments on Airbnb/Booking.com under their own accounts, or run paid ads using The Height trademark without written consent.
+            </p>
+
+            <h6 class="text-gold fw-bold mt-3">5. Suspension &amp; Termination</h6>
+            <p class="small text-muted">
+              The Height reserves the right to suspend or terminate an agent account for violations. Earned commissions on completed paid stays remain payable except in cases of fraud or material breach.
+            </p>
+
+            <h6 class="text-gold fw-bold mt-3">6. Governing Law</h6>
+            <p class="small text-muted mb-0">
+              Governed by the laws of the Federal Republic of Nigeria under the jurisdiction of Lagos State courts.
+            </p>
+          </div>
+          
+          <div class="mt-3 text-center">
+            <a href="#fullTermsModal" data-bs-toggle="modal" data-bs-target="#fullTermsModal" class="small text-gold text-decoration-none">
+              <i class="fas fa-external-link-alt me-1"></i> Read Full Agent Referral Policy Document
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent Registration Form -->
+      <div class="col-lg-6">
+        <div class="glass-card p-5 border-gold">
+          
+          <ul class="nav nav-pills nav-justified mb-4 border-bottom border-secondary border-opacity-25 pb-3" id="agentTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active btn-outline-gold fw-bold py-2" id="agent-register-tab" data-bs-toggle="tab" data-bs-target="#agent-register" type="button" role="tab">
+                <i class="fas fa-user-plus me-2"></i> Register Agent
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link btn-outline-gold fw-bold py-2" id="agent-login-tab" data-bs-toggle="tab" data-bs-target="#agent-login" type="button" role="tab">
+                <i class="fas fa-sign-in-alt me-2"></i> Agent Login
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content" id="agentTabsContent">
+            
+            <!-- Registration Form -->
+            <div class="tab-pane fade show active" id="agent-register" role="tabpanel">
+              <div class="mb-4">
+                <h4 class="fw-bold text-white">Agent Accreditation Form</h4>
+                <p class="small text-muted">Submit your application details below for instant dashboard access.</p>
+              </div>
+
+              <form action="{{ url_for('agents.register_agent') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label small text-gold fw-bold">Full Name *</label>
+                    <input type="text" name="full_name" class="form-control bg-dark text-white border-secondary" placeholder="Full Name" required>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label small text-gold fw-bold">Company Name (Optional)</label>
+                    <input type="text" name="company" class="form-control bg-dark text-white border-secondary" placeholder="Agency / Firm">
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label small text-gold fw-bold">Email Address *</label>
+                    <input type="email" name="email" class="form-control bg-dark text-white border-secondary" placeholder="agent@domain.com" required>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label small text-gold fw-bold">Phone Number *</label>
+                    <input type="tel" name="phone" class="form-control bg-dark text-white border-secondary" placeholder="0904 513 5890" required>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label small text-gold fw-bold">Street Address</label>
+                    <input type="text" name="address" class="form-control bg-dark text-white border-secondary" placeholder="Office / Home Address">
+                  </div>
+
+                  <div class="col-md-3">
+                    <label class="form-label small text-gold fw-bold">City</label>
+                    <input type="text" name="city" class="form-control bg-dark text-white border-secondary" placeholder="Ikeja">
+                  </div>
+
+                  <div class="col-md-3">
+                    <label class="form-label small text-gold fw-bold">State</label>
+                    <input type="text" name="state" class="form-control bg-dark text-white border-secondary" placeholder="Lagos">
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label small text-gold fw-bold">Coverage Area</label>
+                    <input type="text" name="coverage_area" class="form-control bg-dark text-white border-secondary" placeholder="e.g. Lagos Mainland, VI, Airport">
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label small text-gold fw-bold">Real Estate Experience</label>
+                    <select name="experience" class="form-select bg-dark text-white border-secondary">
+                      <option value="1-3 years">1 - 3 Years</option>
+                      <option value="3-5 years">3 - 5 Years</option>
+                      <option value="5+ years">5+ Years</option>
+                    </select>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label small text-gold fw-bold">Account Password *</label>
+                    <input type="password" name="password" class="form-control bg-dark text-white border-secondary" required>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label small text-gold fw-bold">Bank Name (Payouts)</label>
+                    <input type="text" name="bank_name" class="form-control bg-dark text-white border-secondary" placeholder="e.g. Providus Bank / Zenith">
+                  </div>
+
+                  <div class="col-12">
+                    <label class="form-label small text-gold fw-bold">NUBAN Account Number (For 10% Commission Payouts)</label>
+                    <input type="text" name="account_number" class="form-control bg-dark text-white border-secondary" placeholder="10-digit account number">
+                  </div>
+
+                  <!-- Mandatory Policy Checkbox -->
+                  <div class="col-12 mt-3">
+                    <div class="form-check p-3 bg-dark border border-secondary rounded-3">
+                      <input class="form-check-input" type="checkbox" id="agentTermsCheck" required>
+                      <label class="form-check-label small text-light" for="agentTermsCheck">
+                        I have read, understood, and agree to the <strong>Agent Referral Programme Terms &amp; Conditions</strong>. *
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="col-12 mt-4">
+                    <button type="submit" class="btn btn-gold btn-lg w-100">
+                      <i class="fas fa-user-check me-2"></i> Register &amp; Get Referral Link
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <!-- Login Form -->
+            <div class="tab-pane fade" id="agent-login" role="tabpanel">
+              <div class="mb-4">
+                <h4 class="fw-bold text-white">Agent Portal Access</h4>
+                <p class="small text-muted">Sign in with your registered agent credentials.</p>
+              </div>
+
+              <form action="{{ url_for('auth.login') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="mb-3">
+                  <label class="form-label small text-gold fw-bold">Email Address</label>
+                  <input type="email" name="email" class="form-control bg-dark text-white border-secondary" required>
+                </div>
+                <div class="mb-4">
+                  <label class="form-label small text-gold fw-bold">Password</label>
+                  <input type="password" name="password" class="form-control bg-dark text-white border-secondary" required>
+                </div>
+                <button type="submit" class="btn btn-gold btn-lg w-100">
+                  <i class="fas fa-sign-in-alt me-2"></i> Access Commission Dashboard
+                </button>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Full Terms & Conditions Modal -->
+<div class="modal fade" id="fullTermsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content glass-card text-light border-gold terms-conditions-container">
+      <div class="modal-header border-bottom border-secondary">
+        <h5 class="modal-title text-gold-gradient"><i class="fas fa-file-contract me-2"></i> Agent Referral Programme — Full Terms &amp; Conditions</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body small leading-relaxed">
+        <p class="text-gold font-monospace">The Height Premium Apartments — CAC BN7684830</p>
+        <h6>1. Commission &amp; How It Is Earned</h6>
+        <p>Commission is 10% of the room charge only, and excludes caution deposit, taxes, and fees. Earned only after guest completes a fully paid stay.</p>
+        
+        <h6>2. Referral Attribution</h6>
+        <p>Bookings are credited when an agent's referral link or code is applied at booking, or within 30 days of first link click. Excludes corporate accounts and previous guests.</p>
+        
+        <h6>3. Payment of Commission</h6>
+        <p>Paid via bank transfer within 7 working days of guest check-out. Paid only to bank accounts matching the agent's registered name.</p>
+        
+        <h6>4. Conduct &amp; Brand Protection</h6>
+        <p>Agents must not re-list apartments on Airbnb/Booking.com, advertise unauthorized discounts, or run paid search ads on trademark names.</p>
+
+        <h6>5. Contact</h6>
+        <p>6 Olorunadaba Street, Off Hassan Oyo Street, Dopemu, Ikeja, Lagos | 0904 513 5890 | @TheHeightApts</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Agent Registration Success Modal -->
+<div class="modal fade" id="agentSuccessModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-card text-light border-gold text-center p-4">
+      <div class="modal-header border-0 pb-0 justify-content-center">
+        <div class="p-3 bg-gold-subtle text-gold rounded-circle d-inline-flex mb-2">
+          <i class="fas fa-check-circle fs-1"></i>
+        </div>
+      </div>
+      <div class="modal-body">
+        <h4 class="fw-bold text-white font-serif mb-3">Dear {{ agent_name or 'Partner' }}, your registration has been received.</h4>
+        <p class="text-gold fw-bold mb-2">{{ agent_name or 'Partner' }},</p>
+        <p class="text-light mb-3">Thank you for becoming our Referral Agent.</p>
+        <p class="small text-light mb-3">You can now start referring clients using your unique referral link and referral code.</p>
+        
+        {% if agent_code %}
+        <div class="p-3 bg-dark border border-gold rounded-3 mb-3 text-start">
+          <div class="small text-muted mb-1">Your Referral Code: <strong class="text-gold font-monospace fs-6">{{ agent_code }}</strong></div>
+          <div class="small text-muted">Referral Link: <code class="text-light">http://127.0.0.1:5050/?ref={{ agent_code }}</code></div>
+        </div>
+        {% endif %}
+
+        <p class="small text-muted mb-4">Please check your email for your referral details.</p>
+        
+        <a href="{{ url_for('agents.dashboard') }}" class="btn btn-gold w-100 py-2 font-sans fw-bold">
+          <i class="fas fa-arrow-right me-2"></i> Access Commission Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block extra_js %}
+{% if show_success_modal %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var successModal = new bootstrap.Modal(document.getElementById('agentSuccessModal'));
+    successModal.show();
+    if (window.history.replaceState) {
+      window.history.replaceState(null, null, window.location.pathname);
+    }
+  });
+</script>
+{% endif %}
+{% endblock %}
+
+{% endblock %}

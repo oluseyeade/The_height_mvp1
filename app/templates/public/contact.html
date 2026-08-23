@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us | The Height Apartment - Serviced Apartments Ikeja Lagos{% endblock %}
+
+{% block content %}
+
+<!-- Hero Banner -->
+<section class="py-5 text-center position-relative" style="background: linear-gradient(180deg, rgba(11,12,16,0.7) 0%, rgba(11,12,16,0.95) 100%), url('https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;">
+  <div class="container py-4">
+    <span class="hero-badge mb-3 d-inline-block"><i class="fas fa-map-marker-alt me-2"></i> LOCATION &amp; CONTACT</span>
+    <h1 class="display-4 fw-bold text-white mb-2">Get in Touch</h1>
+    <p class="lead text-gold font-heading max-w-700 mx-auto">
+      6 Olorunadaba Street, Off Hassan Oyo Street, Dopemu, Ikeja, Lagos — Just a short drive from Murtala Muhammed International Airport.
+    </p>
+  </div>
+</section>
+
+<!-- Main Contact Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-5">
+      
+      <!-- Contact Information & Business Details -->
+      <div class="col-lg-5">
+        <div class="glass-card p-4 h-100 border-gold">
+          <span class="text-gold-gradient fw-bold text-uppercase">The Height Desk</span>
+          <h3 class="fw-bold text-white mt-1 mb-4">Contact Information</h3>
+          
+          <div class="d-flex align-items-start gap-3 mb-4">
+            <div class="p-3 bg-dark text-gold rounded-3 border border-secondary">
+              <i class="fas fa-building fs-4"></i>
+            </div>
+            <div>
+              <h6 class="fw-bold text-gold mb-1">Physical Address</h6>
+              <p class="small text-muted mb-0">6 Olorunadaba Street, Off Hassan Oyo Street, Dopemu, Ikeja, Lagos, Nigeria</p>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start gap-3 mb-4">
+            <div class="p-3 bg-dark text-gold rounded-3 border border-secondary">
+              <i class="fas fa-phone-alt fs-4"></i>
+            </div>
+            <div>
+              <h6 class="fw-bold text-gold mb-1">Direct Phone &amp; WhatsApp</h6>
+              <p class="small text-muted mb-0"><a href="tel:+2349045135890" class="text-light text-decoration-none">0904 513 5890</a> (24/7 Desk)</p>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start gap-3 mb-4">
+            <div class="p-3 bg-dark text-gold rounded-3 border border-secondary">
+              <i class="fas fa-envelope fs-4"></i>
+            </div>
+            <div>
+              <h6 class="fw-bold text-gold mb-1">Email Desk</h6>
+              <p class="small text-muted mb-0"><a href="mailto:theheightapartments@icloud.com" class="text-light text-decoration-none">theheightapartments@icloud.com</a></p>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-start gap-3 mb-4">
+            <div class="p-3 bg-dark text-gold rounded-3 border border-secondary">
+              <i class="fas fa-shield-alt fs-4"></i>
+            </div>
+            <div>
+              <h6 class="fw-bold text-gold mb-1">Registered &amp; Licensed</h6>
+              <p class="small text-muted mb-0">CAC BN7684830 | SCUML Registered Business</p>
+            </div>
+          </div>
+
+          <!-- Social Media Links -->
+          <div class="pt-3 border-top border-secondary">
+            <h6 class="text-gold fw-bold mb-3">Connect with Us</h6>
+            <div class="d-flex gap-3 fs-4 text-gold">
+              <a href="https://instagram.com/TheHeightApts" target="_blank" class="text-gold"><i class="fab fa-instagram"></i></a>
+              <a href="https://facebook.com/TheHeightApts" target="_blank" class="text-gold"><i class="fab fa-facebook"></i></a>
+              <a href="https://tiktok.com/@TheHeightApts" target="_blank" class="text-gold"><i class="fab fa-tiktok"></i></a>
+              <a href="https://wa.me/2349045135890" target="_blank" class="text-gold"><i class="fab fa-whatsapp"></i></a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Contact Form & NDPR Compliance -->
+      <div class="col-lg-7">
+        <div class="glass-card p-5 border-gold">
+          <div class="mb-4">
+            <span class="text-gold-gradient fw-bold text-uppercase">Direct Enquiry</span>
+            <h3 class="fw-bold text-white mt-1">Send Us a Message</h3>
+            <p class="small text-muted">Fill out the form below. We process all enquiries under strict NDPR privacy guidelines.</p>
+          </div>
+
+          <form action="{{ url_for('public.contact') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label small text-gold fw-bold">Full Name *</label>
+                <input type="text" name="name" class="form-control bg-dark text-white border-secondary" placeholder="Your Name" required>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small text-gold fw-bold">Email Address *</label>
+                <input type="email" name="email" class="form-control bg-dark text-white border-secondary" placeholder="yourname@domain.com" required>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small text-gold fw-bold">Phone Number *</label>
+                <input type="tel" name="phone" class="form-control bg-dark text-white border-secondary" placeholder="0904 513 5890" required>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label small text-gold fw-bold">Subject</label>
+                <select name="subject" class="form-select bg-dark text-white border-secondary">
+                  <option value="General Booking Enquiry">General Booking Enquiry</option>
+                  <option value="Corporate Stays">Corporate Stays &amp; Quotes</option>
+                  <option value="Agent Referral Network">Agent Referral Network</option>
+                  <option value="Feedback / Review">Feedback &amp; Reviews</option>
+                </select>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label small text-gold fw-bold">Your Message *</label>
+                <textarea name="message" class="form-control bg-dark text-white border-secondary" rows="4" placeholder="How can we assist you?" required></textarea>
+              </div>
+
+              <div class="col-12 mt-3">
+                <div class="form-check p-3 bg-dark border border-secondary rounded-3">
+                  <input class="form-check-input" type="checkbox" id="ndprCheck" required>
+                  <label class="form-check-label small text-muted" for="ndprCheck">
+                    I consent to The Height Premium Apartments processing my data in accordance with the <strong>Nigeria Data Protection Regulation (NDPR)</strong>. *
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-12 mt-4">
+                <button type="submit" class="btn btn-gold btn-lg w-100">
+                  <i class="fas fa-paper-plane me-2"></i> Send Message
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Protected Interactive Google Maps & Directions Section -->
+    <div class="row mt-5">
+      <div class="col-12">
+        <div class="glass-card p-4 border-gold">
+          <h5 class="text-gold fw-bold mb-3"><i class="fas fa-map-marked-alt me-2"></i> Location Map &amp; Directions — Dopemu, Ikeja, Lagos</h5>
+          {% if has_paid_booking %}
+          <div class="ratio ratio-21x9 rounded-3 overflow-hidden mb-3">
+            <iframe 
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.3087315572235!2d3.310619574993608!3d6.608493993385732!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b91a27e7f7b3b%3A0x6b6e4e0b0b0b0b0b!2sDopemu%2C%20Ikeja%2C%20Lagos!5e0!3m2!1sen!2sng!4v1700000000000!5m2!1sen!2sng" 
+              style="border:0;" 
+              allowfullscreen="" 
+              loading="lazy" 
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
+          <div class="text-end">
+            <a href="https://maps.google.com/?q=Dopemu+Ikeja+Lagos" target="_blank" class="btn btn-outline-gold btn-sm">
+              <i class="fas fa-directions me-1"></i> Get Driving Directions
+            </a>
+          </div>
+          {% else %}
+          <div class="p-4 bg-dark rounded-3 border border-secondary text-center">
+            <div class="p-3 bg-gold-subtle text-gold rounded-circle d-inline-flex mb-3">
+              <i class="fas fa-lock fs-2"></i>
+            </div>
+            <h5 class="fw-bold text-white mb-2">Protected Property Location</h5>
+            <p class="text-light small max-w-600 mx-auto mb-3">
+              Exact location details, interactive map, and GPS driving directions are exclusively available to confirmed guests after successful booking and payment.
+            </p>
+            {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('auth.login') }}" class="btn btn-gold btn-sm font-sans fw-bold">
+              <i class="fas fa-sign-in-alt me-1"></i> Log In to View Confirmed Booking Location
+            </a>
+            {% else %}
+            <a href="{{ url_for('apartments.list_apartments') }}" class="btn btn-gold btn-sm font-sans fw-bold">
+              <i class="fas fa-calendar-check me-1"></i> Reserve an Apartment to Unlock Location Map
+            </a>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

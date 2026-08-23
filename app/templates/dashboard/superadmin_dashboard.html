@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+
+{% block title %}SuperAdmin Executive Dashboard | The Height Apartment{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    
+    <!-- Marriott-Class Header -->
+    <div class="glass-card p-4 mb-4 border-danger d-flex flex-wrap justify-content-between align-items-center">
+      <div>
+        <span class="badge bg-danger text-white font-monospace text-uppercase px-3 py-1 mb-1"><i class="fas fa-crown me-1"></i> LEVEL 4 SUPER ADMINISTRATOR</span>
+        <h2 class="display-6 fw-bold text-white mb-0 font-serif">Platform Executive Oversight &amp; Audit</h2>
+        <p class="small text-muted mb-0">Logged in as <strong>{{ current_user.full_name }}</strong> — Global Override &amp; System Audit Privileges</p>
+      </div>
+      <div class="mt-3 mt-md-0 d-flex gap-2 flex-wrap">
+        <a href="{{ url_for('superadmin_panel.view_notifications') }}" class="btn btn-warning text-dark fw-bold me-2"><i class="fas fa-bell me-1"></i> Notifications Center</a>
+        <a href="{{ url_for('admin_panel.manage_bookings') }}" class="btn btn-gold me-2"><i class="fas fa-calendar-check me-1"></i> Bookings Portal</a>
+        <a href="{{ url_for('superadmin_panel.manage_admins') }}" class="btn btn-outline-gold me-2"><i class="fas fa-user-shield me-1"></i> Admin Users</a>
+        <a href="{{ url_for('admin_panel.manage_inspections') }}" class="btn btn-outline-gold me-2"><i class="fas fa-clipboard-check me-1"></i> Inspections</a>
+        <a href="{{ url_for('superadmin_panel.view_audit_logs') }}" class="btn btn-outline-gold me-2"><i class="fas fa-shield-alt me-1"></i> Audit Trail</a>
+        <a href="{{ url_for('admin_panel.manage_reviews') }}" class="btn btn-outline-gold me-2"><i class="fas fa-star me-1"></i> Reviews</a>
+        <a href="{{ url_for('admin_panel.manage_agents') }}" class="btn btn-outline-gold me-2"><i class="fas fa-handshake me-1"></i> Agents</a>
+        <a href="{{ url_for('admin_panel.manage_corporate') }}" class="btn btn-outline-gold me-2"><i class="fas fa-briefcase me-1"></i> Corporate</a>
+        <a href="{{ url_for('admin_panel.dashboard') }}" class="btn btn-outline-light"><i class="fas fa-user-cog me-1"></i> Admin View</a>
+      </div>
+    </div>
+
+    <!-- Platform Analytics Cards -->
+    <div class="row g-4 mb-5">
+      <div class="col-md-3">
+        <div class="glass-card p-4 text-center border-gold">
+          <i class="fas fa-users-cog text-gold fs-1 mb-2"></i>
+          <h6 class="small text-muted text-uppercase fw-bold">Admins Managed</h6>
+          <h3 class="fw-bold text-gold font-monospace mb-0">3</h3>
+          <span class="small text-muted">Level 3 Admin Users</span>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="glass-card p-4 text-center border-gold">
+          <i class="fas fa-handshake text-gold fs-1 mb-2"></i>
+          <h6 class="small text-muted text-uppercase fw-bold">Active Agents</h6>
+          <h3 class="fw-bold text-gold font-monospace mb-0">12</h3>
+          <span class="small text-muted">10% Commission Referrers</span>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="glass-card p-4 text-center border-gold">
+          <i class="fas fa-building text-gold fs-1 mb-2"></i>
+          <h6 class="small text-muted text-uppercase fw-bold">Suites Managed</h6>
+          <h3 class="fw-bold text-gold font-monospace mb-0">4</h3>
+          <span class="small text-muted">Active Luxury Suites</span>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="glass-card p-4 text-center border-gold">
+          <i class="fas fa-shield-alt text-gold fs-1 mb-2"></i>
+          <h6 class="small text-muted text-uppercase fw-bold">Security Status</h6>
+          <h3 class="fw-bold text-success font-monospace mb-0">OPTIMAL</h3>
+          <span class="small text-muted">RBAC &amp; Audit Logs Active</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions Module (Superadmin: 4 Actions) -->
+    {% include 'includes/quick_actions.html' %}
+
+    <!-- Admin Account Override Table with Search Bar & Sticky Header -->
+    <div class="glass-card p-4 border-gold mb-5">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
+        <h4 class="fw-bold text-white font-serif mb-2 mb-md-0"><i class="fas fa-user-shield text-danger me-2"></i> Admin Account Override &amp; Deactivation Control</h4>
+        <span class="badge bg-danger text-white">SuperAdmin Overrides</span>
+      </div>
+
+      <!-- Search Bar Above Table -->
+      <div class="table-search-bar">
+        <i class="fas fa-search text-gold"></i>
+        <input type="text" id="adminSearchInput" class="form-control bg-transparent border-0 text-white shadow-none" placeholder="Search by admin name or email..." onkeyup="filterSuperadminTable('adminSearchInput', 'superadminAdminsTable');">
+      </div>
+
+      <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+        <table class="table table-marriott align-middle" id="superadminAdminsTable">
+          <thead style="position: sticky; top: 0; z-index: 10;">
+            <tr>
+              <th>Admin Name</th>
+              <th>Email</th>
+              <th>Role Level</th>
+              <th>Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Operations Admin</strong></td>
+              <td><code>admin@theheightapartment.com</code></td>
+              <td><span class="badge bg-secondary font-monospace">Level 3</span></td>
+              <td><span class="badge bg-success">Active</span></td>
+              <td class="text-end">
+                <div class="btn-group btn-group-sm">
+                  <button class="btn btn-gold py-1 px-2" onclick="alert('Admin privileges overridden.');">Override</button>
+                  <button class="btn btn-outline-danger py-1 px-2" onclick="confirm('Deactivate Admin account?');">Deactivate</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Finance Admin</strong></td>
+              <td><code>finance@theheightapartment.com</code></td>
+              <td><span class="badge bg-secondary font-monospace">Level 3</span></td>
+              <td><span class="badge bg-success">Active</span></td>
+              <td class="text-end">
+                <div class="btn-group btn-group-sm">
+                  <button class="btn btn-gold py-1 px-2" onclick="alert('Admin privileges overridden.');">Override</button>
+                  <button class="btn btn-outline-danger py-1 px-2" onclick="confirm('Deactivate Admin account?');">Deactivate</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Platform Audit Logs Section with Search Bar & Sticky Header -->
+    <div class="glass-card p-4 border-gold">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
+        <h4 class="fw-bold text-white font-serif mb-2 mb-md-0"><i class="fas fa-history text-gold me-2"></i> System Audit Log Inspector</h4>
+        <span class="badge bg-gold text-dark font-monospace">Real-time Audit Logs</span>
+      </div>
+
+      <!-- Search Bar Above Table -->
+      <div class="table-search-bar">
+        <i class="fas fa-search text-gold"></i>
+        <input type="text" id="auditSearchInput" class="form-control bg-transparent border-0 text-white shadow-none" placeholder="Search by actor, module, action or IP address..." onkeyup="filterSuperadminTable('auditSearchInput', 'superadminAuditLogsTable');">
+      </div>
+
+      <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+        <table class="table table-marriott align-middle" id="superadminAuditLogsTable">
+          <thead style="position: sticky; top: 0; z-index: 10;">
+            <tr>
+              <th>Timestamp</th>
+              <th>Actor</th>
+              <th>Module</th>
+              <th>Action Performed</th>
+              <th>IP Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>2026-07-29 12:45:10</td>
+              <td><strong>Super Administrator</strong></td>
+              <td><span class="badge bg-danger font-monospace">SuperAdmin</span></td>
+              <td>System Initialization &amp; Roles Seeded</td>
+              <td><code>127.0.0.1</code></td>
+            </tr>
+            <tr>
+              <td>2026-07-29 12:48:30</td>
+              <td><strong>Super Administrator</strong></td>
+              <td><span class="badge bg-gold text-dark font-monospace">Apartments</span></td>
+              <td>Updated Suite Images &amp; Details</td>
+              <td><code>127.0.0.1</code></td>
+            </tr>
+            <tr>
+              <td>2026-07-29 12:51:00</td>
+              <td><strong>System Logger</strong></td>
+              <td><span class="badge bg-info font-monospace">Security</span></td>
+              <td>NDPR Data Compliance Verification Passed</td>
+              <td><code>127.0.0.1</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+function filterSuperadminTable(inputId, tableId) {
+  var input = document.getElementById(inputId);
+  var filter = input.value.toUpperCase();
+  var table = document.getElementById(tableId);
+  var tr = table.getElementsByTagName("tr");
+
+  for (var i = 1; i < tr.length; i++) {
+    var textContent = tr[i].textContent || tr[i].innerText;
+    if (textContent.toUpperCase().indexOf(filter) > -1) {
+      tr[i].style.display = "";
+    } else {
+      tr[i].style.display = "none";
+    }
+  }
+}
+</script>
+{% endblock %}

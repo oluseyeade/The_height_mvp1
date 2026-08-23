@@ -1,0 +1,467 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ apartment.title }} | The Height Apartment{% endblock %}
+
+{% block extra_css %}
+<!-- FullCalendar 6 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    
+    <!-- Title & Overview Header -->
+    <div class="glass-card p-4 mb-4 border-gold d-flex flex-wrap justify-content-between align-items-center">
+      <div>
+        <span class="badge bg-gold text-dark font-monospace text-uppercase px-3 py-1 mb-2">{{ apartment.category.name if apartment.category else 'Executive' }}</span>
+        <h1 class="display-5 fw-bold text-white mb-0 font-serif">{{ apartment.display_title }}</h1>
+        <p class="small text-muted mb-0"><i class="fas fa-map-marker-alt text-gold me-1"></i> Dopemu, Ikeja, Lagos · {{ apartment.bedrooms }} Bedroom Suite</p>
+      </div>
+      <div class="text-lg-end mt-3 mt-lg-0">
+        <span class="text-gold fw-bold display-6 font-serif">₦{{ "{:,.2f}".format(apartment.price_per_night) }}</span>
+        <span class="small text-muted font-sans d-block">/ night (Exclusive of caution deposit)</span>
+      </div>
+    </div>
+
+    <!-- Centered Customer Booking Card Section -->
+    <div class="row justify-content-center mb-5">
+      <div class="col-lg-8">
+        {% if apartment.status == 'available' %}
+          <div class="glass-card p-5 border-gold shadow-lg">
+            <div class="text-center mb-4">
+              <span class="text-gold fw-bold text-uppercase tracking-wider">Direct Reservation</span>
+              <h3 class="fw-bold text-white font-serif mt-1">Proceed to Book This Suite</h3>
+              <p class="small text-muted">Refundable <strong class="text-gold">₦50,000.00</strong> Caution Fee required before check-in (paid separately via bank transfer).</p>
+            </div>
+
+            <form action="{{ url_for('bookings.create', apartment_id=apartment.apartment_id) }}" method="POST" id="bookingForm">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label small text-gold fw-bold">Check-In Date *</label>
+                  <input type="date" name="check_in" id="check_in_input" class="form-control bg-dark text-white border-secondary" value="{{ booking_session.check_in if booking_session else '' }}" required>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label small text-gold fw-bold">Check-Out Date *</label>
+                  <input type="date" name="check_out" id="check_out_input" class="form-control bg-dark text-white border-secondary" value="{{ booking_session.check_out if booking_session else '' }}" required>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label small text-gold fw-bold">Guest Full Name *</label>
+                  <input type="text" name="guest_name" class="form-control bg-dark text-white border-secondary" value="{{ (booking_session.guest_name if booking_session and booking_session.guest_name else (current_user.full_name if current_user.is_authenticated else '')) }}" placeholder="Full Name" required>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label small text-gold fw-bold">Email Address *</label>
+                  <input type="email" name="guest_email" class="form-control bg-dark text-white border-secondary" value="{{ (booking_session.guest_email if booking_session and booking_session.guest_email else (current_user.email if current_user.is_authenticated else '')) }}" placeholder="email@domain.com" required>
+                </div>
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label small text-gold fw-bold">Phone Number *</label>
+                  <input type="tel" name="guest_phone" class="form-control bg-dark text-white border-secondary" value="{{ (booking_session.guest_phone if booking_session and booking_session.guest_phone else (current_user.phone if current_user.is_authenticated else '')) }}" placeholder="0904 513 5890" required>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label small text-gold fw-bold">Number of Guests</label>
+                  <select name="guest_count" class="form-select bg-dark text-white border-secondary">
+                    <option value="1" {% if booking_session and booking_session.number_of_guests == 1 %}selected{% endif %}>1 Guest</option>
+                    <option value="2" {% if not booking_session or booking_session.number_of_guests == 2 %}selected{% endif %}>2 Guests</option>
+                    <option value="3" {% if booking_session and booking_session.number_of_guests == 3 %}selected{% endif %}>3 Guests</option>
+                    <option value="4" {% if booking_session and booking_session.number_of_guests == 4 %}selected{% endif %}>4 Guests</option>
+                    <option value="5" {% if booking_session and booking_session.number_of_guests >= 5 %}selected{% endif %}>5+ Guests</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label small text-gold fw-bold">Special Requests</label>
+                <textarea name="special_requests" class="form-control bg-dark text-white border-secondary" rows="2" placeholder="Airport transfer, early check-in...">{{ booking_session.special_requests if booking_session else '' }}</textarea>
+              </div>
+
+              <!-- Refundable Caution Fee Notice Box -->
+              <div class="p-3 bg-dark border border-gold rounded-3 mb-3">
+                <h6 class="text-gold fw-bold font-serif mb-1"><i class="fas fa-shield-alt me-1"></i> Refundable Caution Fee Notice</h6>
+                <p class="small text-light opacity-90 mb-2">A Refundable ₦50,000 Caution Fee is required before check-in.</p>
+                <ul class="small text-muted mb-0 ps-3">
+                  <li>This fee is separate from your apartment payment.</li>
+                  <li>It is not included in your booking total.</li>
+                  <li>It must be paid by bank transfer only.</li>
+                  <li>The fee is refundable after checkout, subject to inspection of the apartment and terms compliance.</li>
+                </ul>
+              </div>
+
+              <div class="p-4 bg-dark border border-secondary rounded-3 mb-4">
+                <div class="d-flex justify-content-between small text-muted mb-2">
+                  <span>Rate per Night:</span>
+                  <span class="text-white fw-bold">₦{{ "{:,.2f}".format(apartment.price_per_night) }}</span>
+                </div>
+                {% if booking_session %}
+                  <div class="d-flex justify-content-between small text-muted mb-2">
+                    <span>Duration:</span>
+                    <span class="text-white fw-bold">{{ booking_session.number_of_nights }} Night(s)</span>
+                  </div>
+                  {% if booking_session.discount and booking_session.discount > 0 %}
+                    <div class="d-flex justify-content-between small text-success mb-2">
+                      <span>Agent Referral Discount (3%):</span>
+                      <span class="fw-bold">-₦{{ "{:,.2f}".format(booking_session.discount) }}</span>
+                    </div>
+                  {% endif %}
+                  <div class="d-flex justify-content-between small text-muted mb-2">
+                    <span>Apartment Total:</span>
+                    <span class="text-white fw-bold">₦{{ "{:,.2f}".format(booking_session.total) }}</span>
+                  </div>
+                  <div class="d-flex justify-content-between small text-gold mb-2">
+                    <span>Refundable Caution Fee:</span>
+                    <span class="fw-bold">₦50,000.00 <span class="text-muted fw-normal font-sans">(Pay separately by bank transfer)</span></span>
+                  </div>
+                {% endif %}
+                <div class="d-flex justify-content-between text-gold font-monospace fs-5 fw-bold pt-2 border-top border-secondary">
+                  <span>Total Payable Online:</span>
+                  <span>₦{{ "{:,.2f}".format(booking_session.total) if booking_session else "{:,.2f}".format(apartment.price_per_night) }}</span>
+                </div>
+              </div>
+
+              <!-- Equal Size Buttons Row -->
+              <div class="row g-3 align-items-stretch">
+                <div class="col-md-6 d-flex">
+                  <button type="submit" id="submitBookingBtn" class="btn btn-gold w-100 py-3 text-uppercase fw-bold d-flex align-items-center justify-content-center h-100">
+                    <i class="fas fa-calendar-check me-2"></i> Proceed to Book This Suite
+                  </button>
+                </div>
+                <div class="col-md-6 d-flex">
+                  <a href="{{ url_for('apartments.list_apartments') }}" class="btn btn-outline-gold w-100 py-3 text-uppercase fw-bold d-flex align-items-center justify-content-center h-100">
+                    <i class="fas fa-arrow-left me-2"></i> Choose Other Suite
+                  </a>
+                </div>
+              </div>
+
+            </form>
+
+          </div>
+        {% else %}
+          <div class="alert bg-dark border-gold text-gold text-center py-5 px-4 rounded-3 shadow">
+            <i class="fas fa-exclamation-triangle fs-1 mb-3 d-block text-warning"></i>
+            <h4 class="fw-bold font-serif mb-2 text-white">This apartment is not available. Please check other available apartments. Thank you.</h4>
+            <p class="small text-light opacity-75 mb-4">This suite is currently booked or unavailable for direct online reservation.</p>
+            <a href="{{ url_for('apartments.list_apartments') }}" class="btn btn-gold btn-lg fw-bold font-sans px-4 py-3">
+              <i class="fas fa-search me-2"></i> Browse Available Suites
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+      </div>
+    </div>
+
+    <!-- Image Banner & FullCalendar Section -->
+    <div class="row g-4">
+        <!-- Interactive Suite Image Gallery Component -->
+        {% set gallery_imgs = apartment.images %}
+        <div class="glass-card p-3 border-gold rounded-3 mb-4">
+          <div id="galleryMainViewport" class="position-relative rounded-3 overflow-hidden text-center d-flex align-items-center justify-content-center" style="height: 480px; max-height: 75vh; background-color: #08090c; background-image: radial-gradient(circle, rgba(200, 160, 80, 0.05) 0%, rgba(8, 9, 12, 1) 100%);">
+            <!-- Main Active Image (Proportional, Uncropped) -->
+            <img id="galleryMainImg" 
+                 src="{{ url_for('static', filename=apartment.cover_image) if not apartment.cover_image.startswith('http') else apartment.cover_image }}" 
+                 alt="{{ apartment.display_title }}" 
+                 style="width: 100%; height: 100%; object-fit: contain; cursor: pointer; transition: opacity 0.2s ease-in-out;" 
+                 title="Click image to view next photograph"
+                 loading="lazy">
+
+            {% if gallery_imgs and gallery_imgs|length > 0 %}
+            <!-- Fullscreen Zoom Button -->
+            <button type="button" id="galleryZoomBtn" class="btn btn-dark btn-sm rounded-circle position-absolute top-0 end-0 m-3 z-3 border border-gold" title="Full Screen View" aria-label="Zoom Photo">
+              <i class="fas fa-expand text-gold"></i>
+            </button>
+
+            {% if gallery_imgs|length > 1 %}
+            <!-- Left Navigation Arrow -->
+            <button type="button" id="galleryPrevBtn" class="btn btn-dark btn-sm rounded-circle position-absolute top-50 start-0 translate-middle-y ms-3 opacity-85 hover-opacity-100 z-3 border border-gold shadow" aria-label="Previous Image" style="width: 42px; height: 42px;">
+              <i class="fas fa-chevron-left text-gold fs-5"></i>
+            </button>
+
+            <!-- Right Navigation Arrow -->
+            <button type="button" id="galleryNextBtn" class="btn btn-dark btn-sm rounded-circle position-absolute top-50 end-0 translate-middle-y me-3 opacity-85 hover-opacity-100 z-3 border border-gold shadow" aria-label="Next Image" style="width: 42px; height: 42px;">
+              <i class="fas fa-chevron-right text-gold fs-5"></i>
+            </button>
+            {% endif %}
+
+            <!-- Dynamic Pagination Counter Overlay Bottom-Right -->
+            <div class="position-absolute bottom-0 end-0 m-3 z-3">
+              <span class="badge bg-dark text-gold border border-gold font-monospace px-3 py-2 fs-6 shadow-sm" id="galleryCounter">
+                1 / {{ gallery_imgs|length }}
+              </span>
+            </div>
+            {% endif %}
+          </div>
+
+          {% if gallery_imgs and gallery_imgs|length > 1 %}
+          <!-- Thumbnail Bar Below Main Image -->
+          <div class="d-flex gap-2 overflow-x-auto pt-3 pb-1 px-1 scrollbar-thin" id="galleryThumbnails" style="background-color: #0b0c10; border-radius: 0 0 8px 8px;">
+            {% for img in gallery_imgs %}
+              <img src="{{ url_for('static', filename=img.image_url) if not img.image_url.startswith('http') else img.image_url }}" 
+                   alt="Thumbnail {{ loop.index }}" 
+                   data-index="{{ loop.index0 }}"
+                   class="gallery-thumb rounded border cursor-pointer {{ 'border-gold border-2' if loop.first else 'border-secondary opacity-75' }}" 
+                   style="width: 84px; height: 62px; object-fit: cover; transition: all 0.2s ease; flex-shrink: 0;"
+                   title="View photo {{ loop.index }}">
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Fullscreen Lightbox Modal (Pure Vanilla JS) -->
+        <div id="galleryLightboxModal" class="d-none position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-95 d-flex align-items-center justify-content-center" style="z-index: 1080; backdrop-filter: blur(8px);">
+          <button type="button" id="lightboxCloseBtn" class="btn btn-dark btn-outline-gold rounded-circle position-absolute top-0 end-0 m-4 z-3" aria-label="Close Lightbox">
+            <i class="fas fa-times fs-4"></i>
+          </button>
+          
+          <button type="button" id="lightboxPrevBtn" class="btn btn-dark btn-outline-gold rounded-circle position-absolute top-50 start-0 translate-middle-y ms-4 z-3" aria-label="Previous Photo" style="width: 48px; height: 48px;">
+            <i class="fas fa-chevron-left fs-4"></i>
+          </button>
+          
+          <button type="button" id="lightboxNextBtn" class="btn btn-dark btn-outline-gold rounded-circle position-absolute top-50 end-0 translate-middle-y me-4 z-3" aria-label="Next Photo" style="width: 48px; height: 48px;">
+            <i class="fas fa-chevron-right fs-4"></i>
+          </button>
+
+          <div class="text-center p-3 w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+            <img id="lightboxImg" src="" alt="Full Screen Suite View" style="max-width: 92vw; max-height: 85vh; object-fit: contain;" class="rounded shadow-lg">
+            <div id="lightboxCounter" class="badge bg-dark text-gold border border-gold font-monospace px-3 py-2 mt-3 fs-6"></div>
+          </div>
+        </div>
+
+        <div class="glass-card p-4 border-gold">
+          <h4 class="fw-bold text-white mb-3 font-serif">Suite Description</h4>
+          <p class="text-light opacity-90 mb-4">{{ apartment.description }}</p>
+
+          <h5 class="fw-bold text-gold mb-3 font-serif"><i class="fas fa-star me-2"></i> Key Features &amp; Suite Amenities</h5>
+          <div class="row g-3 mb-4 text-light small">
+            <div class="col-md-4 col-6"><i class="fas fa-wifi text-gold me-2"></i> Starlink High-Speed Wi-Fi</div>
+            <div class="col-md-4 col-6"><i class="fas fa-bolt text-gold me-2"></i> 24/7 Power Guarantee</div>
+            <div class="col-md-4 col-6"><i class="fas fa-shield-alt text-gold me-2"></i> 24/7 Security &amp; CCTV</div>
+            <div class="col-md-4 col-6"><i class="fas fa-laptop-house text-gold me-2"></i> Ergonomic Workstation</div>
+            <div class="col-md-4 col-6"><i class="fas fa-tv text-gold me-2"></i> Smart TV &amp; Netflix</div>
+            <div class="col-md-4 col-6"><i class="fas fa-utensils text-gold me-2"></i> Fitted Kitchen &amp; Fridge</div>
+          </div>
+
+          <!-- FullCalendar Section -->
+          <div class="pt-4 border-top border-secondary">
+            <h5 class="fw-bold text-gold mb-3 font-serif"><i class="fas fa-calendar-alt me-2"></i> Suite Availability Calendar</h5>
+            <p class="small text-muted mb-3">Click on dates in the calendar below to auto-fill check-in and check-out (Format: <code>DD MMM YYYY</code>).</p>
+            <div id="availabilityCalendar" class="bg-dark p-3 rounded-3 border border-secondary" style="min-height: 400px;"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Quick Desk Assistance Sidebar -->
+      <div class="col-lg-4">
+        <div class="glass-card p-4 border-gold sticky-top" style="top: 90px;">
+          <h5 class="fw-bold text-gold mb-3 font-serif"><i class="fas fa-headset me-2"></i> Need Concierge Assistance?</h5>
+          <p class="small text-muted mb-4">Our front desk team is ready to answer questions regarding corporate pricing, long-term stays, or special arrival arrangements.</p>
+
+          <div class="d-flex align-items-center gap-3 mb-3 p-3 bg-dark rounded-3 border border-secondary">
+            <i class="fab fa-whatsapp text-success fs-2"></i>
+            <div>
+              <div class="small fw-bold text-white">Instant WhatsApp Concierge</div>
+              <a href="https://wa.me/2349045135890" target="_blank" class="small text-gold text-decoration-none">Chat 0904 513 5890</a>
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center gap-3 p-3 bg-dark rounded-3 border border-secondary">
+            <i class="fas fa-phone text-gold fs-3"></i>
+            <div>
+              <div class="small fw-bold text-white">Direct Desk Phone</div>
+              <a href="tel:+2349045135890" class="small text-gold text-decoration-none">Call 0904 513 5890</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<!-- FullCalendar 6 JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const bookingForm = document.getElementById('bookingForm');
+    const submitBtn = document.getElementById('submitBookingBtn');
+    
+    if (bookingForm && submitBtn) {
+      bookingForm.addEventListener('submit', function() {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('disabled');
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Proceeding to Payment...';
+      });
+    }
+
+    var calendarEl = document.getElementById('availabilityCalendar');
+    if(calendarEl && typeof FullCalendar !== 'undefined') {
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth'
+        },
+        selectable: true,
+        select: function(info) {
+          document.getElementById('check_in_input').value = info.startStr;
+          document.getElementById('check_out_input').value = info.endStr;
+        }
+      });
+      calendar.render();
+    }
+
+    // Image Gallery Interactive Controls & Lightbox
+    {% if apartment.images and apartment.images|length > 0 %}
+    var galleryImages = [
+      {% for img in apartment.images %}
+        "{{ url_for('static', filename=img.image_url) if not img.image_url.startswith('http') else img.image_url }}"{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ];
+    var currentIndex = 0;
+    var totalImages = galleryImages.length;
+
+    var mainImg = document.getElementById('galleryMainImg');
+    var counterEl = document.getElementById('galleryCounter');
+    var prevBtn = document.getElementById('galleryPrevBtn');
+    var nextBtn = document.getElementById('galleryNextBtn');
+    var zoomBtn = document.getElementById('galleryZoomBtn');
+    var thumbs = document.querySelectorAll('.gallery-thumb');
+
+    // Lightbox Elements
+    var lightboxModal = document.getElementById('galleryLightboxModal');
+    var lightboxImg = document.getElementById('lightboxImg');
+    var lightboxCounter = document.getElementById('lightboxCounter');
+    var lightboxCloseBtn = document.getElementById('lightboxCloseBtn');
+    var lightboxPrevBtn = document.getElementById('lightboxPrevBtn');
+    var lightboxNextBtn = document.getElementById('lightboxNextBtn');
+
+    function updateGallery(index) {
+      if (totalImages <= 0) return;
+      if (index < 0) index = totalImages - 1;
+      if (index >= totalImages) index = 0;
+      currentIndex = index;
+
+      if (mainImg) {
+        mainImg.style.opacity = '0.4';
+        setTimeout(function() {
+          mainImg.src = galleryImages[currentIndex];
+          mainImg.style.opacity = '1';
+        }, 80);
+      }
+
+      if (counterEl) counterEl.textContent = (currentIndex + 1) + ' / ' + totalImages;
+
+      // Update Active Thumbnail
+      thumbs.forEach(function(thumb, idx) {
+        if (idx === currentIndex) {
+          thumb.classList.add('border-gold', 'border-2');
+          thumb.classList.remove('border-secondary', 'opacity-75');
+          if (typeof thumb.scrollIntoView === 'function') {
+            thumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+          }
+        } else {
+          thumb.classList.remove('border-gold', 'border-2');
+          thumb.classList.add('border-secondary', 'opacity-75');
+        }
+      });
+
+      // Synchronize Lightbox if open
+      if (lightboxModal && !lightboxModal.classList.contains('d-none')) {
+        if (lightboxImg) lightboxImg.src = galleryImages[currentIndex];
+        if (lightboxCounter) lightboxCounter.textContent = (currentIndex + 1) + ' / ' + totalImages;
+      }
+
+      // Preload Next Image for Zero-Lag Transitions
+      if (totalImages > 1) {
+        var nextIdx = (currentIndex + 1) % totalImages;
+        var imgPreload = new Image();
+        imgPreload.src = galleryImages[nextIdx];
+      }
+    }
+
+    // 1. Click Main Image to Advance to Next Photo
+    if (mainImg) {
+      mainImg.addEventListener('click', function() {
+        if (totalImages > 1) {
+          updateGallery(currentIndex + 1);
+        } else {
+          openLightbox();
+        }
+      });
+    }
+
+    // 2. Navigation Arrow Buttons
+    if (prevBtn) prevBtn.addEventListener('click', function(e) { e.stopPropagation(); updateGallery(currentIndex - 1); });
+    if (nextBtn) nextBtn.addEventListener('click', function(e) { e.stopPropagation(); updateGallery(currentIndex + 1); });
+
+    // 3. Thumbnail Click Handler
+    thumbs.forEach(function(thumb) {
+      thumb.addEventListener('click', function() {
+        var idx = parseInt(this.getAttribute('data-index'), 10);
+        updateGallery(idx);
+      });
+    });
+
+    // 4. Keyboard Arrow Key Navigation
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'ArrowLeft') updateGallery(currentIndex - 1);
+      if (e.key === 'ArrowRight') updateGallery(currentIndex + 1);
+      if (e.key === 'Escape') closeLightbox();
+    });
+
+    // 5. Mobile Touch Swipe Support
+    var touchStartX = 0;
+    var touchEndX = 0;
+    var viewportEl = document.getElementById('galleryMainViewport');
+    if (viewportEl) {
+      viewportEl.addEventListener('touchstart', function(e) { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
+      viewportEl.addEventListener('touchend', function(e) {
+        touchEndX = e.changedTouches[0].screenX;
+        if (touchStartX - touchEndX > 35) updateGallery(currentIndex + 1);
+        if (touchEndX - touchStartX > 35) updateGallery(currentIndex - 1);
+      }, {passive: true});
+    }
+
+    // 6. Lightbox Modal Controls
+    function openLightbox() {
+      if (!lightboxModal) return;
+      if (lightboxImg) lightboxImg.src = galleryImages[currentIndex];
+      if (lightboxCounter) lightboxCounter.textContent = (currentIndex + 1) + ' / ' + totalImages;
+      lightboxModal.classList.remove('d-none');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      if (!lightboxModal) return;
+      lightboxModal.classList.add('d-none');
+      document.body.style.overflow = '';
+    }
+
+    if (zoomBtn) zoomBtn.addEventListener('click', function(e) { e.stopPropagation(); openLightbox(); });
+    if (lightboxCloseBtn) lightboxCloseBtn.addEventListener('click', closeLightbox);
+    if (lightboxPrevBtn) lightboxPrevBtn.addEventListener('click', function() { updateGallery(currentIndex - 1); });
+    if (lightboxNextBtn) lightboxNextBtn.addEventListener('click', function() { updateGallery(currentIndex + 1); });
+    
+    if (lightboxModal) {
+      lightboxModal.addEventListener('click', function(e) {
+        if (e.target === lightboxModal) closeLightbox();
+      });
+    }
+    {% endif %}
+  });
+</script>
+{% endblock %}

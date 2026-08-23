@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}Agent Commission Dashboard | The Height Apartment{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    <div class="glass-card p-4 mb-4 d-flex justify-content-between align-items-center">
+      <div>
+        <span class="badge bg-warning text-dark fw-bold mb-1">Accredited Agent</span>
+        <h2 class="fw-bold text-white mb-0">Welcome, {{ current_user.full_name }}</h2>
+        <p class="small text-muted mb-0">Referral Code: <strong class="text-gold">{{ agent.agent_code if agent else 'AGT-THA-001' }}</strong></p>
+      </div>
+      <div>
+        <button class="btn btn-gold" onclick="navigator.clipboard.writeText('https://theheightapartment.com/?ref={{ agent.agent_code if agent else '' }}'); alert('Referral link copied!');">
+          <i class="fas fa-copy me-2"></i> Copy Referral Link
+        </button>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="row g-4 mb-4">
+      <div class="col-md-4">
+        <div class="glass-card p-4 text-center">
+          <span class="text-muted small text-uppercase">Total Earned Commissions</span>
+          <h2 class="fw-bold text-gold mt-2">₦{{ "{:,.2f}".format(agent.total_earnings) if agent else '0.00' }}</h2>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="glass-card p-4 text-center">
+          <span class="text-muted small text-uppercase">Pending Payouts</span>
+          <h2 class="fw-bold text-warning mt-2">₦{{ "{:,.2f}".format(agent.pending_commission) if agent else '0.00' }}</h2>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="glass-card p-4 text-center">
+          <span class="text-muted small text-uppercase">Commission Rate</span>
+          <h2 class="fw-bold text-white mt-2">{{ agent.commission_rate if agent else '10.0' }}%</h2>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bookings Table -->
+    <div class="glass-card p-4">
+      <h4 class="fw-bold text-white mb-3">Referred Reservations &amp; Commissions</h4>
+      <div class="table-responsive">
+        <table class="table table-dark table-hover">
+          <thead>
+            <tr>
+              <th>Ref No.</th>
+              <th>Guest Name</th>
+              <th>Check-In</th>
+              <th>Amount</th>
+              <th>Commission</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td colspan="6" class="text-center text-muted py-4">No referred bookings recorded yet. Share your referral code to start earning!</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

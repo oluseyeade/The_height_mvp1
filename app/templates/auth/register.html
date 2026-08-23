@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Account | The Height Apartment{% endblock %}
+
+{% block content %}
+<section class="py-5 min-vh-80 d-flex align-items-center">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="glass-card p-5">
+          <div class="text-center mb-4">
+            <i class="fas fa-user-plus text-gold fs-1 mb-2"></i>
+            <h3 class="fw-bold text-white">Create Guest Account</h3>
+            <p class="small text-muted">Join The Height Apartment guest network for seamless reservations.</p>
+          </div>
+
+          <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <div class="mb-3">
+              <label class="form-label small text-gold fw-bold">Full Name</label>
+              {{ form.full_name(class="form-control bg-dark text-white border-secondary", placeholder="Chief / Dr. / Mr. Full Name") }}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small text-gold fw-bold">Email Address</label>
+              {{ form.email(class="form-control bg-dark text-white border-secondary", placeholder="you@example.com") }}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small text-gold fw-bold">Phone Number</label>
+              {{ form.phone(class="form-control bg-dark text-white border-secondary", placeholder="+234...") }}
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label small text-gold fw-bold">Password</label>
+                {{ form.password(class="form-control bg-dark text-white border-secondary") }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small text-gold fw-bold">Confirm Password</label>
+                {{ form.confirm_password(class="form-control bg-dark text-white border-secondary") }}
+              </div>
+            </div>
+
+            {{ form.submit(class="btn btn-gold w-100 py-2 fw-bold") }}
+          </form>
+
+          <div class="text-center mt-4 pt-3 border-top border-secondary border-opacity-25 small text-muted">
+            Already have an account? <a href="{{ url_for('auth.login') }}" class="text-gold fw-bold text-decoration-none">Log in here</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

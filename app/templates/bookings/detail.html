@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking Reference #{{ booking.booking_ref }} | The Height Apartment{% endblock %}
+
+{% block content %}
+
+<!-- Hero Header -->
+<section class="py-5 text-center position-relative" style="background: linear-gradient(180deg, rgba(11,12,16,0.8) 0%, rgba(11,12,16,0.95) 100%), url('{{ url_for('static', filename='images/theheight.png') }}') center/cover no-repeat;">
+  <div class="container py-3">
+    <span class="badge bg-gold text-dark fs-6 font-monospace mb-2">RESERVATION SUMMARY</span>
+    <h1 class="display-5 fw-bold text-white mb-2">Booking Reference: {{ booking.booking_ref }}</h1>
+    <p class="text-gold lead">Status: <span class="badge bg-warning text-dark text-uppercase fs-6">{{ booking.status }}</span></p>
+  </div>
+</section>
+
+<!-- Details & Payment Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-5">
+      
+      <!-- Reservation Info -->
+      <div class="col-lg-6">
+        <div class="glass-card p-5 h-100 border-gold">
+          <h4 class="fw-bold text-gold mb-4"><i class="fas fa-bookmark me-2"></i> Reservation Details</h4>
+
+          <div class="mb-3 border-bottom border-secondary pb-2">
+            <span class="small text-muted d-block">Suite Reserved:</span>
+            <strong class="text-white fs-5">{{ booking.apartment.title if booking.apartment else 'Luxury Suite' }}</strong>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <span class="small text-muted d-block">Check-In Date:</span>
+              <strong class="text-white">{{ booking.check_in.strftime('%d %b, %Y') }}</strong>
+            </div>
+            <div class="col-6">
+              <span class="small text-muted d-block">Check-Out Date:</span>
+              <strong class="text-white">{{ booking.check_out.strftime('%d %b, %Y') }}</strong>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-6">
+              <span class="small text-muted d-block">Guest Name:</span>
+              <strong class="text-white">{{ booking.guest_name }}</strong>
+            </div>
+            <div class="col-6">
+              <span class="small text-muted d-block">Guest Phone:</span>
+              <strong class="text-white">{{ booking.guest_phone }}</strong>
+            </div>
+          </div>
+
+          <div class="p-3 bg-dark border border-secondary rounded-3 mb-4">
+            <div class="d-flex justify-content-between text-muted small mb-2">
+              <span>Apartment Booking Amount:</span>
+              <span class="text-white fw-bold">₦{{ "{:,.2f}".format(apt_booking_amount) }}</span>
+            </div>
+            {% if booking.discount_amount and booking.discount_amount > 0 %}
+              <div class="d-flex justify-content-between text-success small mb-2">
+                <span>Agent Referral Discount (3%):</span>
+                <span class="fw-bold">-₦{{ "{:,.2f}".format(booking.discount_amount) }}</span>
+              </div>
+            {% endif %}
+            <div class="d-flex justify-content-between text-gold small mb-2">
+              <span>Refundable Caution Fee:</span>
+              <span class="fw-bold">₦{{ "{:,.2f}".format(caution_fee) }}</span>
+            </div>
+            <div class="d-flex justify-content-between text-gold font-monospace fs-5 fw-bold pt-2 border-top border-secondary">
+              <span>Total Payable Online:</span>
+              <span>₦{{ "{:,.2f}".format(total_payable_online) }}</span>
+            </div>
+          </div>
+
+          {% if booking.payments %}
+            <h5 class="fw-bold text-gold mb-3"><i class="fas fa-history me-2"></i> Payment History</h5>
+            {% for pay in booking.payments %}
+              <div class="p-3 bg-dark border border-secondary rounded-3 mb-2 d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="small fw-bold text-white">{{ pay.transaction_ref }}</div>
+                  <div class="small text-muted">{{ pay.payment_method }} · ₦{{ "{:,.2f}".format(pay.amount) }}</div>
+                </div>
+                <span class="badge bg-{{ 'success' if pay.status == 'verified' else 'warning' }}">{{ pay.status }}</span>
+              </div>
+              {% if pay.receipt %}
+                <a href="{{ url_for('receipts.view_receipt', receipt_number=pay.receipt.receipt_number) }}" class="btn btn-sm btn-gold mt-2 w-100">
+                  <i class="fas fa-receipt me-2"></i> View Receipt #{{ pay.receipt.receipt_number }}
+                </a>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
+        </div>
+      </div>
+
+      <!-- Payment & Dynamic Single Call-To-Action (CTA) Panel -->
+      <div class="col-lg-6">
+        {% if booking.apartment and booking.apartment.status == 'available' %}
+          <div class="glass-card p-5 border-gold">
+            
+            {% if booking.status in ['cancelled', 'CANCELLED'] %}
+              <h4 class="fw-bold text-gold mb-3"><i class="fas fa-times-circle text-danger me-2"></i> Reservation Cancelled</h4>
+              <div class="alert bg-dark border-danger text-light small mb-4">
+                <i class="fas fa-info-circle text-danger me-2"></i>
+                This booking has been cancelled. You can select another luxury suite below.
+              </div>
+            {% elif booking.status in ['checked_in', 'CHECKED_IN'] %}
+              <h4 class="fw-bold text-gold mb-3"><i class="fas fa-key text-success me-2"></i> Guest Checked-In</h4>
+              <div class="alert bg-dark border-gold text-light small mb-4">
+                <i class="fas fa-door-open text-gold me-2"></i>
+                Check-in complete. Enjoy your stay at The Height Premium Apartments.
+              </div>
+            {% elif booking.status in ['completed', 'CHECKED_OUT', 'checked_out'] %}
+              <h4 class="fw-bold text-gold mb-3"><i class="fas fa-check-double text-gold me-2"></i> Stay Completed</h4>
+              <div class="alert bg-dark border-gold text-light small mb-4">
+                <i class="fas fa-award text-gold me-2"></i>
+                Thank you for staying with us!
+              </div>
+            {% elif booking.payment_status in ['VERIFIED', 'verified', 'SUCCESS', 'success'] or booking.status in ['confirmed', 'CONFIRMED'] %}
+              <h4 class="fw-bold text-gold mb-3"><i class="fas fa-check-circle text-success me-2"></i> Reservation Verified &amp; Confirmed</h4>
+              <div class="alert bg-dark border-success text-light small mb-4">
+                <i class="fas fa-shield-alt text-success me-2"></i>
+                Your payment of <strong>₦{{ "{:,.2f}".format(booking.total_amount or total_payable_online) }}</strong> has been verified. Your suite is reserved.
+              </div>
+            {% elif booking.payment_status in ['PROCESSING', 'processing', 'verifying'] %}
+              <h4 class="fw-bold text-gold mb-3"><i class="fas fa-spinner fa-spin me-2"></i> Payment Verification in Progress</h4>
+              <div class="alert bg-dark border-warning text-light small mb-4">
+                <i class="fas fa-clock text-warning me-2"></i>
+                We are verifying your transaction with Paystack. Please stand by...
+              </div>
+            {% elif booking.payment_status in ['FAILED', 'failed'] %}
+              <h4 class="fw-bold text-gold mb-3"><i class="fas fa-exclamation-triangle text-danger me-2"></i> Payment Verification Failed</h4>
+              <div class="alert bg-dark border-danger text-light small mb-4">
+                <i class="fas fa-info-circle text-danger me-2"></i>
+                Your previous payment attempt was unsuccessful. You can retry payment below.
+              </div>
+            {% else %}
+              <h4 class="fw-bold text-gold mb-3"><i class="fas fa-credit-card me-2"></i> Secure Paystack Checkout</h4>
+              <div class="alert bg-dark border-gold text-light small mb-4">
+                <i class="fas fa-shield-alt text-gold me-2"></i>
+                A refundable <strong>₦{{ "{:,.2f}".format(caution_fee) }}</strong> caution fee is included in your total booking payment of <strong>₦{{ "{:,.2f}".format(total_payable_online) }}</strong>. This amount is refundable after checkout, subject to inspection of the apartment and compliance with the applicable terms and conditions.
+              </div>
+            {% endif %}
+
+            <!-- Pricing Summary Breakdown Box -->
+            <div class="p-4 bg-dark border border-secondary rounded-3 mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="small text-muted">Apartment Rate:</span>
+                <span class="text-white font-monospace">₦{{ "{:,.2f}".format(apt_booking_amount) }}</span>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="small text-muted">Refundable Caution Fee:</span>
+                <span class="text-gold font-monospace">₦{{ "{:,.2f}".format(caution_fee) }}</span>
+              </div>
+              <hr class="border-secondary my-2">
+              <div class="d-flex justify-content-between align-items-center fw-bold fs-5 text-gold">
+                <span>Total Payable:</span>
+                <span class="font-monospace">₦{{ "{:,.2f}".format(total_payable_online) }}</span>
+              </div>
+            </div>
+
+            <!-- SINGLE PRIMARY CALL-TO-ACTION (CTA) BUTTON BLOCK -->
+            {% if booking.status in ['cancelled', 'CANCELLED'] %}
+              <!-- State: Booking Cancelled -->
+              <a href="{{ url_for('apartments.list_apartments') }}" class="btn btn-gold btn-lg w-100 py-3 fw-bold shadow">
+                <i class="fas fa-redo me-2"></i> Book Again
+              </a>
+
+            {% elif booking.status in ['checked_in', 'CHECKED_IN'] %}
+              <!-- State: Checked-in -->
+              <button type="button" class="btn btn-gold btn-lg w-100 py-3 fw-bold disabled" disabled>
+                <i class="fas fa-key me-2"></i> Check-in Complete
+              </button>
+
+            {% elif booking.status in ['completed', 'CHECKED_OUT', 'checked_out'] %}
+              <!-- State: Checked-out -->
+              <a href="{{ url_for('apartments.list_apartments') }}" class="btn btn-gold btn-lg w-100 py-3 fw-bold shadow">
+                <i class="fas fa-check-double me-2"></i> Booking Completed
+              </a>
+
+            {% elif booking.payment_status in ['VERIFIED', 'verified', 'SUCCESS', 'success'] or booking.status in ['confirmed', 'CONFIRMED'] %}
+              <!-- State: Payment Successful / Confirmed -->
+              <a href="{{ url_for('bookings.success', booking_ref=booking.booking_ref) }}" class="btn btn-gold btn-lg w-100 py-3 fw-bold shadow">
+                <i class="fas fa-calendar-check me-2"></i> View Booking Details
+              </a>
+
+              <!-- Secondary Action: Receipt (Outline Button, NOT primary gold button) -->
+              {% if receipt %}
+                <a href="{{ url_for('receipts.view_receipt', receipt_number=receipt.receipt_number) }}" class="btn btn-outline-gold btn-lg w-100 py-3 fw-bold mt-3">
+                  <i class="fas fa-receipt me-2"></i> View Receipt #{{ receipt.receipt_number }}
+                </a>
+              {% endif %}
+
+            {% elif booking.payment_status in ['PROCESSING', 'processing', 'verifying'] %}
+              <!-- State: Payment Processing -->
+              <button type="button" class="btn btn-gold btn-lg w-100 py-3 fw-bold disabled" disabled>
+                <i class="fas fa-spinner fa-spin me-2"></i> Verifying Payment...
+              </button>
+
+            {% elif booking.payment_status in ['FAILED', 'failed'] %}
+              <!-- State: Payment Failed -->
+              <form action="{{ url_for('bookings.detail', booking_ref=booking.booking_ref) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="payment_method" value="paystack">
+                <button type="submit" class="btn btn-gold btn-lg w-100 py-3 fw-bold shadow">
+                  <i class="fas fa-sync-alt me-2"></i> Retry Payment
+                </button>
+              </form>
+
+            {% else %}
+              <!-- State: Pending Payment -->
+              <form action="{{ url_for('bookings.detail', booking_ref=booking.booking_ref) }}" method="POST" id="paystackCheckoutForm">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="payment_method" value="paystack">
+                <button type="submit" id="paystackCheckoutSubmitBtn" class="btn btn-gold btn-lg w-100 py-3 fw-bold shadow">
+                  <i class="fas fa-lock me-2"></i> Proceed to Secure Payment
+                </button>
+              </form>
+            {% endif %}
+
+          </div>
+        {% else %}
+          <div class="alert bg-dark border-gold text-gold text-center py-5 px-4 rounded-3 shadow">
+            <i class="fas fa-exclamation-triangle fs-1 mb-3 d-block text-warning"></i>
+            <h4 class="fw-bold font-serif mb-2 text-white">This apartment is not available. Please check other available apartments. Thank you.</h4>
+            <p class="small text-light opacity-75 mb-4">Payment instructions are unavailable for this suite.</p>
+            <a href="{{ url_for('apartments.list_apartments') }}" class="btn btn-gold btn-md fw-bold font-sans">
+              <i class="fas fa-search me-1"></i> Browse Available Suites
+            </a>
+          </div>
+        {% endif %}
+      </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const paystackForm = document.getElementById('paystackCheckoutForm');
+  const paystackBtn = document.getElementById('paystackCheckoutSubmitBtn');
+  if (paystackForm && paystackBtn) {
+    paystackForm.addEventListener('submit', function() {
+      paystackBtn.disabled = true;
+      paystackBtn.classList.add('disabled');
+      paystackBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Redirecting to Paystack Secure Payment Gateway...';
+    });
+  }
+});
+</script>
+
+{% endblock %}

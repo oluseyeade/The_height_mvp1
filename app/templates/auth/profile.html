@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}Customer Dashboard &amp; Reservation History | The Height Apartment{% endblock %}
+
+{% block content %}
+<section class="py-5 min-vh-100">
+  <div class="container">
+    
+    <!-- Account Header Component -->
+    <div class="glass-card p-4 p-md-5 mb-4 border-gold shadow-lg">
+      <div class="row align-items-center g-4">
+        <div class="col-auto">
+          <div class="rounded-circle bg-gold text-dark fw-bold display-5 px-4 py-2 text-uppercase shadow">
+            {{ current_user.full_name[0] if current_user.full_name else 'C' }}
+          </div>
+        </div>
+        <div class="col">
+          <h2 class="fw-bold text-white font-serif mb-1">{{ current_user.full_name }}</h2>
+          <p class="text-gold mb-1"><i class="fas fa-envelope me-2"></i>{{ current_user.email }}</p>
+          <p class="text-muted small mb-0"><i class="fas fa-phone me-2"></i>{{ current_user.phone or 'Phone not provided' }}</p>
+        </div>
+        <div class="col-md-auto text-md-end">
+          <span class="badge bg-gold text-dark font-monospace text-uppercase px-3 py-2 fs-6 mb-2">{{ current_user.role.role_name if current_user.role else 'Customer' }}</span>
+          <div class="small text-muted">Member Since: <strong class="text-light">{{ current_user.created_at.strftime('%B %Y') if current_user.created_at else '2026' }}</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reservation Summary Stat Grid -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-gold">
+          <div class="small text-muted text-uppercase font-sans">Total Reservations</div>
+          <div class="display-6 fw-bold text-gold font-monospace">{{ stats.total }}</div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-success">
+          <div class="small text-muted text-uppercase font-sans">Confirmed / Paid</div>
+          <div class="display-6 fw-bold text-success font-monospace">{{ stats.confirmed }}</div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-warning">
+          <div class="small text-muted text-uppercase font-sans">Pending Payment</div>
+          <div class="display-6 fw-bold text-warning font-monospace">{{ stats.pending }}</div>
+        </div>
+      </div>
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-info">
+          <div class="small text-muted text-uppercase font-sans">Completed Stays</div>
+          <div class="display-6 fw-bold text-info font-monospace">{{ stats.completed }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Booking History Table & Cards Component -->
+    <div class="glass-card p-4 p-md-5 border-gold shadow-lg">
+      <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+        <div>
+          <h4 class="fw-bold text-white font-serif mb-1"><i class="fas fa-history text-gold me-2"></i>My Reservation History</h4>
+          <p class="small text-muted mb-0">View all your luxury suite reservations, invoice details, and official receipts.</p>
+        </div>
+        <a href="{{ url_for('apartments.list_apartments') }}" class="btn btn-outline-gold btn-sm"><i class="fas fa-plus me-1"></i>New Booking</a>
+      </div>
+
+      {% if bookings %}
+      <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle mb-0">
+          <thead class="table-dark text-gold font-sans border-bottom border-gold">
+            <tr>
+              <th>Booking Ref</th>
+              <th>Suite / Property</th>
+              <th>Dates &amp; Duration</th>
+              <th>Total Charged</th>
+              <th>Payment Status</th>
+              <th>Reservation Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for booking in bookings %}
+            {% set nights = (booking.check_out - booking.check_in).days if (booking.check_out and booking.check_in) else 1 %}
+            {% set rcp = receipts_map.get(booking.booking_id) %}
+            <tr>
+              <td>
+                <span class="fw-bold text-gold font-monospace">{{ booking.booking_ref }}</span>
+                <div class="small text-muted">{{ booking.created_at.strftime('%d %b %Y') if booking.created_at else '' }}</div>
+              </td>
+              <td>
+                <strong class="text-white">{{ booking.apartment.title if booking.apartment else 'Luxury Suite' }}</strong>
+                <div class="small text-muted">{{ booking.guest_count or 1 }} Guest(s)</div>
+              </td>
+              <td>
+                <div class="small text-light">
+                  <i class="far fa-calendar-alt text-gold me-1"></i>{{ booking.check_in.strftime('%d %b %Y') }} to {{ booking.check_out.strftime('%d %b %Y') }}
+                </div>
+                <div class="small text-gold font-sans">{{ nights }} Night(s)</div>
+              </td>
+              <td class="fw-bold text-white font-monospace">
+                ₦{{ "{:,.2f}".format(booking.total_amount or (booking.final_amount + (booking.caution_fee or 50000.00))) }}
+                <div class="small text-muted font-sans" style="font-size: 0.75rem;">(Inc. ₦50k Caution Fee)</div>
+              </td>
+              <td>
+                {% if booking.payment_status and booking.payment_status.upper() in ['PAID', 'VERIFIED'] %}
+                <span class="badge bg-success px-2 py-1"><i class="fas fa-check-circle me-1"></i>PAID</span>
+                {% elif booking.payment_status and booking.payment_status.upper() in ['PENDING', 'PENDING_PAYMENT'] %}
+                <span class="badge bg-warning text-dark px-2 py-1"><i class="fas fa-clock me-1"></i>PENDING</span>
+                {% else %}
+                <span class="badge bg-secondary px-2 py-1">{{ booking.payment_status or 'UNPAID' }}</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if booking.status and booking.status.lower() in ['confirmed', 'paid'] %}
+                <span class="badge bg-success px-2 py-1">Confirmed</span>
+                {% elif booking.status and booking.status.lower() == 'completed' %}
+                <span class="badge bg-info text-dark px-2 py-1">Completed</span>
+                {% elif booking.status and booking.status.lower() in ['cancelled', 'expired', 'timed_out'] %}
+                <span class="badge bg-danger px-2 py-1">Cancelled</span>
+                {% else %}
+                <span class="badge bg-warning text-dark px-2 py-1">Pending</span>
+                {% endif %}
+              </td>
+              <td class="text-end">
+                <div class="btn-group btn-group-sm">
+                  <a href="{{ url_for('bookings.detail', booking_ref=booking.booking_ref) }}" class="btn btn-gold py-1 px-2" title="View Reservation Details">
+                    <i class="fas fa-eye me-1"></i>Details
+                  </a>
+                  {% if rcp %}
+                  <a href="{{ url_for('receipts.view_receipt', receipt_number=rcp.receipt_number) }}" class="btn btn-outline-gold py-1 px-2" title="View Official Receipt" target="_blank">
+                    <i class="fas fa-receipt me-1"></i>Receipt
+                  </a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="text-center py-5">
+        <div class="display-4 text-gold mb-3"><i class="fas fa-calendar-times"></i></div>
+        <h5 class="fw-bold text-white mb-2">No Reservations Found</h5>
+        <p class="text-muted small max-w-lg mx-auto mb-4">You have not placed any apartment reservations yet. Explore our luxury short-let suites and place your booking today.</p>
+        <a href="{{ url_for('apartments.list_apartments') }}" class="btn btn-gold px-4 py-3 fw-bold">
+          <i class="fas fa-building me-2"></i>Explore Luxury Suites &amp; Reserve Now
+        </a>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,711 @@
+{% extends 'base.html' %}
+
+{% block title %}Enterprise Bookings Management | The Height Apartment{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container-fluid px-lg-5">
+    
+    <!-- Executive Header -->
+    <div class="glass-card p-4 mb-4 border-gold d-flex flex-wrap justify-content-between align-items-center">
+      <div>
+        <span class="badge bg-gold text-dark font-monospace text-uppercase px-3 py-1 mb-1">RESERVATION CONTROL PORTAL</span>
+        <h2 class="display-6 fw-bold text-white mb-0 font-serif">Enterprise Bookings &amp; Reservation Management</h2>
+        <p class="small text-muted mb-0">Real-Time Operational Oversight, Guest Statuses, Paystack References &amp; Financial Audits</p>
+      </div>
+      <div class="mt-3 mt-md-0 d-flex gap-2">
+        <a href="{{ url_for('admin_panel.export_bookings') }}" class="btn btn-outline-gold"><i class="fas fa-file-csv me-1"></i> Export CSV</a>
+        <a href="{{ url_for('admin_panel.manage_commissions') }}" class="btn btn-outline-gold"><i class="fas fa-coins me-1"></i> Commissions</a>
+        <a href="{{ url_for('admin_panel.dashboard') }}" class="btn btn-gold"><i class="fas fa-arrow-left me-1"></i> Dashboard</a>
+      </div>
+    </div>
+
+    <!-- Aggregate KPI Metrics -->
+    <div class="row g-3 mb-4">
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-gold">
+          <i class="fas fa-calendar-alt text-gold fs-3 mb-1"></i>
+          <div class="small text-muted text-uppercase fw-bold">Total Reservations</div>
+          <h4 class="fw-bold text-white font-serif mb-0">{{ metrics.total_bookings }}</h4>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-gold">
+          <i class="fas fa-check-circle text-success fs-3 mb-1"></i>
+          <div class="small text-muted text-uppercase fw-bold">Confirmed / Checked-in</div>
+          <h4 class="fw-bold text-success font-serif mb-0">{{ metrics.confirmed_count }}</h4>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-gold">
+          <i class="fas fa-coins text-gold fs-3 mb-1"></i>
+          <div class="small text-muted text-uppercase fw-bold">Total Room Revenue</div>
+          <h4 class="fw-bold text-gold font-monospace mb-0">₦{{ "{:,.2f}".format(metrics.total_room_revenue) }}</h4>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-6">
+        <div class="glass-card p-3 text-center border-gold">
+          <i class="fas fa-shield-alt text-info fs-3 mb-1"></i>
+          <div class="small text-muted text-uppercase fw-bold">Caution Fees Held</div>
+          <h4 class="fw-bold text-info font-monospace mb-0">₦{{ "{:,.2f}".format(metrics.total_caution_held) }}</h4>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter & Search Control Panel -->
+    <div class="glass-card p-4 border-gold mb-4">
+      <form action="{{ url_for('admin_panel.manage_bookings') }}" method="GET" class="row g-3 align-items-end">
+        <div class="col-lg-3 col-md-6">
+          <label class="form-label text-gold small fw-bold mb-1"><i class="fas fa-search me-1"></i> Search Keywords</label>
+          <input type="text" name="search" class="form-control form-control-sm bg-dark text-white border-secondary" placeholder="Guest name, email, ref, paystack..." value="{{ search_query }}">
+        </div>
+
+        <div class="col-lg-2 col-md-6">
+          <label class="form-label text-gold small fw-bold mb-1"><i class="fas fa-filter me-1"></i> Booking Status</label>
+          <select name="status" class="form-select form-select-sm bg-dark text-white border-secondary">
+            <option value="all" {% if status_filter == 'all' or not status_filter %}selected{% endif %}>All Booking Statuses</option>
+            <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+            <option value="confirmed" {% if status_filter == 'confirmed' %}selected{% endif %}>Confirmed</option>
+            <option value="checked_in" {% if status_filter == 'checked_in' %}selected{% endif %}>Checked In</option>
+            <option value="checked_out" {% if status_filter == 'checked_out' %}selected{% endif %}>Checked Out</option>
+            <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+          </select>
+        </div>
+
+        <div class="col-lg-2 col-md-6">
+          <label class="form-label text-gold small fw-bold mb-1"><i class="fas fa-credit-card me-1"></i> Payment Status</label>
+          <select name="payment_status" class="form-select form-select-sm bg-dark text-white border-secondary">
+            <option value="ALL" {% if payment_status_filter == 'ALL' or not payment_status_filter %}selected{% endif %}>All Payment Statuses</option>
+            <option value="PENDING_PAYMENT" {% if payment_status_filter == 'PENDING_PAYMENT' %}selected{% endif %}>Pending Payment</option>
+            <option value="VERIFIED" {% if payment_status_filter == 'VERIFIED' %}selected{% endif %}>Verified / Paid</option>
+            <option value="FAILED" {% if payment_status_filter == 'FAILED' %}selected{% endif %}>Failed</option>
+            <option value="REFUNDED" {% if payment_status_filter == 'REFUNDED' %}selected{% endif %}>Refunded</option>
+          </select>
+        </div>
+
+        <div class="col-lg-2 col-md-6">
+          <label class="form-label text-gold small fw-bold mb-1"><i class="fas fa-building me-1"></i> Suite / Apartment</label>
+          <select name="apartment_id" class="form-select form-select-sm bg-dark text-white border-secondary">
+            <option value="">All Apartments</option>
+            {% for apt in apartments %}
+              <option value="{{ apt.apartment_id }}" {% if apartment_id_filter == apt.apartment_id %}selected{% endif %}>{{ apt.title }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="col-lg-3 col-md-12 d-flex gap-2">
+          <button type="submit" class="btn btn-sm btn-gold flex-grow-1"><i class="fas fa-filter me-1"></i> Apply Filters</button>
+          <a href="{{ url_for('admin_panel.manage_bookings') }}" class="btn btn-sm btn-outline-light"><i class="fas fa-sync-alt me-1"></i> Reset</a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Block Dates & Management Reservation Module (Anchor: #block-dates-section) -->
+    <div class="glass-card p-4 border-gold mb-4" id="block-dates-section">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
+        <div>
+          <span class="badge bg-gold text-dark font-monospace text-uppercase px-2 py-1 me-2">AVAILABILITY &amp; MANAGEMENT RESERVATIONS</span>
+          <h4 class="fw-bold text-white font-serif d-inline-block mb-0">
+            <i class="fas fa-calendar-times text-gold me-2"></i> Property Date Availability &amp; Management Reservations
+          </h4>
+        </div>
+        <div class="mt-2 mt-md-0">
+          <button type="button" class="btn btn-gold btn-sm fw-bold me-2" data-bs-toggle="modal" data-bs-target="#makeManagementReservationModal">
+            <i class="fas fa-calendar-plus me-1"></i> Make Reservation
+          </button>
+          <button type="button" class="btn btn-outline-gold btn-sm" data-bs-toggle="modal" data-bs-target="#blockPropertyDatesModal">
+            <i class="fas fa-ban me-1"></i> Block Property Dates
+          </button>
+        </div>
+      </div>
+
+      <!-- Interactive Property Calendar Grid & Legend -->
+      <div class="row g-4 align-items-center">
+        <div class="col-lg-4 col-md-5">
+          <label class="form-label text-gold small fw-bold mb-1"><i class="fas fa-building me-1"></i> Select Property / Suite</label>
+          <select id="calendarPropertySelect" class="form-select bg-dark text-white border-secondary" onchange="fetchCalendarAvailability(this.value)">
+            {% for apt in apartments %}
+              <option value="{{ apt.apartment_id }}">{{ apt.title }}</option>
+            {% endfor %}
+          </select>
+          <p class="small text-muted mt-2 mb-0">Select a property to view real-time availability for the next 30 days.</p>
+          
+          <!-- Calendar Legend -->
+          <div class="mt-3 p-3 bg-dark bg-opacity-50 rounded border border-secondary">
+            <div class="small fw-bold text-white mb-2 font-monospace">CALENDAR LEGEND:</div>
+            <div class="d-flex align-items-center gap-3">
+              <span class="badge bg-success px-2 py-1"><i class="fas fa-circle me-1"></i> 🟢 Available</span>
+              <span class="badge bg-danger px-2 py-1"><i class="fas fa-circle me-1"></i> 🔴 Booked / Blocked</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 30-Day Availability Grid Container -->
+        <div class="col-lg-8 col-md-7">
+          <div class="p-3 bg-dark bg-opacity-40 rounded border border-secondary">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="text-gold font-monospace mb-0" id="calendarPropertyTitle">Property Availability Grid</h6>
+              <span class="small text-muted" id="calendarDateRange">Next 30 Days</span>
+            </div>
+            <div id="availabilityCalendarGrid" class="d-flex flex-wrap gap-2 py-2">
+              <!-- Dynamically populated via JS fetch / render -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Make Management Reservation Modal -->
+    <div class="modal fade" id="makeManagementReservationModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content bg-dark border-gold text-light">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title font-serif text-gold">
+              <i class="fas fa-calendar-plus me-2"></i> Make Management Reservation
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <form action="{{ url_for('admin_panel.create_management_reservation') }}" method="POST" id="managementReservationForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="modal-body">
+              <!-- Step 1: Form Fields -->
+              <div id="resStep1">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label text-gold small fw-bold">Booking Type *</label>
+                    <div class="d-flex gap-3">
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="booking_type" id="typeRegular" value="regular" checked onchange="toggleCorporateFields(false)">
+                        <label class="form-check-label text-white" for="typeRegular">Regular Guest</label>
+                      </div>
+                      <div class="form-check">
+                        <input class="form-check-input" type="radio" name="booking_type" id="typeCorporate" value="corporate" onchange="toggleCorporateFields(true)">
+                        <label class="form-check-label text-gold fw-bold" for="typeCorporate">Corporate Customer</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6" id="companyNameContainer" style="display: none;">
+                    <label class="form-label text-gold small fw-bold">Company / Corporate Name *</label>
+                    <input type="text" name="company_name" id="resCompanyName" class="form-control bg-dark text-white border-secondary" placeholder="e.g. Chevron Nigeria Ltd">
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label text-gold small fw-bold">Select Property / Suite *</label>
+                    <select name="apartment_id" id="resApartmentId" class="form-select bg-dark text-white border-secondary" required>
+                      {% for apt in apartments %}
+                        <option value="{{ apt.apartment_id }}" data-title="{{ apt.title }}" data-price="{{ apt.price_per_night }}">{{ apt.title }} (₦{{ "{:,.2f}".format(apt.price_per_night) }}/night)</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label text-gold small fw-bold">Guest / Contact Name *</label>
+                    <input type="text" name="guest_name" id="resGuestName" class="form-control bg-dark text-white border-secondary" placeholder="John Doe" required>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label text-gold small fw-bold">Guest Email *</label>
+                    <input type="email" name="guest_email" id="resGuestEmail" class="form-control bg-dark text-white border-secondary" placeholder="guest@domain.com" required>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label text-gold small fw-bold">Guest Phone *</label>
+                    <input type="text" name="guest_phone" id="resGuestPhone" class="form-control bg-dark text-white border-secondary" placeholder="+234 800 000 0000" required>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label text-gold small fw-bold">Check-in Date *</label>
+                    <input type="date" name="check_in" id="resCheckIn" class="form-control bg-dark text-white border-secondary" required>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label text-gold small fw-bold">Check-out Date *</label>
+                    <input type="date" name="check_out" id="resCheckOut" class="form-control bg-dark text-white border-secondary" required>
+                  </div>
+
+                  <div class="col-md-4">
+                    <label class="form-label text-gold small fw-bold">Guests *</label>
+                    <input type="number" name="guest_count" id="resGuestCount" class="form-control bg-dark text-white border-secondary" value="1" min="1" max="10" required>
+                  </div>
+
+                  <div class="col-12">
+                    <label class="form-label text-gold small fw-bold">Management Notes / Special Requests</label>
+                    <textarea name="special_requests" id="resNotes" class="form-control bg-dark text-white border-secondary" rows="2" placeholder="e.g. VIP Corporate Client, Priority Check-in..."></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 2: Confirmation Summary -->
+              <div id="resStep2" style="display: none;">
+                <div class="p-4 bg-secondary bg-opacity-20 rounded border border-gold">
+                  <h5 class="text-gold font-serif fw-bold mb-3"><i class="fas fa-clipboard-check me-2"></i> Reservation Confirmation Summary</h5>
+                  <div class="row g-2">
+                    <div class="col-6"><strong>Property:</strong></div>
+                    <div class="col-6 text-end text-gold fw-bold" id="summaryProperty">Property Title</div>
+
+                    <div class="col-6"><strong>Booking Type:</strong></div>
+                    <div class="col-6 text-end" id="summaryType">Regular Guest</div>
+
+                    <div class="col-6"><strong>Customer / Guest:</strong></div>
+                    <div class="col-6 text-end text-white" id="summaryCustomer">Guest Name</div>
+
+                    <div class="col-6"><strong>Check-in Date:</strong></div>
+                    <div class="col-6 text-end text-white" id="summaryCheckIn">2026-08-20</div>
+
+                    <div class="col-6"><strong>Check-out Date:</strong></div>
+                    <div class="col-6 text-end text-white" id="summaryCheckOut">2026-08-23</div>
+
+                    <div class="col-6"><strong>Guests:</strong></div>
+                    <div class="col-6 text-end text-white" id="summaryGuests">1 Guest(s)</div>
+
+                    <div class="col-12"><hr class="border-secondary my-2"></div>
+
+                    <div class="col-6 fs-5 font-monospace text-gold fw-bold">Total Payable:</div>
+                    <div class="col-6 text-end fs-5 font-monospace text-gold fw-bold" id="summaryTotal">₦0.00</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="modal-footer border-secondary">
+              <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-outline-gold" id="btnBackStep1" style="display: none;" onclick="showReservationStep(1)">Back</button>
+              <button type="button" class="btn btn-gold fw-bold" id="btnReviewRes" onclick="reviewReservationSummary()">Review Reservation Summary</button>
+              <button type="submit" class="btn btn-success fw-bold" id="btnConfirmRes" style="display: none;"><i class="fas fa-check-circle me-1"></i> Confirm &amp; Create Reservation</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Block Property Dates Modal -->
+    <div class="modal fade" id="blockPropertyDatesModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark border-gold text-light">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title font-serif text-gold"><i class="fas fa-ban me-2"></i> Block Property Dates</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form action="{{ url_for('admin_panel.block_property_dates') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label text-gold small fw-bold">Property / Suite *</label>
+                <select name="apartment_id" class="form-select bg-dark text-white border-secondary" required>
+                  {% for apt in apartments %}
+                    <option value="{{ apt.apartment_id }}">{{ apt.title }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label text-gold small fw-bold">Check-in / Start Date *</label>
+                <input type="date" name="check_in" class="form-control bg-dark text-white border-secondary" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label text-gold small fw-bold">Check-out / End Date *</label>
+                <input type="date" name="check_out" class="form-control bg-dark text-white border-secondary" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label text-gold small fw-bold">Reason for Blocking</label>
+                <input type="text" name="reason" class="form-control bg-dark text-white border-secondary" placeholder="Maintenance, Renovation, Owner Use...">
+              </div>
+            </div>
+            <div class="modal-footer border-secondary">
+              <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-danger fw-bold"><i class="fas fa-ban me-1"></i> Block Selected Dates</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Script for Calendar Availability & Reservation Summary -->
+    <script>
+      function toggleCorporateFields(isCorporate) {
+        const container = document.getElementById('companyNameContainer');
+        const input = document.getElementById('resCompanyName');
+        if (isCorporate) {
+          container.style.display = 'block';
+          input.setAttribute('required', 'required');
+        } else {
+          container.style.display = 'none';
+          input.removeAttribute('required');
+        }
+      }
+
+      function fetchCalendarAvailability(aptId) {
+        const grid = document.getElementById('availabilityCalendarGrid');
+        const title = document.getElementById('calendarPropertyTitle');
+        if (!grid || !aptId) return;
+        grid.innerHTML = '<span class="spinner-border spinner-border-sm text-gold"></span> Loading availability...';
+
+        fetch('/admin/api/apartments/' + aptId + '/calendar-availability')
+          .then(res => res.json())
+          .then(data => {
+            grid.innerHTML = '';
+            if (data.apartment_title && title) title.innerText = data.apartment_title + ' Availability';
+            
+            data.calendar.forEach(item => {
+              const badge = document.createElement('span');
+              badge.className = item.status === 'available' 
+                ? 'badge bg-success bg-opacity-75 p-2 font-monospace cursor-pointer' 
+                : 'badge bg-danger bg-opacity-75 p-2 font-monospace';
+              badge.title = item.date + ': ' + item.status.toUpperCase();
+              badge.innerHTML = item.day_label + '<br><small>' + item.status_icon + '</small>';
+              
+              if (item.status === 'available') {
+                badge.onclick = function() {
+                  document.getElementById('resApartmentId').value = aptId;
+                  document.getElementById('resCheckIn').value = item.date;
+                  var modal = new bootstrap.Modal(document.getElementById('makeManagementReservationModal'));
+                  modal.show();
+                };
+              }
+              grid.appendChild(badge);
+            });
+          })
+          .catch(err => {
+            grid.innerHTML = '<span class="text-danger small">Failed to load calendar.</span>';
+          });
+      }
+
+      function reviewReservationSummary() {
+        const form = document.getElementById('managementReservationForm');
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+
+        const checkIn = new Date(document.getElementById('resCheckIn').value);
+        const checkOut = new Date(document.getElementById('resCheckOut').value);
+        
+        if (checkIn >= checkOut) {
+          alert('Check-out date must be after Check-in date.');
+          return;
+        }
+
+        const aptSelect = document.getElementById('resApartmentId');
+        const selectedOpt = aptSelect.options[aptSelect.selectedIndex];
+        const pricePerNight = parseFloat(selectedOpt.getAttribute('data-price') || 0);
+        const nights = Math.max(1, Math.round((checkOut - checkIn) / (1000 * 60 * 60 * 24)));
+        const roomTotal = pricePerNight * nights;
+        const grandTotal = roomTotal + 50000.00;
+
+        const isCorp = document.getElementById('typeCorporate').checked;
+        const company = document.getElementById('resCompanyName').value;
+        const guestName = document.getElementById('resGuestName').value;
+
+        document.getElementById('summaryProperty').innerText = selectedOpt.getAttribute('data-title') || selectedOpt.text;
+        document.getElementById('summaryType').innerText = isCorp ? 'Corporate Customer (' + company + ')' : 'Regular Guest';
+        document.getElementById('summaryCustomer').innerText = guestName;
+        document.getElementById('summaryCheckIn').innerText = document.getElementById('resCheckIn').value;
+        document.getElementById('summaryCheckOut').innerText = document.getElementById('resCheckOut').value;
+        document.getElementById('summaryGuests').innerText = document.getElementById('resGuestCount').value + ' Guest(s)';
+        document.getElementById('summaryTotal').innerText = '₦' + grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+        showReservationStep(2);
+      }
+
+      function showReservationStep(step) {
+        if (step === 1) {
+          document.getElementById('resStep1').style.display = 'block';
+          document.getElementById('resStep2').style.display = 'none';
+          document.getElementById('btnReviewRes').style.display = 'inline-block';
+          document.getElementById('btnConfirmRes').style.display = 'none';
+          document.getElementById('btnBackStep1').style.display = 'none';
+        } else {
+          document.getElementById('resStep1').style.display = 'none';
+          document.getElementById('resStep2').style.display = 'block';
+          document.getElementById('btnReviewRes').style.display = 'none';
+          document.getElementById('btnConfirmRes').style.display = 'inline-block';
+          document.getElementById('btnBackStep1').style.display = 'inline-block';
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const select = document.getElementById('calendarPropertySelect');
+        if (select && select.value) {
+          fetchCalendarAvailability(select.value);
+        }
+      });
+    </script>
+
+    <!-- Master Bookings Table -->
+    <div class="glass-card p-4 border-gold mb-4">
+      <div class="table-responsive">
+        <table class="table table-marriott align-middle">
+          <thead>
+            <tr>
+              <th>Booking Ref &amp; Date</th>
+              <th>Guest Details</th>
+              <th>Suite / Apartment</th>
+              <th>Stay Dates &amp; Nights</th>
+              <th>Total Amount (Room + Caution)</th>
+              <th>Payment &amp; Paystack Ref</th>
+              <th>Booking Status</th>
+              <th>Referral Code</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if bookings %}
+              {% for b in bookings %}
+                {% set num_nights = (b.check_out - b.check_in).days if b.check_in and b.check_out else 1 %}
+                <tr>
+                  <td>
+                    <strong class="text-gold font-monospace d-block">{{ b.booking_ref }}</strong>
+                    <span class="small text-muted opacity-75">{{ b.created_at.strftime('%b %d, %Y %H:%M') if b.created_at else '' }}</span>
+                  </td>
+
+                  <td>
+                    <strong class="text-white d-block">{{ b.guest_name or 'N/A' }}</strong>
+                    <span class="small text-muted d-block"><i class="fas fa-envelope me-1"></i> {{ b.guest_email or 'N/A' }}</span>
+                    <span class="small text-muted d-block"><i class="fas fa-phone me-1"></i> {{ b.guest_phone or 'N/A' }}</span>
+                  </td>
+
+                  <td>
+                    <span class="fw-bold text-light d-block">{{ b.apartment.title if b.apartment else 'N/A' }}</span>
+                    <span class="small text-gold">₦{{ "{:,.2f}".format(b.apartment.price_per_night if b.apartment else 0) }}/night</span>
+                  </td>
+
+                  <td>
+                    <span class="d-block text-light small"><i class="fas fa-sign-in-alt text-success me-1"></i> {{ b.check_in.strftime('%d %b %Y') if b.check_in else '' }}</span>
+                    <span class="d-block text-light small"><i class="fas fa-sign-out-alt text-danger me-1"></i> {{ b.check_out.strftime('%d %b %Y') if b.check_out else '' }}</span>
+                    <span class="badge bg-secondary font-monospace mt-1">{{ num_nights }} Night{% if num_nights > 1 %}s{% endif %}</span>
+                  </td>
+
+                  <td>
+                    <strong class="text-gold font-monospace d-block">₦{{ "{:,.2f}".format(b.total_amount or (b.final_amount + b.caution_fee)) }}</strong>
+                    <span class="small text-muted d-block">Room: ₦{{ "{:,.2f}".format(b.final_amount or b.total_price) }}</span>
+                    <span class="small text-info d-block">Caution: ₦{{ "{:,.2f}".format(b.caution_fee or 50000.00) }}</span>
+                  </td>
+
+                  <td>
+                    {% if b.payment_status in ['VERIFIED', 'PAID', 'verified', 'paid'] %}
+                      <span class="badge bg-success font-monospace px-2 py-1"><i class="fas fa-check-circle me-1"></i> Paid / Verified</span>
+                    {% elif b.payment_status in ['FAILED', 'failed'] %}
+                      <span class="badge bg-danger font-monospace px-2 py-1"><i class="fas fa-times-circle me-1"></i> Failed</span>
+                    {% else %}
+                      <span class="badge bg-warning text-dark font-monospace px-2 py-1"><i class="fas fa-hourglass-half me-1"></i> Pending Payment</span>
+                    {% endif %}
+
+                    {% if b.payment_reference %}
+                      <span class="small text-muted d-block font-monospace mt-1"><i class="fas fa-receipt me-1"></i> {{ b.payment_reference }}</span>
+                    {% endif %}
+                  </td>
+
+                  <td>
+                    {% if b.status in ['confirmed', 'CONFIRMED'] %}
+                      <span class="badge bg-success text-white px-2 py-1"><i class="fas fa-check me-1"></i> Confirmed</span>
+                    {% elif b.status in ['checked_in', 'CHECKED_IN'] %}
+                      <span class="badge bg-primary text-white px-2 py-1"><i class="fas fa-key me-1"></i> Checked In</span>
+                    {% elif b.status in ['checked_out', 'CHECKED_OUT'] %}
+                      <span class="badge bg-info text-dark px-2 py-1"><i class="fas fa-door-open me-1"></i> Checked Out</span>
+                    {% elif b.status in ['cancelled', 'CANCELLED'] %}
+                      <span class="badge bg-danger text-white px-2 py-1"><i class="fas fa-ban me-1"></i> Cancelled</span>
+                    {% else %}
+                      <span class="badge bg-warning text-dark px-2 py-1"><i class="fas fa-clock me-1"></i> Pending</span>
+                    {% endif %}
+                  </td>
+
+                  <td>
+                    {% if b.agent %}
+                      <span class="badge bg-gold text-dark font-monospace"><i class="fas fa-tag me-1"></i> {{ b.agent.agent_code }}</span>
+                      <span class="small text-muted d-block">{{ b.agent.user.full_name if b.agent.user else '' }}</span>
+                    {% else %}
+                      <span class="text-muted small">Direct</span>
+                    {% endif %}
+                  </td>
+
+                  <td class="text-end">
+                    <div class="dropdown">
+                      <button class="btn btn-sm btn-gold dropdown-toggle py-1 px-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Actions
+                      </button>
+                      <ul class="dropdown-menu dropdown-menu-end bg-dark border-gold shadow">
+                        <li>
+                          <button class="dropdown-item text-light" type="button" data-bs-toggle="modal" data-bs-target="#viewBookingModal{{ b.booking_id }}">
+                            <i class="fas fa-eye text-gold me-2"></i> View Details
+                          </button>
+                        </li>
+
+                        {% set pm = b.payments[0] if b.payments else None %}
+                        {% set rc = pm.receipts[0] if pm and pm.receipts else None %}
+                        {% if rc %}
+                          <li>
+                            <a class="dropdown-item text-light" href="{{ url_for('receipts.view_receipt', receipt_number=rc.receipt_number) }}" target="_blank">
+                              <i class="fas fa-file-invoice text-success me-2"></i> View Receipt
+                            </a>
+                          </li>
+                        {% endif %}
+
+                        <li><hr class="dropdown-divider border-secondary"></li>
+                        
+                        <!-- Status Update Actions -->
+                        {% if b.status != 'confirmed' %}
+                          <li>
+                            <form action="{{ url_for('admin_panel.update_booking_status', booking_id=b.booking_id) }}" method="POST">
+                              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                              <input type="hidden" name="status" value="confirmed">
+                              <button type="submit" class="dropdown-item text-success"><i class="fas fa-check-circle me-2"></i> Confirm Booking</button>
+                            </form>
+                          </li>
+                        {% endif %}
+
+                        {% if b.status != 'checked_in' %}
+                          <li>
+                            <form action="{{ url_for('admin_panel.update_booking_status', booking_id=b.booking_id) }}" method="POST">
+                              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                              <input type="hidden" name="status" value="checked_in">
+                              <button type="submit" class="dropdown-item text-primary"><i class="fas fa-key me-2"></i> Mark Checked In</button>
+                            </form>
+                          </li>
+                        {% endif %}
+
+                        {% if b.status != 'checked_out' %}
+                          <li>
+                            <form action="{{ url_for('admin_panel.update_booking_status', booking_id=b.booking_id) }}" method="POST">
+                              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                              <input type="hidden" name="status" value="checked_out">
+                              <button type="submit" class="dropdown-item text-info"><i class="fas fa-door-open me-2"></i> Mark Checked Out</button>
+                            </form>
+                          </li>
+                        {% endif %}
+
+                        {% if b.status != 'cancelled' %}
+                          <li>
+                            <form action="{{ url_for('admin_panel.update_booking_status', booking_id=b.booking_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this booking and release the dates?');">
+                              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                              <input type="hidden" name="status" value="cancelled">
+                              <button type="submit" class="dropdown-item text-danger"><i class="fas fa-ban me-2"></i> Cancel Booking</button>
+                            </form>
+                          </li>
+                        {% endif %}
+
+                      </ul>
+                    </div>
+
+                    <!-- View Booking Details Modal -->
+                    <div class="modal fade text-start" id="viewBookingModal{{ b.booking_id }}" tabindex="-1" aria-hidden="true">
+                      <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content bg-dark border-gold text-light">
+                          <div class="modal-header border-secondary">
+                            <h5 class="modal-title font-serif text-gold"><i class="fas fa-bookmark me-2"></i> Booking Audit Details: {{ b.booking_ref }}</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <div class="row g-3">
+                              <div class="col-md-6">
+                                <h6 class="text-gold fw-bold font-monospace border-bottom border-secondary pb-1">Guest Information</h6>
+                                <p class="mb-1"><strong>Name:</strong> {{ b.guest_name or 'N/A' }}</p>
+                                <p class="mb-1"><strong>Email:</strong> {{ b.guest_email or 'N/A' }}</p>
+                                <p class="mb-1"><strong>Phone:</strong> {{ b.guest_phone or 'N/A' }}</p>
+                                <p class="mb-1"><strong>Guests:</strong> {{ b.guest_count or 1 }} Person(s)</p>
+                                <p class="mb-1"><strong>Source:</strong> {{ b.source or 'website' }}</p>
+                              </div>
+
+                              <div class="col-md-6">
+                                <h6 class="text-gold fw-bold font-monospace border-bottom border-secondary pb-1">Reservation &amp; Suite</h6>
+                                <p class="mb-1"><strong>Suite:</strong> {{ b.apartment.title if b.apartment else 'N/A' }}</p>
+                                <p class="mb-1"><strong>Check-in:</strong> {{ b.check_in.strftime('%A, %d %B %Y') if b.check_in else '' }}</p>
+                                <p class="mb-1"><strong>Check-out:</strong> {{ b.check_out.strftime('%A, %d %B %Y') if b.check_out else '' }}</p>
+                                <p class="mb-1"><strong>Duration:</strong> {{ num_nights }} Night(s)</p>
+                                <p class="mb-1"><strong>Status:</strong> <span class="badge bg-gold text-dark">{{ b.status }}</span></p>
+                              </div>
+
+                              <div class="col-12"><hr class="border-secondary my-2"></div>
+
+                              <div class="col-md-6">
+                                <h6 class="text-gold fw-bold font-monospace border-bottom border-secondary pb-1">Financial Breakdown</h6>
+                                <p class="mb-1"><strong>Original Room Rate:</strong> ₦{{ "{:,.2f}".format(b.total_price or b.apartment_fee) }}</p>
+                                <p class="mb-1 text-info"><strong>Referral Discount:</strong> -₦{{ "{:,.2f}".format(b.discount_amount) }} ({{ b.discount_percentage }}%)</p>
+                                <p class="mb-1"><strong>Net Room Fee:</strong> ₦{{ "{:,.2f}".format(b.final_amount) }}</p>
+                                <p class="mb-1 text-warning"><strong>Refundable Caution Fee:</strong> ₦{{ "{:,.2f}".format(b.caution_fee or 50000.00) }}</p>
+                                <p class="mb-1 fs-5 font-monospace text-gold fw-bold"><strong>Total Paid Online:</strong> ₦{{ "{:,.2f}".format(b.total_amount or (b.final_amount + b.caution_fee)) }}</p>
+                              </div>
+
+                              <div class="col-md-6">
+                                <h6 class="text-gold fw-bold font-monospace border-bottom border-secondary pb-1">Payment &amp; Referral Details</h6>
+                                <p class="mb-1"><strong>Payment Status:</strong> {{ b.payment_status }}</p>
+                                <p class="mb-1"><strong>Paystack Tx Ref:</strong> <code>{{ b.payment_reference or 'N/A' }}</code></p>
+                                <p class="mb-1"><strong>Referral Code:</strong> {{ b.agent.agent_code if b.agent else 'None' }}</p>
+                                <p class="mb-1"><strong>Created At:</strong> {{ b.created_at.strftime('%Y-%m-%d %H:%M:%S') if b.created_at else '' }}</p>
+                                <p class="mb-1"><strong>Verified At:</strong> {{ b.verified_at.strftime('%Y-%m-%d %H:%M:%S') if b.verified_at else 'N/A' }}</p>
+                              </div>
+
+                              {% if b.special_requests %}
+                                <div class="col-12">
+                                  <h6 class="text-gold fw-bold font-monospace mb-1">Special Requests</h6>
+                                  <div class="p-2 bg-secondary bg-opacity-20 rounded border border-secondary text-light small">{{ b.special_requests }}</div>
+                                </div>
+                              {% endif %}
+                            </div>
+                          </div>
+                          <div class="modal-footer border-secondary">
+                            <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Close</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="9" class="text-center py-5 text-muted">
+                  <i class="fas fa-folder-open fs-1 d-block mb-3 text-gold opacity-50"></i>
+                  <h5>No bookings found matching your search criteria.</h5>
+                  <p class="small mb-0">Try resetting filters or searching with different keywords.</p>
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Server-Side Pagination Controls -->
+      {% if pagination and pagination.pages > 1 %}
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 pt-3 border-top border-secondary gap-3">
+          <div class="small text-muted">
+            Showing {{ pagination.items|length }} of {{ pagination.total }} total reservations (Page {{ pagination.page }} of {{ pagination.pages }})
+          </div>
+
+          <ul class="pagination pagination-sm mb-0">
+            <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+              <a class="page-link bg-dark text-gold border-secondary" href="{{ url_for('admin_panel.manage_bookings', page=pagination.prev_num, search=search_query, status=status_filter, payment_status=payment_status_filter, apartment_id=apartment_id_filter) }}">
+                <i class="fas fa-chevron-left"></i> Previous
+              </a>
+            </li>
+
+            {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+              {% if page_num %}
+                <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
+                  <a class="page-link {% if page_num == pagination.page %}bg-gold text-dark border-gold fw-bold{% else %}bg-dark text-gold border-secondary{% endif %}" href="{{ url_for('admin_panel.manage_bookings', page=page_num, search=search_query, status=status_filter, payment_status=payment_status_filter, apartment_id=apartment_id_filter) }}">
+                    {{ page_num }}
+                  </a>
+                </li>
+              {% else %}
+                <li class="page-item disabled"><span class="page-link bg-dark text-muted border-secondary">...</span></li>
+              {% endif %}
+            {% endfor %}
+
+            <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+              <a class="page-link bg-dark text-gold border-secondary" href="{{ url_for('admin_panel.manage_bookings', page=pagination.next_num, search=search_query, status=status_filter, payment_status=payment_status_filter, apartment_id=apartment_id_filter) }}">
+                Next <i class="fas fa-chevron-right"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,289 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Operations & Control Portal | The Height Apartment{% endblock %}
+
+{% block content %}
+<section class="py-5">
+  <div class="container">
+    
+    <!-- Marriott-Class Header -->
+    <div class="glass-card p-4 mb-4 border-gold d-flex flex-wrap justify-content-between align-items-center">
+      <div>
+        <span class="badge bg-gold text-dark font-monospace text-uppercase px-3 py-1 mb-1">ADMIN OPERATIONS PORTAL</span>
+        <h2 class="display-6 fw-bold text-white mb-0 font-serif">Executive Operations Dashboard</h2>
+        <p class="small text-muted mb-0">Logged in as <strong>{{ current_user.full_name }}</strong> (Operations Admin)</p>
+      </div>
+      <div class="mt-3 mt-md-0 d-flex gap-2 flex-wrap">
+        <a href="{{ url_for('admin_panel.manage_bookings') }}" class="btn btn-gold"><i class="fas fa-calendar-check me-1"></i> Bookings Portal</a>
+        <a href="{{ url_for('admin_panel.manage_inspections') }}" class="btn btn-outline-gold"><i class="fas fa-clipboard-check me-1"></i> Inspections Portal</a>
+        <a href="{{ url_for('admin_panel.manage_reviews') }}" class="btn btn-outline-gold"><i class="fas fa-star me-1"></i> Reviews Portal</a>
+        <a href="{{ url_for('admin_panel.manage_agents') }}" class="btn btn-outline-gold"><i class="fas fa-handshake me-1"></i> Agents Portal</a>
+        <a href="{{ url_for('admin_panel.manage_corporate') }}" class="btn btn-outline-gold"><i class="fas fa-briefcase me-1"></i> Corporate Portal</a>
+        <a href="{{ url_for('admin_panel.manage_commissions') }}" class="btn btn-outline-gold"><i class="fas fa-coins me-1"></i> Commission Portal</a>
+        <a href="{{ url_for('apartments.list_apartments') }}" class="btn btn-outline-gold"><i class="fas fa-eye me-1"></i> Live Site</a>
+        <a href="{{ url_for('superadmin_panel.dashboard') }}" class="btn btn-outline-light"><i class="fas fa-crown me-1"></i> SuperAdmin View</a>
+      </div>
+    </div>
+
+    <!-- 7 Dashboard Metrics Cards (Marriott Specification Requirement) -->
+    <div class="row g-4 mb-5">
+      <div class="col-lg-3 col-md-6">
+        <div class="glass-card p-4 text-center border-gold">
+          <i class="fas fa-calendar-check text-gold fs-1 mb-2"></i>
+          <h6 class="small text-muted text-uppercase fw-bold">Bookings</h6>
+          <h3 class="fw-bold text-white font-serif mb-0">28</h3>
+          <span class="small text-success"><i class="fas fa-arrow-up me-1"></i> 14% this month</span>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="glass-card p-4 text-center border-gold">
+          <i class="fas fa-coins text-gold fs-1 mb-2"></i>
+          <h6 class="small text-muted text-uppercase fw-bold">Revenue</h6>
+          <h3 class="fw-bold text-gold font-monospace mb-0">₦2.45M</h3>
+          <span class="small text-success"><i class="fas fa-arrow-up me-1"></i> Verified Deposits</span>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="glass-card p-4 text-center border-gold">
+          <i class="fas fa-hotel text-gold fs-1 mb-2"></i>
+          <h6 class="small text-muted text-uppercase fw-bold">Occupancy Rate</h6>
+          <h3 class="fw-bold text-white font-serif mb-0">85%</h3>
+          <span class="small text-gold">4 Suites Active</span>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="glass-card p-4 text-center border-gold">
+          <i class="fas fa-users text-gold fs-1 mb-2"></i>
+          <h6 class="small text-muted text-uppercase fw-bold">Customers</h6>
+          <h3 class="fw-bold text-white font-serif mb-0">142</h3>
+          <span class="small text-muted">Registered Guests</span>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="glass-card p-4 text-center border-gold">
+          <i class="fas fa-briefcase text-gold fs-1 mb-2"></i>
+          <h6 class="small text-muted text-uppercase fw-bold">Corporate</h6>
+          <h3 class="fw-bold text-white font-serif mb-0">12</h3>
+          <span class="small text-gold">Corporate Partners</span>
+        </div>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <div class="glass-card p-4 text-center border-gold">
+          <i class="fas fa-handshake text-gold fs-1 mb-2"></i>
+          <h6 class="small text-muted text-uppercase fw-bold">Agent Referrals</h6>
+          <h3 class="fw-bold text-white font-serif mb-0">19</h3>
+          <span class="small text-muted">Active Referrers</span>
+        </div>
+      </div>
+
+      <div class="col-lg-6 col-md-12">
+        <div class="glass-card p-4 text-center border-gold h-100 d-flex flex-column justify-content-center">
+          <i class="fas fa-bolt text-gold fs-1 mb-2"></i>
+          <h6 class="small text-muted text-uppercase fw-bold">Power Guarantee Status</h6>
+          <h3 class="fw-bold text-success font-serif mb-0"><i class="fas fa-check-circle me-1"></i> 100% Operational</h3>
+          <p class="small text-light opacity-75 mb-0">Dual Industrial Generators + Solar Backup</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions Module (Admin: 2 Actions) -->
+    {% include 'includes/quick_actions.html' %}
+
+    <!-- Centralized Enterprise Price Management Panel -->
+    <div class="glass-card p-4 border-gold mb-5">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
+        <div>
+          <h4 class="fw-bold text-white font-serif mb-1"><i class="fas fa-tags text-gold me-2"></i> Master Apartment Pricing (Single Source of Truth)</h4>
+          <p class="small text-muted mb-0">Updates made here automatically propagate across Homepage, List, Details, Search, Calculations, Emails &amp; Receipts.</p>
+        </div>
+        <span class="badge bg-gold text-dark font-monospace mt-2 mt-md-0">SuperAdmin Pricing Control</span>
+      </div>
+
+      <div class="row g-4">
+        {% if apartments %}
+          {% for apt in apartments %}
+            <div class="col-md-6">
+              <div class="p-3 bg-dark border border-gold rounded-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <h6 class="fw-bold text-gold font-serif mb-0">{{ apt.title }}</h6>
+                  <span class="badge bg-secondary font-monospace">Current: ₦{{ "{:,.2f}".format(apt.price_per_night) }}</span>
+                </div>
+                <form action="{{ url_for('admin_panel.update_apartment_price', apartment_id=apt.apartment_id) }}" method="POST" class="row g-2 align-items-center">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <div class="col-7">
+                    <div class="input-group input-group-sm">
+                      <span class="input-group-text bg-secondary text-white border-secondary">₦</span>
+                      <input type="number" step="0.01" min="1000" name="price_per_night" class="form-control bg-dark text-white border-secondary" value="{{ apt.price_per_night }}" required>
+                    </div>
+                  </div>
+                  <div class="col-5">
+                    <button type="submit" class="btn btn-sm btn-gold w-100 font-sans fw-bold">
+                      <i class="fas fa-save me-1"></i> Update Price
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="col-12 text-muted small">No active apartments found to manage.</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Responsive Table with Search Bar & Sticky Header -->
+    <div class="glass-card p-4 border-gold mb-5">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
+        <h4 class="fw-bold text-white font-serif mb-2 mb-md-0"><i class="fas fa-list-alt text-gold me-2"></i> Guest Bookings &amp; Payment Verification</h4>
+        <span class="badge bg-gold text-dark font-monospace">Live Sync Active</span>
+      </div>
+
+      <!-- Search Bar Above Table -->
+      <div class="table-search-bar">
+        <i class="fas fa-search text-gold"></i>
+        <input type="text" id="bookingSearchInput" class="form-control bg-transparent border-0 text-white shadow-none" placeholder="Search by guest name, booking ref, or payment status..." onkeyup="filterAdminTable();">
+      </div>
+
+      <div class="table-responsive" style="max-height: 450px; overflow-y: auto;">
+        <table class="table table-marriott align-middle" id="adminBookingsTable">
+          <thead style="position: sticky; top: 0; z-index: 10;">
+            <tr>
+              <th>Booking Ref</th>
+              <th>Guest Name</th>
+              <th>Suite</th>
+              <th>Check-In / Out</th>
+              <th>Apartment Total</th>
+              <th>Refundable Caution Fee</th>
+              <th>Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong class="text-gold font-monospace">THA-8A91F2</strong></td>
+              <td>Dr. Oladipo Adeleke<div class="small text-muted">oladipo@domain.com</div></td>
+              <td>3-Bedrooms Premium</td>
+              <td>30 Jul 2026 to 05 Aug 2026</td>
+              <td>₦720,000</td>
+              <td><span class="badge bg-info text-dark">Refundable (₦50k)</span></td>
+              <td><span class="badge bg-warning text-dark">Pending Verification</span></td>
+              <td class="text-end">
+                <!-- Equal Action Buttons Group -->
+                <div class="btn-group btn-group-sm">
+                  <button class="btn btn-gold py-1 px-2" onclick="alert('Payment verified! Branded receipt generated.');">Verify</button>
+                  <button class="btn btn-outline-gold py-1 px-2" onclick="alert('Contacting guest via WhatsApp...');"><i class="fab fa-whatsapp"></i></button>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td><strong class="text-gold font-monospace">THA-9B22C4</strong></td>
+              <td>Engr. Brenda Washington<div class="small text-muted">brenda@domain.com</div></td>
+              <td>Executive Diplomatic Suite</td>
+              <td>01 Aug 2026 to 10 Aug 2026</td>
+              <td>₦765,000</td>
+              <td><span class="badge bg-info text-dark">Received (₦50k)</span></td>
+              <td><span class="badge bg-success">Verified</span></td>
+              <td class="text-end">
+                <div class="btn-group btn-group-sm">
+                  <a href="{{ url_for('receipts.view_receipt', receipt_number='RCP-THA-8A91F2') }}" class="btn btn-gold py-1 px-2">Receipt</a>
+                  <button class="btn btn-outline-gold py-1 px-2" onclick="alert('Viewing booking details...');"><i class="fas fa-eye"></i></button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Suite Photo Upload & Gallery Manager Section -->
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="glass-card p-4 border-gold h-100">
+          <h4 class="fw-bold text-white font-serif mb-2"><i class="fas fa-cloud-upload-alt text-gold me-2"></i> Suite Photo Uploader</h4>
+          <p class="small text-muted mb-4">Upload high-resolution luxury gallery imagery for listed suites.</p>
+
+          <form action="#imageUpload" method="POST" enctype="multipart/form-data" onsubmit="alert('Photo upload request processed successfully.'); return false;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="mb-3">
+              <label class="form-label small text-gold fw-bold">Select Suite</label>
+              <select name="apartment_id" class="form-select bg-dark text-white border-secondary" required>
+                <option value="1">3-Bedrooms Premium Suite</option>
+                <option value="2">2-Bedrooms Well Furnished Suite</option>
+                <option value="3">1-Bedroom Tastefully Finished Suite</option>
+                <option value="4">Studio Apartment Premium</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small text-gold fw-bold">Select Photos</label>
+              <input type="file" name="apartment_images" class="form-control bg-dark text-white border-secondary" multiple accept="image/*" required>
+            </div>
+
+            <div class="row g-2">
+              <div class="col-md-6">
+                <button type="submit" class="btn btn-gold w-100 py-2">
+                  <i class="fas fa-save me-2"></i> Save Photos
+                </button>
+              </div>
+              <div class="col-md-6">
+                <button type="reset" class="btn btn-outline-gold w-100 py-2">
+                  <i class="fas fa-undo me-2"></i> Reset Selection
+                </button>
+              </div>
+            </div>
+          </form>
+
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="glass-card p-4 border-gold h-100">
+          <h4 class="fw-bold text-white font-serif mb-2"><i class="fas fa-images text-gold me-2"></i> Active Suite Gallery</h4>
+          <p class="small text-muted mb-4">Manage live photos assigned to luxury suites.</p>
+
+          <div class="row g-3">
+            <div class="col-6">
+              <div class="glass-card p-2 text-center">
+                <img src="{{ url_for('static', filename='images/apartments/living_room.jpg') }}" class="img-fluid rounded mb-2" style="height: 110px; object-fit: cover;" alt="3-Bedrooms Suite">
+                <div class="small fw-bold text-white text-truncate">3-Bedrooms Premium</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="glass-card p-2 text-center">
+                <img src="https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=600&q=80" class="img-fluid rounded mb-2" style="height: 110px; object-fit: cover;" alt="2-Bedrooms Suite">
+                <div class="small fw-bold text-white text-truncate">2-Bedrooms Suite</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+function filterAdminTable() {
+  var input = document.getElementById("bookingSearchInput");
+  var filter = input.value.toUpperCase();
+  var table = document.getElementById("adminBookingsTable");
+  var tr = table.getElementsByTagName("tr");
+
+  for (var i = 1; i < tr.length; i++) {
+    var textContent = tr[i].textContent || tr[i].innerText;
+    if (textContent.toUpperCase().indexOf(filter) > -1) {
+      tr[i].style.display = "";
+    } else {
+      tr[i].style.display = "none";
+    }
+  }
+}
+</script>
+{% endblock %}

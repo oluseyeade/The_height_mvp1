@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Cancellation & Refund Policy | The Height Apartment{% endblock %}
+
+{% block content %}
+
+<!-- Hero Banner -->
+<section class="py-5 text-center position-relative" style="background: linear-gradient(180deg, rgba(11,12,16,0.7) 0%, rgba(11,12,16,0.95) 100%), url('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;">
+  <div class="container py-4">
+    <span class="hero-badge mb-3 d-inline-block"><i class="fas fa-undo me-2"></i> BOOKING GUARANTEE</span>
+    <h1 class="display-4 fw-bold text-white mb-2">Moderate Cancellation Policy</h1>
+    <p class="lead text-gold font-heading max-w-700 mx-auto">
+      Clear, fair, and transparent cancellation terms for all guest and corporate reservations.
+    </p>
+  </div>
+</section>
+
+<!-- Policy Content -->
+<section class="py-5">
+  <div class="container max-w-900">
+    <div class="glass-card p-5 border-gold terms-conditions-container">
+      
+      <div class="mb-4">
+        <span class="text-gold-gradient fw-bold text-uppercase">Terms &amp; Conditions</span>
+        <h3 class="fw-bold text-white mt-1">Cancellation Schedule</h3>
+        <p class="text-muted">The Height Apartment operates a standard <strong>Moderate Cancellation Policy</strong> for all direct and corporate bookings.</p>
+      </div>
+
+      <div class="timeline-box">
+        
+        <div class="d-flex gap-3 mb-4">
+          <div class="p-3 bg-success text-white rounded-circle flex-shrink-0 d-flex align-items-center justify-content-center" style="width:50px; height:50px;">
+            <i class="fas fa-check fs-5"></i>
+          </div>
+          <div>
+            <h5 class="text-gold fw-bold">Up to 5 Days Before Check-In (Full Refund)</h5>
+            <p class="small text-muted mb-0">
+              Guests who cancel their reservation at least <strong>5 full days (120 hours)</strong> prior to check-in time (2:00 PM on check-in date) will receive a <strong>100% full refund</strong> of all payments minus bank transaction processing fees.
+            </p>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 mb-4">
+          <div class="p-3 bg-warning text-dark rounded-circle flex-shrink-0 d-flex align-items-center justify-content-center" style="width:50px; height:50px;">
+            <i class="fas fa-exclamation-triangle fs-5"></i>
+          </div>
+          <div>
+            <h5 class="text-gold fw-bold">Within 5 Days of Check-In (First Night Retained)</h5>
+            <p class="small text-muted mb-0">
+              If a cancellation occurs less than 5 days before check-in, the payment for the <strong>first night's stay</strong> is non-refundable. The remaining nights will be refunded in full.
+            </p>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 mb-4">
+          <div class="p-3 bg-danger text-white rounded-circle flex-shrink-0 d-flex align-items-center justify-content-center" style="width:50px; height:50px;">
+            <i class="fas fa-times fs-5"></i>
+          </div>
+          <div>
+            <h5 class="text-gold fw-bold">No-Show or Early Departure</h5>
+            <p class="small text-muted mb-0">
+              In cases of a guest no-show on the check-in date without notice, or early departure after check-in, unused nights are non-refundable.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="p-4 bg-dark border border-secondary rounded-3 mt-4">
+        <h6 class="text-gold fw-bold mb-2"><i class="fas fa-info-circle me-2"></i> Corporate &amp; Group Booking Adjustments</h6>
+        <p class="small text-muted mb-0">
+          Corporate clients with retainer agreements or extended-stay bookings may have custom modification clauses outlined in their signed corporate quote document. Contact our Corporate Desk at <a href="tel:+2349045135890" class="text-gold">0904 513 5890</a> for assistance.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% endblock %}

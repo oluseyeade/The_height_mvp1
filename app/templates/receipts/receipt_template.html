@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block title %}Receipt #{{ receipt.receipt_number }} | The Height Apartment{% endblock %}
+
+{% block content %}
+
+<section class="py-5 bg-dark">
+  <div class="container max-w-800 py-4">
+    
+    <!-- Printable Branded Receipt Card -->
+    <div class="glass-card p-5 border-gold shadow-lg" id="receiptPrintArea">
+      
+      <!-- Receipt Header -->
+      <div class="d-flex justify-content-between align-items-start border-bottom border-gold pb-4 mb-4">
+        <div>
+          <img src="{{ url_for('static', filename='images/Brandlogo.png') }}" alt="The Height Premium Apartments" class="img-fluid mb-2" style="height: 56px; object-fit: contain;">
+          <p class="small text-muted mb-0">6 Olorunadaba Street, Off Hassan Oyo Street, Dopemu, Ikeja, Lagos</p>
+          <p class="small text-gold font-monospace mb-0">CAC BN7684830 | Phone: 0904 513 5890</p>
+        </div>
+        <div class="text-end">
+          <span class="badge bg-gold text-dark fs-6 font-monospace mb-2">OFFICIAL RECEIPT</span>
+          <h5 class="fw-bold text-white mb-1">#{{ receipt.receipt_number }}</h5>
+          <p class="small text-muted mb-0">Date: {{ receipt.generated_at.strftime('%d %b %Y, %I:%M %p') }}</p>
+        </div>
+      </div>
+
+      <!-- Verification Badge -->
+      <div class="p-3 bg-success bg-opacity-10 border border-success rounded-3 d-flex align-items-center gap-3 mb-4">
+        <i class="fas fa-check-circle text-success fs-3"></i>
+        <div>
+          <strong class="text-success d-block">PAYMENT VERIFIED BY FINANCE DESK</strong>
+          <span class="small text-muted">Transaction Ref: {{ receipt.payment.transaction_ref if receipt.payment else 'N/A' }}</span>
+        </div>
+      </div>
+
+      <!-- Itemized Breakdown -->
+      <h5 class="fw-bold text-gold mb-3">Booking Breakdown</h5>
+      <table class="table table-dark table-striped table-bordered border-secondary mb-4 align-middle">
+        <thead>
+          <tr class="table-dark text-gold">
+            <th>Description</th>
+            <th>Check-In / Out</th>
+            <th class="text-end">Amount (₦)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if receipt.payment and receipt.payment.booking %}
+          {% set caution_val = (receipt.payment.booking.caution_fee or 50000.00)|float %}
+          {% set total_paid_val = (receipt.payment.amount or 0.0)|float %}
+          {% set accommodation_val = (total_paid_val - caution_val) if total_paid_val > caution_val else ((receipt.payment.booking.final_amount or receipt.payment.booking.total_price or 0.0)|float) %}
+          <tr>
+            <td>
+              <strong>{{ receipt.payment.booking.apartment.title if receipt.payment.booking.apartment else 'Luxury Suite' }} (Accommodation Amount)</strong>
+              <div class="small text-muted">Ref: {{ receipt.payment.booking.booking_ref }} · Check-In: {{ receipt.payment.booking.check_in.strftime('%d %b %Y') }} to {{ receipt.payment.booking.check_out.strftime('%d %b %Y') }}</div>
+            </td>
+            <td>
+              {{ receipt.payment.booking.check_in.strftime('%d %b %Y') }} to {{ receipt.payment.booking.check_out.strftime('%d %b %Y') }}
+            </td>
+            <td class="text-end fw-bold text-white">₦{{ "{:,.2f}".format(accommodation_val) }}</td>
+          </tr>
+          <tr>
+            <td>
+              <strong>Refundable Caution Fee</strong>
+              <div class="small text-gold font-sans">Refundable after checkout inspection subject to applicable terms &amp; conditions</div>
+            </td>
+            <td>N/A</td>
+            <td class="text-end fw-bold text-gold">₦{{ "{:,.2f}".format(caution_val) }}</td>
+          </tr>
+          {% else %}
+          {% set total_paid_val = ((receipt.payment.amount or 0.0)|float) if receipt.payment else 0.0 %}
+          {% set caution_val = 50000.00 %}
+          {% set accommodation_val = (total_paid_val - caution_val) if total_paid_val > caution_val else total_paid_val %}
+          <tr>
+            <td>Accommodation Amount</td>
+            <td>N/A</td>
+            <td class="text-end fw-bold text-white">₦{{ "{:,.2f}".format(accommodation_val) }}</td>
+          </tr>
+          <tr>
+            <td>Refundable Caution Fee</td>
+            <td>N/A</td>
+            <td class="text-end fw-bold text-gold">₦{{ "{:,.2f}".format(caution_val) }}</td>
+          </tr>
+          {% endif %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="2" class="text-end text-gold fs-5">Total Amount Paid:</th>
+            <th class="text-end text-gold fs-5 font-monospace">₦{{ "{:,.2f}".format(receipt.payment.amount) if receipt.payment else '0.00' }}</th>
+          </tr>
+        </tfoot>
+      </table>
+
+      <!-- Footer Sign-off & Verification -->
+      <div class="d-flex justify-content-between align-items-center pt-3 border-top border-secondary">
+        <div>
+          <p class="small text-muted mb-0">Issued by: <strong>The Height Finance Desk</strong></p>
+          <p class="small text-muted mb-0">Email: <code>theheightapartments@icloud.com</code></p>
+        </div>
+        <div class="text-end">
+          <button onclick="window.print()" class="btn btn-gold btn-sm d-print-none">
+            <i class="fas fa-print me-2"></i> Print Branded Receipt
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}
