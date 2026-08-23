@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5" style="background-color: var(--bg-dark-core);">
+  <div class="container py-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="text-white fw-bold"><i class="fa-solid fa-gauge-high text-warning me-2"></i>Admin Control Center</h2>
+        <p class="text-muted mb-0">Overview of operational metrics, apartment occupancy, and pending actions</p>
+      </div>
+      <a href="{{ url_for('reports.index') }}" class="btn btn-gold"><i class="fa-solid fa-file-csv me-1"></i> Export Reports</a>
+    </div>
+
+    <!-- Admin Operational Metrics Grid -->
+    <div class="row g-4 mb-5">
+      <div class="col-md-3">
+        <div class="glass-panel p-4 text-center">
+          <small class="text-muted text-uppercase fw-bold">Verified Revenue</small>
+          <h3 class="text-success fw-bold mt-2">₦{{ "{:,.2f}".format(metrics.total_revenue) }}</h3>
+          <small class="text-muted">Cleared Payments</small>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="glass-panel p-4 text-center">
+          <small class="text-muted text-uppercase fw-bold">Suite Occupancy Rate</small>
+          <h3 class="text-warning fw-bold mt-2">{{ metrics.occupancy_rate }}%</h3>
+          <small class="text-muted">{{ metrics.available_apartments }} / {{ metrics.total_apartments }} Available</small>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="glass-panel p-4 text-center">
+          <small class="text-muted text-uppercase fw-bold">Pending Payments</small>
+          <h3 class="text-warning fw-bold mt-2">{{ metrics.pending_payments_count }}</h3>
+          <a href="{{ url_for('payments.manage_payments') }}" class="btn btn-outline-warning btn-sm mt-1">Verify Now</a>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="glass-panel p-4 text-center">
+          <small class="text-muted text-uppercase fw-bold">New B2B Enquiries</small>
+          <h3 class="text-info fw-bold mt-2">{{ metrics.new_corporate_enquiries }}</h3>
+          <a href="{{ url_for('corporate.manage_enquiries') }}" class="btn btn-outline-info btn-sm mt-1">Review Enquiries</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Management Quick Action Tiles -->
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="glass-panel p-4 h-100">
+          <h5 class="text-white fw-bold mb-3"><i class="fa-solid fa-building text-warning me-2"></i>Suite Inventory</h5>
+          <p class="text-muted small">Manage apartment suites, create new listings, and update room photo galleries.</p>
+          <a href="{{ url_for('apartments.manage_apartments') }}" class="btn btn-gold btn-sm w-100">Open Suite Manager</a>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="glass-panel p-4 h-100">
+          <h5 class="text-white fw-bold mb-3"><i class="fa-solid fa-calendar-check text-warning me-2"></i>Reservations</h5>
+          <p class="text-muted small">View all guest reservations, check-in dates, and manually adjust stay statuses.</p>
+          <a href="{{ url_for('bookings.manage_bookings') }}" class="btn btn-gold btn-sm w-100">Manage Reservations</a>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="glass-panel p-4 h-100">
+          <h5 class="text-white fw-bold mb-3"><i class="fa-solid fa-building-columns text-warning me-2"></i>Payment Approvals</h5>
+          <p class="text-muted small">Inspect uploaded bank transfer receipts and issue official branded PDF receipts.</p>
+          <a href="{{ url_for('payments.manage_payments') }}" class="btn btn-gold btn-sm w-100">Payment Verification</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

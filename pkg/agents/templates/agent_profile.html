@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5" style="background-color: var(--bg-dark-core);">
+  <div class="container py-3">
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+        <div class="glass-panel p-4 mb-4 text-center">
+          <i class="fa-solid fa-user-gear text-warning display-4 mb-2"></i>
+          <h3 class="text-white fw-bold">Agent Profile & Payout Info</h3>
+          <p class="text-muted mb-0">Agent Code: <strong class="text-warning">{{ agent.agent_code if agent else 'N/A' }}</strong></p>
+        </div>
+
+        <div class="glass-panel p-4">
+          <h5 class="text-white fw-bold mb-3 border-bottom border-secondary pb-2">Registered Payout Bank Account</h5>
+          <div class="row g-3 text-white mb-4">
+            <div class="col-6 text-muted">Bank Name:</div>
+            <div class="col-6 fw-bold">{{ agent.bank_name if agent else 'N/A' }}</div>
+            <div class="col-6 text-muted">Account Number:</div>
+            <div class="col-6 fw-bold text-warning fs-5">{{ agent.account_number if agent else 'N/A' }}</div>
+            <div class="col-6 text-muted">Account Holder:</div>
+            <div class="col-6 fw-bold">{{ agent.account_holder_name if agent else 'N/A' }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

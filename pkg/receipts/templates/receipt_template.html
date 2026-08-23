@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5" style="background-color: var(--bg-dark-core);">
+  <div class="container py-3">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <a href="{{ url_for('bookings.detail_booking', booking_ref=booking.booking_ref) }}" class="text-warning text-decoration-none"><i class="fa-solid fa-arrow-left me-1"></i> Back to Booking</a>
+          <a href="{{ url_for('receipts.download_pdf', booking_ref=booking.booking_ref) }}" class="btn btn-gold"><i class="fa-solid fa-file-pdf me-2"></i> Download Official PDF Receipt</a>
+        </div>
+
+        <!-- Branded Receipt Card -->
+        <div class="glass-panel p-5 border border-warning shadow-lg text-white" id="printable-receipt">
+          <!-- Logo & Header -->
+          <div class="row align-items-center mb-4 border-bottom border-secondary pb-4">
+            <div class="col-md-7">
+              <h3 class="fw-bold mb-1"><i class="fa-solid fa-building-user text-warning me-2"></i>THE HEIGHT APARTMENT</h3>
+              <p class="text-muted small mb-0">Official AMRS Shortlet Reservation Receipt</p>
+            </div>
+            <div class="col-md-5 text-md-end">
+              <span class="badge bg-warning text-dark px-3 py-2 fw-bold text-uppercase mb-2">RECEIPT PAID</span>
+              <p class="text-warning fw-bold mb-0">Receipt #: {{ receipt.receipt_number }}</p>
+              <small class="text-muted">Issued: {{ receipt.generated_at.strftime('%d %B %Y') }}</small>
+            </div>
+          </div>
+
+          <!-- Customer & Stay Info -->
+          <div class="row g-4 mb-4">
+            <div class="col-md-6">
+              <h6 class="text-warning fw-bold text-uppercase">Billed To:</h6>
+              <p class="mb-1 fw-bold">{{ booking.guest_name or (booking.user.full_name if booking.user else 'Guest') }}</p>
+              <p class="text-muted small mb-0">{{ booking.guest_email or (booking.user.email if booking.user else '') }}</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+              <h6 class="text-warning fw-bold text-uppercase">Reservation Details:</h6>
+              <p class="mb-1"><strong>Suite:</strong> {{ booking.apartment.title }}</p>
+              <p class="text-muted small mb-0"><strong>Stay:</strong> {{ booking.check_in.strftime('%d %b %Y') }} - {{ booking.check_out.strftime('%d %b %Y') }} ({{ booking.total_nights }} nights)</p>
+            </div>
+          </div>
+
+          <!-- Items Table -->
+          <div class="table-responsive mb-4">
+            <table class="table table-dark table-bordered align-middle">
+              <thead class="bg-secondary">
+                <tr>
+                  <th>Description</th>
+                  <th>Nights</th>
+                  <th>Rate</th>
+                  <th class="text-end">Total Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Shortlet Suite Reservation ({{ booking.apartment.title }})</td>
+                  <td>{{ booking.total_nights }}</td>
+                  <td>₦{{ "{:,.2f}".format(booking.price_per_night) }}</td>
+                  <td class="text-end fw-bold">₦{{ "{:,.2f}".format(booking.total_price) }}</td>
+                </tr>
+                <tr class="bg-dark">
+                  <td colspan="3" class="text-end fw-bold text-warning">Verified Deposit Paid:</td>
+                  <td class="text-end fw-bold text-success fs-5">₦{{ "{:,.2f}".format(receipt.payment.amount) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Verification Footer & QR code -->
+          <div class="row align-items-center border-top border-secondary pt-4">
+            <div class="col-auto">
+              {% if receipt.qr_code_path %}
+                <img src="{{ receipt.qr_code_path }}" alt="QR Verification" class="bg-white p-1 rounded" style="width: 80px; height: 80px;">
+              {% endif %}
+            </div>
+            <div class="col">
+              <p class="small text-muted mb-0">
+                <strong class="text-white">Digital Security Verification</strong><br/>
+                Scan the QR code to verify receipt authenticity online.<br/>
+                The Height Apartments Ltd • Plot 12, Height Towers, Victoria Island, Lagos
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

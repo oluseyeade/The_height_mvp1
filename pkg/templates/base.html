@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+{% include 'includes/header.html' %}
+<body>
+
+  <!-- Navigation Bar -->
+  {% include 'includes/navbar.html' %}
+
+  <!-- Flash Messages -->
+  {% include 'includes/flash_messages.html' %}
+
+  <!-- Main Content Block -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Sticky WhatsApp Widget -->
+  {% include 'includes/whatsapp.html' %}
+
+  <!-- Footer -->
+  {% include 'includes/footer.html' %}
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom Application Scripts -->
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/validation.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

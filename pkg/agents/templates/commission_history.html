@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5" style="background-color: var(--bg-dark-core);">
+  <div class="container py-3">
+    <h2 class="text-white fw-bold mb-4"><i class="fa-solid fa-file-invoice-dollar text-warning me-2"></i>Commission Transaction Ledger</h2>
+
+    <div class="glass-panel p-4">
+      {% if commissions %}
+        <div class="table-responsive">
+          <table class="table table-dark table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Transaction ID</th>
+                <th>Booking Ref</th>
+                <th>Booking Total</th>
+                <th>Rate</th>
+                <th>Commission Amount</th>
+                <th>Status</th>
+                <th>Payout Ref</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in commissions %}
+              <tr>
+                <td>#{{ c.commission_id }}</td>
+                <td class="fw-bold text-warning">{{ c.booking.booking_ref if c.booking else 'N/A' }}</td>
+                <td>₦{{ "{:,.2f}".format(c.booking_amount) }}</td>
+                <td>{{ c.commission_percentage }}%</td>
+                <td class="fw-bold text-success">₦{{ "{:,.2f}".format(c.commission_amount) }}</td>
+                <td>
+                  {% if c.status == 'paid' %}
+                    <span class="badge bg-success">Paid</span>
+                  {% else %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                  {% endif %}
+                </td>
+                <td><small class="text-muted">{{ c.payment_reference or 'Awaiting Payout' }}</small></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-5">
+          <p class="text-muted">No commission records generated yet.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

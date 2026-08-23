@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5" style="background-color: var(--bg-dark-core);">
+  <div class="container py-3">
+    <h2 class="text-white fw-bold mb-4"><i class="fa-solid fa-file-csv text-warning me-2"></i>Financial & Operational Reports</h2>
+
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="glass-panel p-4 h-100">
+          <i class="fa-solid fa-file-invoice-dollar text-warning display-4 mb-3"></i>
+          <h4 class="text-white fw-bold">All Bookings & Financial Export</h4>
+          <p class="text-muted">Export complete dataset of guest reservations, night calculations, stay amounts, and verified statuses in CSV format for auditing.</p>
+          <a href="{{ url_for('reports.export_bookings_csv') }}" class="btn btn-gold w-100 py-3 fw-bold"><i class="fa-solid fa-download me-2"></i> Download Bookings CSV Report</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

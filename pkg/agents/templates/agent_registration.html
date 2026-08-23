@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5 d-flex align-items-center" style="min-height: 85vh; background: radial-gradient(circle at center, rgba(209,152,40,0.05) 0%, rgba(10,10,12,0.98) 100%);">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+        <div class="glass-panel text-center p-4 mb-4">
+          <i class="fa-solid fa-user-tie text-warning display-4 mb-2"></i>
+          <h2 class="text-white fw-bold">Partner Agent Registration</h2>
+          <p class="text-muted">Join our exclusive partner network and earn 5% commission on every verified shortlet booking referred.</p>
+        </div>
+
+        <div class="glass-panel p-4">
+          <form method="POST" action="{{ url_for('agents.register') }}" class="needs-validation" novalidate>
+            {{ form.hidden_tag() }}
+
+            <h5 class="text-white fw-bold mb-3 border-bottom border-secondary pb-2"><i class="fa-solid fa-user text-warning me-2"></i>Personal & Contact Details</h5>
+
+            <div class="mb-3">
+              <label for="full_name" class="form-label">Full Name</label>
+              {{ form.full_name(class="form-control", placeholder="John Partner") }}
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label for="email" class="form-label">Email Address</label>
+                {{ form.email(class="form-control", placeholder="partner@agency.com") }}
+              </div>
+              <div class="col-md-6">
+                <label for="phone" class="form-label">Direct Phone Number</label>
+                {{ form.phone(class="form-control", placeholder="+234 800 000 0000") }}
+              </div>
+            </div>
+
+            <h5 class="text-white fw-bold mb-3 border-bottom border-secondary pb-2"><i class="fa-solid fa-building-columns text-warning me-2"></i>Commission Payout Bank Account</h5>
+
+            <div class="mb-3">
+              <label for="bank_name" class="form-label">Bank Name</label>
+              {{ form.bank_name(class="form-control", placeholder="e.g. GTBank / Access Bank / Zenith Bank") }}
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label for="account_number" class="form-label">Account Number (NUBAN)</label>
+                {{ form.account_number(class="form-control", placeholder="0123456789") }}
+              </div>
+              <div class="col-md-6">
+                <label for="account_holder_name" class="form-label">Account Holder Name</label>
+                {{ form.account_holder_name(class="form-control", placeholder="John Partner") }}
+              </div>
+            </div>
+
+            <h5 class="text-white fw-bold mb-3 border-bottom border-secondary pb-2"><i class="fa-solid fa-lock text-warning me-2"></i>Account Credentials</h5>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label for="password" class="form-label">Password</label>
+                {{ form.password(class="form-control", placeholder="At least 8 chars") }}
+              </div>
+              <div class="col-md-6">
+                <label for="confirm_password" class="form-label">Confirm Password</label>
+                {{ form.confirm_password(class="form-control", placeholder="Re-type password") }}
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-gold w-100 py-3 fw-bold fs-6">
+              <i class="fa-solid fa-user-check me-2"></i> Register as Partner Agent & Generate Code
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

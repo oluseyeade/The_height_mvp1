@@ -1,0 +1,11 @@
+{% if user and user.role %}
+  {% if user.role.hierarchy_level == 4 %}
+    <span class="badge badge-role badge-superadmin"><i class="fa-solid fa-crown me-1"></i>SuperAdmin</span>
+  {% elif user.role.hierarchy_level == 3 %}
+    <span class="badge badge-role badge-admin"><i class="fa-solid fa-user-shield me-1"></i>Admin</span>
+  {% elif user.role.hierarchy_level == 2 %}
+    <span class="badge badge-role badge-agent"><i class="fa-solid fa-user-tie me-1"></i>Agent</span>
+  {% else %}
+    <span class="badge badge-role badge-user"><i class="fa-solid fa-user me-1"></i>Guest/User</span>
+  {% endif %}
+{% endif %}

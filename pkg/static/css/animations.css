@@ -1,0 +1,94 @@
+/* Luxury Hover & Interactive Animations */
+
+/* Apartment & Feature Cards Hover Specification */
+.luxury-card {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-dark);
+}
+
+.luxury-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg), 0 0 20px rgba(209, 152, 40, 0.15);
+  border-color: var(--border-gold);
+}
+
+.luxury-card .card-img-wrapper {
+  overflow: hidden;
+  position: relative;
+}
+
+.luxury-card .card-img-top {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.luxury-card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+.luxury-card .price-tag {
+  transition: all 0.4s ease;
+}
+
+.luxury-card:hover .price-tag {
+  box-shadow: 0 0 12px var(--gold-primary);
+  background-color: var(--gold-primary);
+  color: #000;
+}
+
+.luxury-card .btn-card-action {
+  transition: all 0.4s ease;
+  background-color: transparent;
+  color: var(--gold-primary);
+  border: 1px solid var(--gold-primary);
+}
+
+.luxury-card:hover .btn-card-action {
+  background-color: var(--gold-primary);
+  color: #000000;
+  box-shadow: 0 0 15px rgba(209, 152, 40, 0.4);
+}
+
+/* Keyframe Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseGold {
+  0% {
+    box-shadow: 0 0 0 0 rgba(209, 152, 40, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(209, 152, 40, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(209, 152, 40, 0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+.animate-pulse-gold {
+  animation: pulseGold 2s infinite;
+}

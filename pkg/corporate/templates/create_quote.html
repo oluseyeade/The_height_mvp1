@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5" style="background-color: var(--bg-dark-core);">
+  <div class="container py-3">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="glass-panel p-4 mb-4">
+          <span class="badge bg-warning text-dark px-3 py-2 fw-bold text-uppercase mb-2">B2B QUOTE GENERATOR</span>
+          <h3 class="text-white fw-bold">Issue Corporate Quotation</h3>
+          <p class="text-muted mb-0">For: <strong class="text-warning">{{ enquiry.company_name }}</strong> (Attn: {{ enquiry.contact_person }})</p>
+        </div>
+
+        <div class="glass-panel p-4">
+          <form method="POST" action="{{ url_for('corporate.create_quote', enquiry_id=enquiry.enquiry_id) }}">
+            {{ form.hidden_tag() }}
+
+            <div class="mb-3">
+              <label for="room_type" class="form-label">Suite Type & Package Description</label>
+              {{ form.room_type(class="form-control", placeholder="e.g. 2 bed rooms premium apartment") }}
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="amount" class="form-label">Gross Base Amount (₦)</label>
+                {{ form.amount(class="form-control", placeholder="1200000.00") }}
+              </div>
+              <div class="col-md-6">
+                <label for="discount" class="form-label">Corporate Discount (₦)</label>
+                {{ form.discount(class="form-control", placeholder="150000.00") }}
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="valid_until" class="form-label">Quote Validity Expiry Date</label>
+              {{ form.valid_until(class="form-control", type="date") }}
+            </div>
+
+            <div class="mb-4">
+              <label for="terms" class="form-label">B2B Inclusions & Terms</label>
+              {{ form.terms(class="form-control", rows=4, placeholder="Includes complimentary airport shuttle, daily breakfast, 24/7 laundry, and weekly invoicing terms.") }}
+            </div>
+
+            <button type="submit" class="btn btn-gold w-100 py-3 fw-bold">
+              <i class="fa-solid fa-file-signature me-2"></i> Issue & Dispatch Corporate Quote
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

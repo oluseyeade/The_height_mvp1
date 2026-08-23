@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5" style="background-color: var(--bg-dark-core);">
+  <div class="container py-3">
+    <div class="mb-4">
+      <a href="{{ url_for('apartments.detail_apartment', apartment_id=apartment.apartment_id) }}" class="text-warning text-decoration-none small"><i class="fa-solid fa-arrow-left me-1"></i> Back to {{ apartment.title }}</a>
+      <h2 class="text-white fw-bold mt-2"><i class="fa-solid fa-calendar-days text-warning me-2"></i>Availability Calendar</h2>
+      <p class="text-muted">Live reservation availability calendar for <strong>{{ apartment.title }}</strong></p>
+    </div>
+
+    <div class="glass-panel p-4">
+      <!-- FullCalendar Container -->
+      <div id="calendar" style="min-height: 550px;"></div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<!-- FullCalendar 6 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const calendarEl = document.getElementById('calendar');
+  if (calendarEl) {
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      themeSystem: 'standard',
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,timeGridWeek'
+      },
+      events: '/availability/api/events/{{ apartment.apartment_id }}',
+      eventDidMount: function(info) {
+        info.el.style.borderRadius = '6px';
+        info.el.style.padding = '4px 8px';
+      }
+    });
+    calendar.render();
+  }
+});
+</script>
+{% endblock %}

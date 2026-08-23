@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5" style="background-color: var(--bg-dark-core);">
+  <div class="container py-3">
+    <h2 class="text-white fw-bold mb-4"><i class="fa-solid fa-clock-rotate-left text-warning me-2"></i>System Audit Trail Logs</h2>
+
+    <div class="glass-panel p-4">
+      <div class="table-responsive">
+        <table class="table table-dark table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Timestamp</th>
+              <th>Activity Type</th>
+              <th>Description</th>
+              <th>Module</th>
+              <th>Action</th>
+              <th>IP Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in logs %}
+            <tr>
+              <td>#{{ log.log_id }}</td>
+              <td><small class="text-muted">{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small></td>
+              <td><span class="badge bg-warning text-dark">{{ log.activity_type }}</span></td>
+              <td>{{ log.description }}</td>
+              <td><span class="badge bg-secondary">{{ log.module }}</span></td>
+              <td><small class="text-white">{{ log.action }}</small></td>
+              <td><small class="text-muted">{{ log.ip_address or '127.0.0.1' }}</small></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

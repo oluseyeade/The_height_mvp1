@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-overlay"></div>
+  <div class="hero-content text-white animate-fade-in-up">
+    <div class="badge bg-dark border border-warning text-warning px-3 py-2 rounded-pill mb-3 fw-bold tracking-wider">
+      <i class="fa-solid fa-gem me-1"></i> EXCLUSIVE SHORTLET APARTMENTS
+    </div>
+    <h1 class="hero-title"> The Height  Premium Apartment<span>Elevate your stay</span></h1>
+    <p class="hero-subtitle">
+    The Height Apartment
+    Elevate Your Stay. Feel at Home.premium  serviced apartments designed for business travelers, corporate training, and unforgettable stay. Perfect for holiday retreats.
+    </p>
+    <div class="d-flex flex-wrap justify-content-center gap-3">
+      <a href="#apartments-section" class="btn btn-gold btn-lg px-4 py-3"><i class="fa-solid fa-calendar-check me-2"></i> Explore Suites</a>
+      <a href="#corporate-section" class="btn btn-outline-gold btn-lg px-4 py-3"><i class="fa-solid fa-briefcase me-2"></i> Corporate Enquiries</a>
+    </div>
+  </div>
+</section>
+
+<!-- Apartment Showcase Grid (4 Cards Hover Animation) -->
+<section id="apartments-section" class="py-5" style="background-color: var(--bg-dark-surface);">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <span class="text-warning text-uppercase fw-bold tracking-wider small">Premier Collection</span>
+      <h2 class="text-white fw-bold display-6 mt-1">Featured Luxury Apartments</h2>
+      <div class="mx-auto bg-warning" style="height: 3px; width: 60px; border-radius: 2px;"></div>
+    </div>
+
+    <!-- 4 Cards Per Row Grid -->
+    <div class="row g-4">
+      {% for apt in apartments %}
+      <div class="col-xl-3 col-lg-6 col-md-6">
+        <div class="card luxury-card h-100 bg-dark text-white rounded-4 border-0">
+          <div class="card-img-wrapper">
+            <img src="{{ apt.image }}" class="card-img-top" alt="{{ apt.title }}" style="height: 240px; object-fit: cover;">
+            <span class="position-absolute top-0 end-0 m-3 price-tag">₦{{ "{:,.0f}".format(apt.price) }}/night</span>
+            <span class="position-absolute top-0 start-0 m-3 badge bg-warning text-dark font-weight-bold">{{ apt.tag }}</span>
+          </div>
+          <div class="card-body d-flex flex-column p-4">
+            <small class="text-warning text-uppercase fw-bold mb-1">{{ apt.category }}</small>
+            <h5 class="card-title text-white fw-bold mb-3">{{ apt.title }}</h5>
+            
+            <div class="d-flex justify-content-between text-muted small mb-4 border-top border-bottom border-secondary py-2">
+              <span><i class="fa-solid fa-bed me-1 text-warning"></i> {{ apt.bedrooms }} Beds</span>
+              <span><i class="fa-solid fa-bath me-1 text-warning"></i> {{ apt.bathrooms }} Baths</span>
+              <span><i class="fa-solid fa-users me-1 text-warning"></i> {{ apt.capacity }} Guests</span>
+            </div>
+
+            <div class="mt-auto d-flex justify-content-between align-items-center">
+              <span class="small text-muted"><i class="fa-solid fa-shield-halved text-success me-1"></i> Verified</span>
+              <a href="#" class="btn btn-card-action px-3 py-2 text-decoration-none fw-bold small">
+                Reserve Suite <i class="fa-solid fa-arrow-right ms-1"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Corporate & Extended Stays Callout Section -->
+<section id="corporate-section" class="py-5" style="background-color: var(--bg-dark-core);">
+  <div class="container py-4">
+    <div class="glass-panel p-5">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+          <span class="badge bg-warning text-dark px-3 py-2 rounded-pill mb-3 font-weight-bold">B2B CORPORATE SOLUTIONS</span>
+          <h2 class="text-white fw-bold display-6 mb-3">Corporate & Extended Stays</h2>
+          <p class="text-secondary leading-relaxed mb-4">
+            Custom corporate lodging packages with negotiated rates, dedicated account managers, priority booking windows, and automated tax receipts for organizations and executive teams.
+          </p>
+          <div class="d-flex flex-wrap gap-4 text-white small">
+            <div><i class="fa-solid fa-circle-check text-warning me-2"></i> Dedicated Invoicing & Receipts</div>
+            <div><i class="fa-solid fa-circle-check text-warning me-2"></i> Flexible Extended Stay Discounts</div>
+            <div><i class="fa-solid fa-circle-check text-warning me-2"></i> Priority Support & Quotations</div>
+          </div>
+        </div>
+        <div class="col-lg-5 text-lg-end text-center">
+          <a href="#" class="btn btn-gold btn-lg px-4 py-3"><i class="fa-solid fa-file-signature me-2"></i> Request Corporate Quote</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Partner Agent Portal Callout Section -->
+<section id="agent-section" class="py-5" style="background-color: var(--bg-dark-surface);">
+  <div class="container py-4">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-6">
+        <img src="static/img/kitchen.jpg" alt="Agent Partner" class="img-fluid rounded-4 shadow-lg border border-secondary">
+      </div>
+      <div class="col-lg-6">
+        <span class="text-warning text-uppercase fw-bold tracking-wider small">Partner Network</span>
+        <h2 class="text-white fw-bold display-6 mb-3">Become a Height Partner Agent</h2>
+        <p class="text-secondary mb-4">
+          Earn competitive commissions on every verified shortlet booking referred through your agent referral code. Track earnings in real-time on your dedicated Agent Dashboard.
+        </p>
+        <div class="d-flex gap-3">
+          <a href="#" class="btn btn-gold px-4 py-3 fw-bold"><i class="fa-solid fa-user-tie me-2"></i> Register as Agent</a>
+          <a href="{{ url_for('auth.login') }}" class="btn btn-outline-gold px-4 py-3"><i class="fa-solid fa-right-to-bracket me-2"></i> Agent Login</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

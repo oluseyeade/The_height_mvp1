@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5" style="background-color: var(--bg-dark-core);">
+  <div class="container py-3">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="glass-panel text-center p-4 mb-4">
+          <i class="fa-solid fa-briefcase text-warning display-4 mb-2"></i>
+          <h2 class="text-white fw-bold">Request a Corporate Quote</h2>
+          <p class="text-muted">Fill out this dedicated B2B form to receive a tailored quotation from our Corporate Accounts Director.</p>
+        </div>
+
+        <!-- Separate B2B Form -->
+        <div class="glass-panel p-4">
+          <form method="POST" action="{{ url_for('corporate.request_quote') }}" class="needs-validation" novalidate>
+            {{ form.hidden_tag() }}
+
+            <h5 class="text-white fw-bold mb-3 border-bottom border-secondary pb-2"><i class="fa-solid fa-building text-warning me-2"></i>Organization Information</h5>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="company_name" class="form-label">Company / Organization Name</label>
+                {{ form.company_name(class="form-control", placeholder="e.g. Chevron Nigeria / Embassy") }}
+              </div>
+              <div class="col-md-6">
+                <label for="contact_person" class="form-label">Contact Person & Title</label>
+                {{ form.contact_person(class="form-control", placeholder="Jane Smith - Head of HR") }}
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label for="email" class="form-label">Corporate Email Address</label>
+                {{ form.email(class="form-control", placeholder="jane.smith@company.com") }}
+              </div>
+              <div class="col-md-6">
+                <label for="phone" class="form-label">Direct Phone Number</label>
+                {{ form.phone(class="form-control", placeholder="+234 800 000 0000") }}
+              </div>
+            </div>
+
+            <h5 class="text-white fw-bold mb-3 border-bottom border-secondary pb-2"><i class="fa-solid fa-calendar-days text-warning me-2"></i>Lodging Specifications</h5>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="check_in" class="form-label">Proposed Check-in Date</label>
+                {{ form.check_in(class="form-control", type="date") }}
+              </div>
+              <div class="col-md-6">
+                <label for="check_out" class="form-label">Proposed Check-out Date</label>
+                {{ form.check_out(class="form-control", type="date") }}
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-4">
+                <label for="guest_count" class="form-label">Guest Count</label>
+                {{ form.guest_count(class="form-control", min=1) }}
+              </div>
+              <div class="col-md-4">
+                <label for="suite_count" class="form-label">Suites Required</label>
+                {{ form.suite_count(class="form-control", min=1) }}
+              </div>
+              <div class="col-md-4">
+                <label for="budget_range" class="form-label">Budget Range</label>
+                {{ form.budget_range(class="form-select") }}
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="special_requests" class="form-label">Special B2B Requirements / Requests</label>
+              {{ form.special_requests(class="form-control", rows=4, placeholder="Chauffeur services, specific suite categories, weekly invoicing...") }}
+            </div>
+
+            <button type="submit" class="btn btn-gold w-100 py-3 fw-bold fs-6">
+              <i class="fa-solid fa-paper-plane me-2"></i> Submit Corporate Enquiry & Request Quotation
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,29 @@
+<nav class="navbar navbar-expand-lg navbar-dark navbar-marriott sticky-top">
+  <div class="container">
+    
+    <!-- The Height Official Logo -> Navigates to Home / Welcome -->
+    <a class="navbar-brand me-4" href="{{ url_for('public.index') }}">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="The Height Premium Apartments" class="img-fluid" style="height: 100px; object-fit: contain;">
+    </a>
+    <!-- Mobile Navigation Toggler -->
+    <button class="navbar-toggler border-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMarriottNav" aria-controls="navbarMarriottNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- Header Navigation Items strictly limited to: Agent, Contact Us, Register, Login -->
+    <div class="collapse navbar-collapse" id="navbarMarriottNav">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+        
+        <!-- Agent -->
+        <li class="nav-item">
+          <a class="nav-link {{ 'active' if 'agents' in request.endpoint }}" href="{{ url_for('agents.register') }}">
+            <i class="fas fa-handshake text-gold me-1 d-lg-none"></i> Agent
+          </a>
+        </li>
+        <!-- Contact Us -->
+        <li class="nav-item">
+          <a class="nav-link {{ 'active' if request.endpoint == 'public.contact' }}" href="{{ url_for('public.contact') }}">
+            <i class="fas fa-envelope text-gold me-1 d-lg-none"></i> Contact Us
+          </a>
+        </li>
+        <!-- Register -->
+        <li class="nav-item">

@@ -1,0 +1,34 @@
+
+.header{
+    padding: 5vh 0px;
+    background: rgb(3, 3, 31);
+    color: white;
+    font-family: "Poppins", sans-serif;
+}
+
+.formy{
+    padding: 5vh 0px;
+    color: rgb(3, 3, 31);
+    font-weight: 900;
+}
+.brr{
+    /* border: rgb(3, 3, 31) 2px solid; */
+    border-radius: 20px;
+}
+.brr input::placeholder{
+    color: rgb(3, 3, 31);
+    font-weight: 400;
+}
+.brr input{
+    border-bottom: 1px dotted rgb(3, 3, 31);
+}
+.mine{
+    background-color: rgb(3, 3, 31) !important;
+}
+.products{
+    padding: 5vh 0px;
+    background: rgb(3, 3, 31);
+    color: white;
+    font-family: "Poppins", sans-serif;
+    min-height: 60vh;
+}

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5 d-flex align-items-center" style="min-height: 80vh; background: radial-gradient(circle at center, rgba(209,152,40,0.05) 0%, rgba(10,10,12,0.98) 100%);">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-5 col-md-7">
+        <div class="glass-panel text-center">
+          <div class="mb-4">
+            <i class="fa-solid fa-building-user text-warning display-4 mb-2"></i>
+            <h3 class="fw-bold text-white mb-1">Welcome Back</h3>
+            <p class="text-muted small">Sign in to manage your luxury shortlet reservations</p>
+          </div>
+
+          <form method="POST" action="{{ url_for('auth.login') }}" class="needs-validation text-start" novalidate>
+            {{ form.hidden_tag() }}
+
+            <div class="mb-3">
+              <label for="email" class="form-label">Email Address</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark text-warning border-dark"><i class="fa-solid fa-envelope"></i></span>
+                {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="name@example.com") }}
+              </div>
+              {% for error in form.email.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark text-warning border-dark"><i class="fa-solid fa-lock"></i></span>
+                {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), placeholder="••••••••") }}
+              </div>
+              {% for error in form.password.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+              {% endfor %}
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="form-check">
+                {{ form.remember(class="form-check-input") }}
+                <label class="form-check-label text-muted small" for="remember">Remember me</label>
+              </div>
+              <a href="#" class="text-warning small text-decoration-none">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="btn btn-gold w-100 py-3 fw-bold fs-6 mb-3">
+              <i class="fa-solid fa-right-to-bracket me-2"></i> Sign In to Account
+            </button>
+
+            <p class="text-center text-muted small mb-0">
+              Don't have an account yet? 
+              <a href="{{ url_for('auth.register') }}" class="text-warning fw-bold text-decoration-none">Create Account</a>
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

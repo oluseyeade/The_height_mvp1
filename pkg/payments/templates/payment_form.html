@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5" style="background-color: var(--bg-dark-core);">
+  <div class="container py-3">
+    <div class="row justify-content-center">
+      <div class="col-lg-7">
+        <div class="glass-panel p-4 text-center mb-4">
+          <i class="fa-solid fa-file-invoice-dollar text-warning display-4 mb-2"></i>
+          <h3 class="text-white fw-bold">Submit Deposit Payment Proof</h3>
+          <p class="text-muted">Booking Reference: <strong class="text-warning">{{ booking.booking_ref }}</strong></p>
+        </div>
+
+        <div class="glass-panel p-4">
+          <form method="POST" enctype="multipart/form-data" action="{{ url_for('payments.submit_payment', booking_ref=booking.booking_ref) }}">
+            {{ form.hidden_tag() }}
+
+            <div class="mb-3">
+              <label for="amount" class="form-label">Amount Paid (₦)</label>
+              {{ form.amount(class="form-control", placeholder="50000.00") }}
+              <small class="text-muted">Required refundable Caution fee of : ₦{{ "{:,.2f}".format(refundable.deposit_required) }}</small>
+            </div>
+
+            <div class="mb-3">
+              <label for="transaction_ref" class="form-label">Transaction Ref / Teller Number (Optional)</label>
+              {{ form.transaction_ref(class="form-control", placeholder="e.g. ZN-99881122") }}
+            </div>
+
+            <div class="mb-4">
+              <label for="payment_proof" class="form-label">Upload Transfer Receipt / Screenshot</label>
+              {{ form.payment_proof(class="form-control") }}
+              <small class="text-muted">Upload JPG, PNG, or PDF format</small>
+            </div>
+
+            <button type="submit" class="btn btn-gold w-100 py-3 fw-bold">
+              <i class="fa-solid fa-upload me-2"></i> Upload Payment Proof for Verification
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

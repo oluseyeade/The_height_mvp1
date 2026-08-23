@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5" style="background-color: var(--bg-dark-core);">
+  <div class="container py-3">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h2 class="text-white fw-bold"><i class="fa-solid fa-camera-retro text-warning me-2"></i>Upload Room Pictures</h2>
+            <p class="text-muted mb-0">Adding photos for: <strong>{{ apartment.title }}</strong></p>
+          </div>
+          <a href="{{ url_for('apartments.detail_apartment', apartment_id=apartment.apartment_id) }}" class="btn btn-outline-gold btn-sm"><i class="fa-solid fa-eye me-1"></i> View Suite</a>
+        </div>
+
+        <div class="glass-panel p-4 mb-4">
+          <form method="POST" enctype="multipart/form-data" action="{{ url_for('apartments.upload_images', apartment_id=apartment.apartment_id) }}">
+            {{ form.hidden_tag() }}
+
+            <div class="mb-3">
+              <label for="caption" class="form-label">Room / Area Caption</label>
+              {{ form.caption(class="form-control", placeholder="e.g., Master Bedroom, Living Room, Kitchen, Balcony") }}
+              <small class="text-muted">Tag the uploaded photos to specific rooms in the apartment</small>
+            </div>
+
+            <div class="mb-4">
+              <label for="images" class="form-label">Select Image Files</label>
+              {{ form.images(class="form-control", multiple=True) }}
+            </div>
+
+            <button type="submit" class="btn btn-gold px-4 py-3 fw-bold w-100">
+              <i class="fa-solid fa-cloud-arrow-up me-2"></i> Upload Room Pictures
+            </button>
+          </form>
+        </div>
+
+        <!-- Existing Photos Gallery -->
+        {% if apartment.images %}
+        <div class="glass-panel p-4">
+          <h5 class="text-white fw-bold mb-3">Uploaded Room Photos ({{ apartment.images|length }})</h5>
+          <div class="row g-3">
+            {% for img in apartment.images %}
+            <div class="col-md-4 col-6">
+              <div class="position-relative border border-secondary rounded-3 overflow-hidden">
+                <img src="{{ img.image_url }}" alt="{{ img.caption }}" class="img-fluid" style="height: 140px; width: 100%; object-fit: cover;">
+                <div class="p-2 bg-dark text-white small d-flex justify-content-between align-items-center">
+                  <span class="text-truncate">{{ img.caption or 'Room Image' }}</span>
+                  {% if img.is_cover %}<span class="badge bg-warning text-dark">Cover</span>{% endif %}
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

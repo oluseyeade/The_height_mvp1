@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="py-5" style="background-color: var(--bg-dark-core);">
+  <div class="container py-3">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <!-- Suite Header Summary -->
+        <div class="glass-panel p-4 mb-4">
+          <div class="d-flex align-items-center gap-4">
+            <img src="{{ apartment.cover_image }}" alt="{{ apartment.title }}" class="rounded-3" style="width: 120px; height: 90px; object-fit: cover;">
+            <div>
+              <span class="badge bg-warning text-dark font-weight-bold mb-1">{{ apartment.category.name }}</span>
+              <h3 class="text-white fw-bold mb-1">{{ apartment.title }}</h3>
+              <p class="text-warning fw-bold mb-0">₦{{ "{:,.0f}".format(apartment.price_per_night) }} / night</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reservation Request Form -->
+        <div class="glass-panel p-4">
+          <h4 class="text-white fw-bold mb-3"><i class="fa-solid fa-calendar-check text-warning me-2"></i>Reservation Request</h4>
+          
+          <form method="POST" action="{{ url_for('bookings.create_booking', apartment_id=apartment.apartment_id) }}" id="bookingForm">
+            {{ form.hidden_tag() }}
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label for="check_in" class="form-label">Check-in Date</label>
+                {{ form.check_in(class="form-control", type="date", id="check_in") }}
+              </div>
+              <div class="col-md-6">
+                <label for="check_out" class="form-label">Check-out Date</label>
+                {{ form.check_out(class="form-control", type="date", id="check_out") }}
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label for="guest_count" class="form-label">Number of Guests</label>
+              {{ form.guest_count(class="form-control", min=1, max=apartment.capacity) }}
+              <small class="text-muted">Max suite capacity: {{ apartment.capacity }} guests</small>
+            </div>
+
+            <!-- Guest Details Section (Optional Registration) -->
+            <div class="border-top border-secondary pt-4 mb-4">
+              <h5 class="text-white fw-bold mb-3"><i class="fa-solid fa-user text-warning me-2"></i>Guest Contact Information</h5>
+              
+              <div class="mb-3">
+                <label for="guest_name" class="form-label">Full Name</label>
+                {{ form.guest_name(class="form-control", placeholder="John Doe") }}
+              </div>
+
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label for="guest_email" class="form-label">Email Address</label>
+                  {{ form.guest_email(class="form-control", placeholder="john@example.com") }}
+                </div>
+                <div class="col-md-6">
+                  <label for="guest_phone" class="form-label">Phone Number</label>
+                  {{ form.guest_phone(class="form-control", placeholder="+234 800 000 0000") }}
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="special_requests" class="form-label">Special Requests (Optional)</label>
+                {{ form.special_requests(class="form-control", rows=3, placeholder="Airport pickup, extra towels, late arrival time...") }}
+              </div>
+            </div>
+
+            <!-- Pricing Breakdown Box -->
+            <div class="p-3 bg-dark rounded-3 border border-secondary mb-4 text-white">
+              <div class="d-flex justify-content-between mb-2">
+                <span class="text-muted">Deposit Required for Guarantee:</span>
+                <span class="fw-bold text-warning">₦50,000.00</span>
+              </div>
+              <small class="text-muted d-block"><i class="fa-solid fa-circle-info text-warning me-1"></i> The ₦50,000 initial deposit is payable via bank transfer or Paystack to confirm your reservation.</small>
+            </div>
+
+            <button type="submit" class="btn btn-gold w-100 py-3 fw-bold fs-6">
+              <i class="fa-solid fa-paper-plane me-2"></i> Submit Booking Request & View Payment Instructions
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/booking.js') }}"></script>
+{% endblock %}

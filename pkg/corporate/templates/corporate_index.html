@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Corporate Hero Section -->
+<section class="py-5" style="background: linear-gradient(180deg, rgba(10, 10, 12, 0.6) 0%, rgba(10, 10, 12, 0.98) 100%), url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat; min-height: 60vh; display: flex; align-items: center;">
+  <div class="container text-center py-5">
+    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fw-bold text-uppercase mb-3"><i class="fa-solid fa-briefcase me-1"></i> B2B CORPORATE LODGING</span>
+    <h1 class="text-white fw-bold display-4">Corporate & Extended Stays</h1>
+    <p class="text-secondary fs-5 mx-auto max-w-2xl leading-relaxed">
+       The Height is a natural fit for:
+      *Visiting executives, partners and board members
+      Relocating and newly onboarded staff members    </p>
+    <div class="mt-4">
+      <a href="{{ url_for('corporate.request_quote') }}" class="btn btn-gold btn-lg px-5 py-3 fw-bold"><i class="fa-solid fa-paper-plane me-2"></i> Request Corporate Quotation</a>
+    </div>
+  </div>
+</section>
+
+<!-- Corporate Benefits Section -->
+<section class="py-5" style="background-color: var(--bg-dark-core);">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <span class="text-warning text-uppercase fw-bold tracking-wider small">Exclusive Benefits</span>
+      <h2 class="text-white fw-bold display-6 mt-1">Why Partner With The Height Apartment</h2>
+      <div class="mx-auto bg-warning" style="height: 3px; width: 60px; border-radius: 2px;"></div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="glass-panel h-100 p-4 text-center">
+          <i class="fa-solid fa-file-invoice-dollar text-warning display-4 mb-3"></i>
+          <h4 class="text-white fw-bold"> Corporate Packages & Rates</h4>
+          <p class="text-muted small">.We keep it flexible and build around how your organisation actually travels:
+• Negotiated rates for volume and repeat bookings
+• Extended-stay discounts (weekly and monthly)
+• Consolidated invoicing and flexible billing — bank transfer or secure online payment
+• Priority availability for corporate partners and retainer arrangements
+Share your typical needs — nights per month, number of guests and duration — and we'll build a rate</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="glass-panel h-100 p-4 text-center">
+          <i class="fa-solid fa-user-gear text-warning display-4 mb-3"></i>
+          <h4 class="text-white fw-bold">Dedicated Account Manager</h4>
+          <p class="text-muted small">We keep it flexible and build around how your organisation actually travels:
+• Negotiated rates for volume and repeat bookings
+• Extended-stay discounts (weekly and monthly)
+• Consolidated invoicing and flexible billing — bank transfer or secure online payment
+• Priority availability for corporate partners and retainer arrangements
+Share your typical needs — nights per month, number of guests and duration — and we'll build a rate.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="glass-panel h-100 p-4 text-center">
+          <i class="fa-solid fa-shield-halved text-warning display-4 mb-3"></i>
+          <h4 class="text-white fw-bold">Trained on-site guards,CCTV and smart-lock entry for complete peace of mind </h4>
+          <p class="text-muted small">fast and reliable internet connectivity with 100% uptime guarantee.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
