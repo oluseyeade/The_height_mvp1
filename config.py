@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '.env'))
 
-def _get_database_url():
+def _get_database_url(required=True):
     db_uri = (
         os.environ.get('DATABASE_URL') or 
         os.environ.get('SQLALCHEMY_DATABASE_URI') or 
@@ -14,6 +14,9 @@ def _get_database_url():
     )
     if db_uri:
         db_uri = db_uri.strip()
+
+    if db_uri and (db_uri.startswith('your-') or db_uri == 'x'):
+        db_uri = None
 
     if not db_uri:
         user = (os.environ.get('DB_USER') or os.environ.get('MYSQL_USER') or os.environ.get('MYSQLUSER') or 'root').strip()
@@ -30,7 +33,9 @@ def _get_database_url():
     if '?' not in db_uri and not db_uri.startswith('sqlite'):
         db_uri += '?use_pure=True'
 
-    if not db_uri or not (db_uri.startswith('mysql://') or db_uri.startswith('mysql+mysqlconnector://') or db_uri.startswith('mysql+pymysql://')):
+    is_valid_mysql = db_uri and (db_uri.startswith('mysql://') or db_uri.startswith('mysql+mysqlconnector://') or db_uri.startswith('mysql+pymysql://'))
+
+    if required and not is_valid_mysql:
         raise RuntimeError("DATABASE_URL must be set to a real MySQL connection string before starting the app.")
 
     return db_uri
@@ -102,7 +107,7 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = _get_database_url()
+    SQLALCHEMY_DATABASE_URI = _get_database_url(required=False)
     
 class ProductionConfig(Config):
     DEBUG = False
