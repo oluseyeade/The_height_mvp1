@@ -83,15 +83,15 @@
       {% if apartments %}
         {% for apt in apartments %}
           <div class="col-lg-4 col-md-6">
-            <div class="room-card h-100 cursor-pointer" onclick="window.location.href='{{ url_for('apartments.detail', apartment_id=apt.apartment_id) }}';">
-              
+            <div class="room-card h-100 cursor-pointer"
+                 onclick="window.location.href="{{ url_for('apartments.detail', apartment_id=apt.apartment_id) }}';">            
               <!-- Property Image with Price / Status Badge Overlay -->
               <div class="room-card-img-wrapper position-relative">
                 <img src="{{ url_for('static', filename=apt.cover_image) if not apt.cover_image.startswith('http') else apt.cover_image }}" alt="{{ apt.title }}">
                 
                 <!-- Premium Badge Overlay Top-Right -->
                 <div class="position-absolute top-0 end-0 m-3 z-2">
-                  {% if apt.status == 'coming_soon' or '1' in apt.title or 'studio' in apt.title.lower() %}
+                  {% if apt.status == 'coming_soon' %}
                     <span class="badge-coming-soon">Coming Soon</span>
                   {% else %}
                     <span class="price-badge-gold">From ₦{{ "{:,.0f}".format(apt.price_per_night) }} / Night</span>
@@ -118,7 +118,7 @@
 
                 <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary border-opacity-25">
                   <span class="small text-muted"><i class="fas fa-bed text-gold me-1"></i> {{ apt.bedrooms }} Bed(s)</span>
-                  <span class="btn btn-sm btn-gold">View Details <i class="fas fa-arrow-right ms-1"></i></span>
+                  <a href="{{ url_for('apartments.detail', apartment_id=apt.apartment_id) }}" class="btn btn-sm btn-gold">View Details <i class="fas fa-arrow-right ms-1"></i></a>
                 </div>
               </div>
 
