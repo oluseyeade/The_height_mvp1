@@ -12,12 +12,15 @@ def _get_database_url():
         os.environ.get('MYSQL_PRIVATE_URL') or 
         os.environ.get('DATABASE_PUBLIC_URL')
     )
+    if db_uri:
+        db_uri = db_uri.strip()
+
     if not db_uri:
-        user = os.environ.get('DB_USER') or os.environ.get('MYSQL_USER') or os.environ.get('MYSQLUSER') or 'root'
-        password = os.environ.get('DB_PASSWORD') or os.environ.get('MYSQL_PASSWORD') or os.environ.get('MYSQLPASSWORD') or ''
-        host = os.environ.get('DB_HOST') or os.environ.get('MYSQL_HOST') or os.environ.get('MYSQLHOST') or 'localhost'
-        port = os.environ.get('DB_PORT') or os.environ.get('MYSQL_PORT') or os.environ.get('MYSQLPORT') or '3306'
-        name = os.environ.get('DB_NAME') or os.environ.get('MYSQL_DATABASE') or os.environ.get('MYSQLDATABASE') or os.environ.get('MYSQL_DB') or 'the_height'
+        user = (os.environ.get('DB_USER') or os.environ.get('MYSQL_USER') or os.environ.get('MYSQLUSER') or 'root').strip()
+        password = (os.environ.get('DB_PASSWORD') or os.environ.get('MYSQL_PASSWORD') or os.environ.get('MYSQLPASSWORD') or '').strip()
+        host = (os.environ.get('DB_HOST') or os.environ.get('MYSQL_HOST') or os.environ.get('MYSQLHOST') or 'localhost').strip()
+        port = (os.environ.get('DB_PORT') or os.environ.get('MYSQL_PORT') or os.environ.get('MYSQLPORT') or '3306').strip()
+        name = (os.environ.get('DB_NAME') or os.environ.get('MYSQL_DATABASE') or os.environ.get('MYSQLDATABASE') or os.environ.get('MYSQL_DB') or 'the_height').strip()
         pass_part = f":{password}" if password else ""
         db_uri = f"mysql+mysqlconnector://{user}{pass_part}@{host}:{port}/{name}?use_pure=True"
 
