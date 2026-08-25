@@ -19,11 +19,16 @@ def _get_database_url():
         db_uri = None
 
     if not db_uri:
-        user = (os.environ.get('DB_USER') or os.environ.get('MYSQL_USER') or os.environ.get('MYSQLUSER') or 'root').strip()
-        password = (os.environ.get('DB_PASSWORD') or os.environ.get('MYSQL_PASSWORD') or os.environ.get('MYSQLPASSWORD') or '').strip()
-        host = (os.environ.get('DB_HOST') or os.environ.get('MYSQL_HOST') or os.environ.get('MYSQLHOST') or 'localhost').strip()
-        port = (os.environ.get('DB_PORT') or os.environ.get('MYSQL_PORT') or os.environ.get('MYSQLPORT') or '3306').strip()
-        name = (os.environ.get('DB_NAME') or os.environ.get('MYSQL_DATABASE') or os.environ.get('MYSQLDATABASE') or os.environ.get('MYSQL_DB') or 'the_height').strip()
+        user = (os.environ.get('DB_USER') or os.environ.get('MYSQLUSER') or os.environ.get('MYSQL_USER') or 'root').strip()
+        password = (os.environ.get('DB_PASSWORD') or os.environ.get('MYSQLPASSWORD') or os.environ.get('MYSQL_PASSWORD') or '').strip()
+        host = (os.environ.get('DB_HOST') or os.environ.get('MYSQLHOST') or os.environ.get('MYSQL_HOST') or os.environ.get('MYSQLPRIVATEHOST') or 'localhost').strip()
+        port = (os.environ.get('DB_PORT') or os.environ.get('MYSQLPORT') or os.environ.get('MYSQL_PORT') or '3306').strip()
+        name = (os.environ.get('DB_NAME') or os.environ.get('MYSQLDATABASE') or os.environ.get('MYSQL_DATABASE') or os.environ.get('MYSQL_DB') or 'the_height').strip()
+        
+        is_production = os.environ.get('FLASK_ENV') == 'production' or os.environ.get('FLASK_CONFIG') == 'production'
+        if is_production and host in ['localhost', '127.0.0.1']:
+            raise RuntimeError("Railway MySQL database configuration missing: Please set DATABASE_URL, MYSQL_URL, or MYSQLHOST in Railway Variables dashboard.")
+
         pass_part = f":{password}" if password else ""
         db_uri = f"mysql+mysqlconnector://{user}{pass_part}@{host}:{port}/{name}?use_pure=True"
 
