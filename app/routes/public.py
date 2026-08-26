@@ -24,9 +24,9 @@ def init_public_routes(app):
             db.session.execute(text('SELECT 1'))
             health_status['database'] = 'connected'
             return jsonify(health_status), 200
-        except Exception as e:
+        except Exception:
             health_status['status'] = 'unhealthy'
-            health_status['database'] = f'error: {str(e)}'
+            health_status['database'] = 'disconnected'
             return jsonify(health_status), 503
         
 

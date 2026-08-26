@@ -2,41 +2,132 @@ import os
 from dotenv import load_dotenv
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-load_dotenv(os.path.join(basedir, '.env'))
+load_dotenv(os.path.join(basedir, '.env'), override=False)
+
+def _is_localhost(val):
+    if not val:
+        return False
+    s = str(val).lower().strip()
+    return 'localhost' in s or '127.0.0.1' in s
+
+def _log_safe_db_diagnostics(db_uri, source, is_production):
+    try:
+        clean_uri = db_uri
+        scheme = 'mysql+mysqlconnector'
+        if '://' in clean_uri:
+            scheme, rest = clean_uri.split('://', 1)
+        else:
+            rest = clean_uri
+
+        user = 'N/A'
+        host = 'N/A'
+        port = '3306'
+        dbname = 'N/A'
+        has_password = 'NO'
+
+        if '@' in rest:
+            auth_part, host_part = rest.split('@', 1)
+            if ':' in auth_part:
+                user = auth_part.split(':', 1)[0]
+                has_password = 'YES'
+            else:
+                user = auth_part
+        else:
+            host_part = rest
+
+        if '/' in host_part:
+            hp, db_part = host_part.split('/', 1)
+            dbname = db_part.split('?', 1)[0] if '?' in db_part else db_part
+        else:
+            hp = host_part
+
+        if ':' in hp:
+            host, port = hp.split(':', 1)
+        else:
+            host = hp
+
+        print("========================================================================")
+        print("              DATABASE CONFIGURATION RESOLUTION DIAGNOSTICS              ")
+        print("========================================================================")
+        print(f"[INFO] Mode: {'PRODUCTION' if is_production else 'DEVELOPMENT'}")
+        print(f"[INFO] Database Source: {source}")
+        print(f"[INFO] Database Dialect/Driver: {scheme}")
+        print(f"[INFO] Database Host: {host}")
+        print(f"[INFO] Database Port: {port}")
+        print(f"[INFO] Database Name: {dbname}")
+        print(f"[INFO] Database User: {user}")
+        print(f"[INFO] Database Password Configured: {has_password}")
+        print("========================================================================")
+    except Exception as e:
+        print(f"[DIAGNOSTICS WARNING] Could not parse DB URI for logging: {e}")
 
 def _get_database_url():
-    db_uri = (
-        os.environ.get('DATABASE_URL') or 
-        os.environ.get('SQLALCHEMY_DATABASE_URI') or 
-        os.environ.get('MYSQL_URL') or 
-        os.environ.get('MYSQL_PRIVATE_URL') or 
-        os.environ.get('DATABASE_PUBLIC_URL')
+    is_production = (
+        os.environ.get('FLASK_ENV') == 'production' or
+        os.environ.get('FLASK_CONFIG') == 'production' or
+        os.environ.get('RAILWAY_ENVIRONMENT') is not None or
+        os.environ.get('RAILWAY_SERVICE_ID') is not None
     )
-    if db_uri:
-        db_uri = db_uri.strip()
 
-    if db_uri and (db_uri.startswith('your-') or db_uri == 'x'):
-        db_uri = None
+    resolved_source = None
+    db_uri = None
 
+    # Priority 1: DATABASE_URL (if not pointing to localhost in production)
+    env_db_url = os.environ.get('DATABASE_URL', '').strip()
+    if env_db_url and not (env_db_url.startswith('your-') or env_db_url == 'x'):
+        if not (is_production and _is_localhost(env_db_url)):
+            db_uri = env_db_url
+            resolved_source = 'DATABASE_URL'
+
+    # Priority 2: MYSQL_URL / MYSQL_PRIVATE_URL / DATABASE_PUBLIC_URL / SQLALCHEMY_DATABASE_URI
     if not db_uri:
-        user = (os.environ.get('DB_USER') or os.environ.get('MYSQLUSER') or os.environ.get('MYSQL_USER') or 'root').strip()
-        password = (os.environ.get('DB_PASSWORD') or os.environ.get('MYSQLPASSWORD') or os.environ.get('MYSQL_PASSWORD') or '').strip()
-        host = (os.environ.get('DB_HOST') or os.environ.get('MYSQLHOST') or os.environ.get('MYSQL_HOST') or os.environ.get('MYSQLPRIVATEHOST') or 'localhost').strip()
-        port = (os.environ.get('DB_PORT') or os.environ.get('MYSQLPORT') or os.environ.get('MYSQL_PORT') or '3306').strip()
-        name = (os.environ.get('DB_NAME') or os.environ.get('MYSQLDATABASE') or os.environ.get('MYSQL_DATABASE') or os.environ.get('MYSQL_DB') or 'the_height').strip()
+        for var_name in ['MYSQL_URL', 'MYSQL_PRIVATE_URL', 'DATABASE_PUBLIC_URL', 'SQLALCHEMY_DATABASE_URI']:
+            val = os.environ.get(var_name, '').strip()
+            if val and not (val.startswith('your-') or val == 'x'):
+                if not (is_production and _is_localhost(val)):
+                    db_uri = val
+                    resolved_source = var_name
+                    break
+
+    # Priority 3: Component variables (MYSQLHOST / MYSQLPRIVATEHOST / MYSQL_HOST / DB_HOST)
+    if not db_uri:
+        host = (os.environ.get('MYSQLHOST') or os.environ.get('MYSQLPRIVATEHOST') or os.environ.get('MYSQL_HOST') or os.environ.get('DB_HOST') or '').strip()
         
-        is_production = os.environ.get('FLASK_ENV') == 'production' or os.environ.get('FLASK_CONFIG') == 'production'
-        if is_production and host in ['localhost', '127.0.0.1']:
-            raise RuntimeError("Railway MySQL database configuration missing: Please set DATABASE_URL, MYSQL_URL, or MYSQLHOST in Railway Variables dashboard.")
+        if is_production and (not host or _is_localhost(host)):
+            pass
+        else:
+            if not host:
+                host = 'localhost'
+            user = (os.environ.get('MYSQLUSER') or os.environ.get('MYSQL_USER') or os.environ.get('DB_USER') or 'root').strip()
+            password = (os.environ.get('MYSQLPASSWORD') or os.environ.get('MYSQL_PASSWORD') or os.environ.get('DB_PASSWORD') or '').strip()
+            port = (os.environ.get('MYSQLPORT') or os.environ.get('MYSQL_PORT') or os.environ.get('DB_PORT') or '3306').strip()
+            name = (os.environ.get('MYSQLDATABASE') or os.environ.get('MYSQL_DATABASE') or os.environ.get('MYSQL_DB') or os.environ.get('DB_NAME') or 'the_height').strip()
 
-        pass_part = f":{password}" if password else ""
-        db_uri = f"mysql+mysqlconnector://{user}{pass_part}@{host}:{port}/{name}?use_pure=True"
+            pass_part = f":{password}" if password else ""
+            db_uri = f"mysql+mysqlconnector://{user}{pass_part}@{host}:{port}/{name}"
+            resolved_source = 'MYSQLHOST/Component Variables' if (os.environ.get('MYSQLHOST') or os.environ.get('MYSQLPRIVATEHOST') or os.environ.get('MYSQL_HOST')) else 'Local Fallback'
 
+    # Strict Production Guard: Fail fast if host resolves to localhost/empty in production
+    if is_production and (not db_uri or _is_localhost(db_uri)):
+        raise RuntimeError(
+            "Railway Production Database Error: No valid Railway MySQL database connection string or host was found. "
+            "Database host resolved to localhost or empty. "
+            "Please ensure Railway MySQL service variables (MYSQL_URL or MYSQLHOST) are linked to the Flask service in Railway Dashboard."
+        )
+
+    # Fallback for Local Development mode ONLY
+    if not db_uri:
+        db_uri = "mysql+mysqlconnector://root:@localhost:3306/the_height"
+        resolved_source = 'Local Default Fallback'
+
+    # Normalize mysql:// to mysql+mysqlconnector://
     if db_uri.startswith('mysql://'):
         db_uri = db_uri.replace('mysql://', 'mysql+mysqlconnector://', 1)
 
     if '?' not in db_uri and not db_uri.startswith('sqlite'):
         db_uri += '?use_pure=True'
+
+    _log_safe_db_diagnostics(db_uri, resolved_source, is_production)
 
     return db_uri
 
