@@ -89,28 +89,24 @@ def get_production_database_url():
     resolved_source = None
     db_uri = None
 
-    # Priority 1: DATABASE_URL (if provided and not pointing to localhost in production)
-    env_db_url = os.environ.get('DATABASE_URL', '').strip()
-    if env_db_url and not (env_db_url.startswith('your-') or env_db_url == 'x'):
-        if not (is_prod_env and _is_localhost(env_db_url)):
-            db_uri = env_db_url
-            resolved_source = 'DATABASE_URL'
-
-    # Priority 2: MYSQL_URL
-    if not db_uri:
-        val = os.environ.get('MYSQL_URL', '').strip()
+    # Priority 1: DATABASE_URL / DATABASE_PRIVATE_URL / DATABASE_PUBLIC_URL
+    for var_name in ['DATABASE_URL', 'DATABASE_PRIVATE_URL', 'DATABASE_PUBLIC_URL']:
+        val = os.environ.get(var_name, '').strip()
         if val and not (val.startswith('your-') or val == 'x'):
             if not (is_prod_env and _is_localhost(val)):
                 db_uri = val
-                resolved_source = 'MYSQL_URL'
+                resolved_source = var_name
+                break
 
-    # Priority 3: MYSQL_PRIVATE_URL
+    # Priority 2: MYSQL_URL / MYSQL_PRIVATE_URL / MYSQL_PUBLIC_URL / SQLALCHEMY_DATABASE_URI
     if not db_uri:
-        val = os.environ.get('MYSQL_PRIVATE_URL', '').strip()
-        if val and not (val.startswith('your-') or val == 'x'):
-            if not (is_prod_env and _is_localhost(val)):
-                db_uri = val
-                resolved_source = 'MYSQL_PRIVATE_URL'
+        for var_name in ['MYSQL_URL', 'MYSQL_PRIVATE_URL', 'MYSQL_PUBLIC_URL', 'SQLALCHEMY_DATABASE_URI']:
+            val = os.environ.get(var_name, '').strip()
+            if val and not (val.startswith('your-') or val == 'x'):
+                if not (is_prod_env and _is_localhost(val)):
+                    db_uri = val
+                    resolved_source = var_name
+                    break
 
     # Priority 4: Component variables (MYSQLHOST / MYSQLPRIVATEHOST / MYSQL_HOST)
     if not db_uri:
