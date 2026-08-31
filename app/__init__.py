@@ -1,19 +1,23 @@
 import os
 from flask import Flask
 from config import config
-from app.extensions import db, login_manager, csrf, mail
+from app.extensions import db, migrate, login_manager, csrf, mail
 
 def create_app(config_name=None):
+
+    app = Flask(__name__)
+
     if config_name is None:
-        config_name = os.environ.get('FLASK_CONFIG', 'production')
+        config_name = os.getenv("FLASK_CONFIG") or os.getenv("FLASK_ENV") or "production"
 
-    if config_name not in config:
-        raise RuntimeError(
-            f"Invalid FLASK_CONFIG: {config_name}"
-        )
+    config_name = str(config_name).lower().strip()
+    config_class = config.get(
+        config_name,
+        config.get("production", config.get("default"))
+    )
 
-    app = Flask(__name__, instance_relative_config=True)
-    app.config.from_object(config[config_name])
+    app.config.from_object(config_class)
+
     
     # Ensure upload directory exists
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
@@ -50,9 +54,28 @@ def create_app(config_name=None):
 
     # Initialize extensions
     db.init_app(app)
+    migrate.init_app(app, db)
     login_manager.init_app(app)
     csrf.init_app(app)
     mail.init_app(app)
+
+    # Ensure database tables exist & seed default data on startup
+    with app.app_context():
+        try:
+            from flask_migrate import upgrade as flask_migrate_upgrade
+            flask_migrate_upgrade()
+        except Exception as e:
+            app.logger.warning(f"[MIGRATION WARNING] Automatic migration warning: {e}")
+            try:
+                db.create_all()
+            except Exception as e2:
+                app.logger.error(f"[MIGRATION ERROR] db.create_all error: {e2}")
+
+        try:
+            from starter import seed_database
+            seed_database(app)
+        except Exception as e:
+            app.logger.warning(f"[SEED WARNING] Automatic database seeding warning: {e}")
 
     # HTTP Security Headers Response Hook
     @app.after_request
