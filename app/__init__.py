@@ -1,4 +1,5 @@
 import os
+import sys
 from flask import Flask
 from config import config
 from app.extensions import db, migrate, login_manager, csrf, mail
@@ -8,13 +9,21 @@ def create_app(config_name=None):
     app = Flask(__name__)
 
     if config_name is None:
-        config_name = os.getenv("FLASK_CONFIG") or os.getenv("FLASK_ENV") or "production"
+        config_name = os.getenv("FLASK_CONFIG") or os.getenv("FLASK_ENV")
 
-    config_name = str(config_name).lower().strip()
-    config_class = config.get(
-        config_name,
-        config.get("production", config.get("default"))
-    )
+    if config_name:
+        config_name = str(config_name).lower().strip()
+        config_class = config.get(config_name)
+    else:
+        config_class = None
+
+    if config_class is None:
+        is_railway = (
+            os.getenv("RAILWAY_ENVIRONMENT") is not None or
+            os.getenv("RAILWAY_ENVIRONMENT_NAME") is not None or
+            os.getenv("RAILWAY_SERVICE_ID") is not None
+        )
+        config_class = config["production"] if is_railway else config["default"]
 
     app.config.from_object(config_class)
 
@@ -43,7 +52,7 @@ def create_app(config_name=None):
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1)
 
     # Production Structured Stream Logging Setup
-    import logging, sys
+    import logging
     if not app.debug:
         stream_handler = logging.StreamHandler(sys.stdout)
         stream_handler.setLevel(logging.INFO)
@@ -59,23 +68,29 @@ def create_app(config_name=None):
     csrf.init_app(app)
     mail.init_app(app)
 
-    # Ensure database tables exist & seed default data on startup
-    with app.app_context():
-        try:
-            from flask_migrate import upgrade as flask_migrate_upgrade
-            flask_migrate_upgrade()
-        except Exception as e:
-            app.logger.warning(f"[MIGRATION WARNING] Automatic migration warning: {e}")
-            try:
-                db.create_all()
-            except Exception as e2:
-                app.logger.error(f"[MIGRATION ERROR] db.create_all error: {e2}")
+    # Ensure database tables exist & seed default data on startup (Gunicorn / Server boot only, skip during CLI commands)
+    is_cli_command = (
+        os.environ.get('FLASK_RUN_FROM_CLI') == 'true' or
+        any(cmd in sys.argv for cmd in ['db', 'routes', 'shell', 'run', 'create-user', 'seed-db'])
+    )
 
-        try:
-            from starter import seed_database
-            seed_database(app)
-        except Exception as e:
-            app.logger.warning(f"[SEED WARNING] Automatic database seeding warning: {e}")
+    if not is_cli_command:
+        with app.app_context():
+            try:
+                from flask_migrate import upgrade as flask_migrate_upgrade
+                flask_migrate_upgrade()
+            except Exception as e:
+                app.logger.warning(f"[MIGRATION WARNING] Automatic migration warning: {e}")
+                try:
+                    db.create_all()
+                except Exception as e2:
+                    app.logger.error(f"[MIGRATION ERROR] db.create_all error: {e2}")
+
+            try:
+                from starter import seed_database
+                seed_database(app)
+            except Exception as e:
+                app.logger.warning(f"[SEED WARNING] Automatic database seeding warning: {e}")
 
     # HTTP Security Headers Response Hook
     @app.after_request

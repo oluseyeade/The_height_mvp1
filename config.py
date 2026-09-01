@@ -212,17 +212,19 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = get_development_database_url()
 
+class LazyProductionURI:
+    def __get__(self, instance, owner):
+        secret_key = os.environ.get('SECRET_KEY')
+        if not secret_key:
+            raise RuntimeError("SECRET_KEY must be configured in production.")
+        return get_production_database_url()
+
 class ProductionConfig(Config):
     DEBUG = False
 
     SECRET_KEY = os.environ.get('SECRET_KEY')
 
-    if not SECRET_KEY:
-        raise RuntimeError(
-            "SECRET_KEY must be configured in production."
-        )
-
-    SQLALCHEMY_DATABASE_URI = get_production_database_url()
+    SQLALCHEMY_DATABASE_URI = LazyProductionURI()
 
     SESSION_COOKIE_SECURE = os.environ.get(
         'SESSION_COOKIE_SECURE', 'True'
