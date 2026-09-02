@@ -8,22 +8,22 @@ def create_app(config_name=None):
 
     app = Flask(__name__)
 
-    if config_name is None:
-        config_name = os.getenv("FLASK_CONFIG") or os.getenv("FLASK_ENV")
+    is_railway = (
+        os.getenv("RAILWAY_ENVIRONMENT") is not None or
+        os.getenv("RAILWAY_ENVIRONMENT_NAME") is not None or
+        os.getenv("RAILWAY_SERVICE_ID") is not None
+    )
 
-    if config_name:
-        config_name = str(config_name).lower().strip()
-        config_class = config.get(config_name)
+    if is_railway:
+        if config_name and str(config_name).lower().strip() == 'testing':
+            config_class = config['testing']
+        else:
+            config_class = config['production']
     else:
-        config_class = None
-
-    if config_class is None:
-        is_railway = (
-            os.getenv("RAILWAY_ENVIRONMENT") is not None or
-            os.getenv("RAILWAY_ENVIRONMENT_NAME") is not None or
-            os.getenv("RAILWAY_SERVICE_ID") is not None
-        )
-        config_class = config["production"] if is_railway else config["default"]
+        if config_name is None:
+            config_name = os.getenv("FLASK_CONFIG") or os.getenv("FLASK_ENV") or "development"
+        config_name = str(config_name).lower().strip()
+        config_class = config.get(config_name, config['default'])
 
     app.config.from_object(config_class)
 
@@ -42,7 +42,7 @@ def create_app(config_name=None):
     print(f"[OK] Number of environment variables loaded: {len(os.environ)}")
     print(f"[OK] PAYSTACK_SECRET_KEY exists: {'Yes' if app.config.get('PAYSTACK_SECRET_KEY') else 'No'}")
     print(f"[OK] PAYSTACK_PUBLIC_KEY exists: {'Yes' if app.config.get('PAYSTACK_PUBLIC_KEY') else 'No'}")
-    print(f"[OK] DATABASE_URL exists: {'Yes' if app.config.get('SQLALCHEMY_DATABASE_URI') else 'No'}")
+    print(f"[OK] Database URI configured: {'Yes' if app.config.get('SQLALCHEMY_DATABASE_URI') else 'No'}")
     print(f"[OK] MAIL configuration loaded: {'Yes' if app.config.get('MAIL_SERVER') and app.config.get('MAIL_USERNAME') else 'No'}")
     print("========================================================================")
 
@@ -68,29 +68,18 @@ def create_app(config_name=None):
     csrf.init_app(app)
     mail.init_app(app)
 
-    # Ensure database tables exist & seed default data on startup (Gunicorn / Server boot only, skip during CLI commands)
-    is_cli_command = (
-        os.environ.get('FLASK_RUN_FROM_CLI') == 'true' or
-        any(cmd in sys.argv for cmd in ['db', 'routes', 'shell', 'run', 'create-user', 'seed-db'])
-    )
+    # Register CLI commands for controlled database seeding & initialization
+    @app.cli.command('init-db')
+    def init_db_command():
+        """Explicitly seed default system roles, admin accounts, and categories."""
+        from app.seed import seed_database
+        seed_database(app)
 
-    if not is_cli_command:
-        with app.app_context():
-            try:
-                from flask_migrate import upgrade as flask_migrate_upgrade
-                flask_migrate_upgrade()
-            except Exception as e:
-                app.logger.warning(f"[MIGRATION WARNING] Automatic migration warning: {e}")
-                try:
-                    db.create_all()
-                except Exception as e2:
-                    app.logger.error(f"[MIGRATION ERROR] db.create_all error: {e2}")
-
-            try:
-                from starter import seed_database
-                seed_database(app)
-            except Exception as e:
-                app.logger.warning(f"[SEED WARNING] Automatic database seeding warning: {e}")
+    @app.cli.command('seed-db')
+    def seed_db_command():
+        """Alias for init-db command."""
+        from app.seed import seed_database
+        seed_database(app)
 
     # HTTP Security Headers Response Hook
     @app.after_request

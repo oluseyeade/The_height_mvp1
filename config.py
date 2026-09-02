@@ -208,9 +208,13 @@ class Config:
         'max_overflow': int(os.environ.get('DB_MAX_OVERFLOW', 20))
     }
 
+class LazyDevelopmentURI:
+    def __get__(self, instance, owner):
+        return get_development_database_url()
+
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = get_development_database_url()
+    SQLALCHEMY_DATABASE_URI = LazyDevelopmentURI()
 
 class LazyProductionURI:
     def __get__(self, instance, owner):

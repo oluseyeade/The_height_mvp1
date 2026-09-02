@@ -11,7 +11,7 @@ from app import create_app
 from app.extensions import db
 from app.models import Apartment, Booking, User
 from app.services import BookingService, UserService
-from starter import seed_database
+from app.seed import seed_database
 from tests.conftest import clean_test_db, seed_test_apartment
 
 class BookingServiceTestCase(unittest.TestCase):
