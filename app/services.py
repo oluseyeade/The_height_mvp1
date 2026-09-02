@@ -44,7 +44,19 @@ class ApartmentService:
         return Apartment.query.filter_by(status='available').all()
 
     def get_featured_apartments(self, limit=4):
-        return Apartment.query.filter_by(is_featured=True, status='available').limit(limit).all()
+        from sqlalchemy.exc import DBAPIError, OperationalError, ProgrammingError
+        try:
+            return Apartment.query.filter_by(is_featured=True, status='available').limit(limit).all()
+        except (ProgrammingError, OperationalError, DBAPIError) as e:
+            err_str = str(e).lower()
+            if '1146' in err_str or "doesn't exist" in err_str or 'no such table' in err_str:
+                if has_request_context():
+                    current_app.logger.warning(f"[DATABASE TABLE WARNING] 'apartments' table unavailable: {e}")
+                else:
+                    print(f"[DATABASE TABLE WARNING] 'apartments' table unavailable: {e}")
+                db.session.rollback()
+                return []
+            raise
 
     def get_all_categories(self):
         return Category.query.filter_by(is_active=True).all()

@@ -33,8 +33,19 @@ def init_public_routes(app):
 
     @app.route('/', endpoint='public.index')
     def index():
+        from sqlalchemy.exc import DBAPIError, OperationalError, ProgrammingError
         get_booking_session()
-        featured_apartments = apt_service.get_featured_apartments(limit=4)
+        try:
+            featured_apartments = apt_service.get_featured_apartments(limit=4)
+        except (ProgrammingError, OperationalError, DBAPIError) as e:
+            err_str = str(e).lower()
+            if '1146' in err_str or "doesn't exist" in err_str or 'no such table' in err_str:
+                app.logger.warning(f"[HOMEPAGE DB WARNING] 'apartments' table unavailable during GET /: {e}")
+                from app.extensions import db
+                db.session.rollback()
+                featured_apartments = []
+            else:
+                raise
         return render_template('public/index.html', apartments=featured_apartments)
 
     @app.route('/contact', methods=['GET', 'POST'], endpoint='public.contact')
