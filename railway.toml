@@ -1,11 +1,13 @@
 # ==============================================================================
 # Railway Deployment Configuration for The Height Apartment
 # ==============================================================================
+
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
+preDeployCommand = ["python -m flask db upgrade"]
 startCommand = "gunicorn --config gunicorn.conf.py \"app:create_app()\""
 healthcheckTimeout = 15
 restartPolicyType = "ON_FAILURE"
