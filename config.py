@@ -10,7 +10,13 @@ def _is_localhost(val):
     s = str(val).lower().strip()
     return 'localhost' in s or '127.0.0.1' in s
 
+_db_diagnostic_logged = False
+
 def _log_safe_db_diagnostics(db_uri, source, is_production):
+    global _db_diagnostic_logged
+    if _db_diagnostic_logged:
+        return
+    _db_diagnostic_logged = True
     try:
         db_url_present = "YES" if os.environ.get('DATABASE_URL') else "NO"
         mysql_url_present = "YES" if os.environ.get('MYSQL_URL') else "NO"

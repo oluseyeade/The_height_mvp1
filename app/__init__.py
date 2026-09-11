@@ -4,7 +4,10 @@ from flask import Flask
 from config import config
 from app.extensions import db, migrate, login_manager, csrf, mail
 
+_startup_audit_logged = False
+
 def create_app(config_name=None):
+    global _startup_audit_logged
 
     app = Flask(__name__)
 
@@ -31,20 +34,22 @@ def create_app(config_name=None):
     # Ensure upload directory exists
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-    # Startup Environment & Configuration Audit Logger
-    env_file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
-    env_found = os.path.exists(env_file_path)
-    print("========================================================================")
-    print("            .ENV ENVIRONMENT & STARTUP CONFIGURATION AUDIT              ")
-    print("========================================================================")
-    print(f"[OK] .env file found: {'Yes (' + env_file_path + ')' if env_found else 'No'}")
-    print(f"[OK] .env successfully loaded: Yes")
-    print(f"[OK] Number of environment variables loaded: {len(os.environ)}")
-    print(f"[OK] PAYSTACK_SECRET_KEY exists: {'Yes' if app.config.get('PAYSTACK_SECRET_KEY') else 'No'}")
-    print(f"[OK] PAYSTACK_PUBLIC_KEY exists: {'Yes' if app.config.get('PAYSTACK_PUBLIC_KEY') else 'No'}")
-    print(f"[OK] Database URI configured: {'Yes' if app.config.get('SQLALCHEMY_DATABASE_URI') else 'No'}")
-    print(f"[OK] MAIL configuration loaded: {'Yes' if app.config.get('MAIL_SERVER') and app.config.get('MAIL_USERNAME') else 'No'}")
-    print("========================================================================")
+    # Startup Environment & Configuration Audit Logger (Printed once per process)
+    if not _startup_audit_logged:
+        _startup_audit_logged = True
+        env_file_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env')
+        env_found = os.path.exists(env_file_path)
+        print("========================================================================")
+        print("            .ENV ENVIRONMENT & STARTUP CONFIGURATION AUDIT              ")
+        print("========================================================================")
+        print(f"[OK] .env file found: {'Yes (' + env_file_path + ')' if env_found else 'No'}")
+        print(f"[OK] .env successfully loaded: Yes")
+        print(f"[OK] Number of environment variables loaded: {len(os.environ)}")
+        print(f"[OK] PAYSTACK_SECRET_KEY exists: {'Yes' if app.config.get('PAYSTACK_SECRET_KEY') else 'No'}")
+        print(f"[OK] PAYSTACK_PUBLIC_KEY exists: {'Yes' if app.config.get('PAYSTACK_PUBLIC_KEY') else 'No'}")
+        print(f"[OK] Database URI configured: {'Yes' if app.config.get('SQLALCHEMY_DATABASE_URI') else 'No'}")
+        print(f"[OK] MAIL configuration loaded: {'Yes' if app.config.get('MAIL_SERVER') and app.config.get('MAIL_USERNAME') else 'No'}")
+        print("========================================================================")
 
     # Configure ProxyFix Middleware for Railway Reverse Proxy Load Balancers
     if app.config.get('USE_PROXY_FIX'):
