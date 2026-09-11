@@ -26,49 +26,6 @@ def upgrade():
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('amenity_id')
     )
-    op.create_table('bookings',
-    sa.Column('booking_id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.Column('apartment_id', sa.Integer(), nullable=False),
-    sa.Column('agent_id', sa.Integer(), nullable=True),
-    sa.Column('check_in', sa.Date(), nullable=False),
-    sa.Column('check_out', sa.Date(), nullable=False),
-    sa.Column('guest_count', sa.Integer(), nullable=True),
-    sa.Column('total_price', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('discount_amount', sa.Numeric(precision=10, scale=2), nullable=True),
-    sa.Column('final_amount', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('caution_fee_amount', sa.Numeric(precision=10, scale=2), nullable=True),
-    sa.Column('caution_fee_status', sa.String(length=30), nullable=True),
-    sa.Column('booking_ref', sa.String(length=30), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=True),
-    sa.Column('apartment_fee', sa.Numeric(precision=10, scale=2), nullable=True),
-    sa.Column('discount_percentage', sa.Numeric(precision=5, scale=2), nullable=True),
-    sa.Column('caution_fee', sa.Numeric(precision=10, scale=2), nullable=True),
-    sa.Column('total_amount', sa.Numeric(precision=10, scale=2), nullable=True),
-    sa.Column('payment_status', sa.String(length=30), nullable=True),
-    sa.Column('booking_status', sa.String(length=30), nullable=True),
-    sa.Column('refund_status', sa.String(length=30), nullable=True),
-    sa.Column('payment_reference', sa.String(length=100), nullable=True),
-    sa.Column('commission_generated', sa.Boolean(), nullable=True),
-    sa.Column('commission_id', sa.Integer(), nullable=True),
-    sa.Column('checked_in_at', sa.DateTime(), nullable=True),
-    sa.Column('checked_out_at', sa.DateTime(), nullable=True),
-    sa.Column('verified_at', sa.DateTime(), nullable=True),
-    sa.Column('inspection_status', sa.String(length=30), nullable=True),
-    sa.Column('guest_name', sa.String(length=120), nullable=True),
-    sa.Column('guest_email', sa.String(length=120), nullable=True),
-    sa.Column('guest_phone', sa.String(length=30), nullable=True),
-    sa.Column('special_requests', sa.Text(), nullable=True),
-    sa.Column('source', sa.String(length=30), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['agent_id'], ['agents.agent_id'], ),
-    sa.ForeignKeyConstraint(['apartment_id'], ['apartments.apartment_id'], ),
-    sa.ForeignKeyConstraint(['commission_id'], ['commissions.commission_id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
-    sa.PrimaryKeyConstraint('booking_id'),
-    sa.UniqueConstraint('booking_ref')
-    )
     op.create_table('categories',
     sa.Column('category_id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
@@ -78,49 +35,6 @@ def upgrade():
     sa.Column('is_active', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('category_id')
     )
-    op.create_table('commissions',
-    sa.Column('commission_id', sa.Integer(), nullable=False),
-    sa.Column('commission_reference', sa.String(length=50), nullable=False),
-    sa.Column('booking_id', sa.Integer(), nullable=False),
-    sa.Column('agent_id', sa.Integer(), nullable=False),
-    sa.Column('referral_code', sa.String(length=50), nullable=False),
-    sa.Column('customer_id', sa.Integer(), nullable=True),
-    sa.Column('property_id', sa.Integer(), nullable=True),
-    sa.Column('payment_reference', sa.String(length=100), nullable=False),
-    sa.Column('payment_provider', sa.String(length=30), nullable=True),
-    sa.Column('booking_amount', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('discount_percentage', sa.Numeric(precision=5, scale=2), nullable=True),
-    sa.Column('discount_amount', sa.Numeric(precision=10, scale=2), nullable=True),
-    sa.Column('net_booking_amount', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('commission_percentage', sa.Numeric(precision=5, scale=2), nullable=True),
-    sa.Column('commission_amount', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('currency', sa.String(length=10), nullable=True),
-    sa.Column('commission_status', sa.String(length=30), nullable=True),
-    sa.Column('payment_status', sa.String(length=30), nullable=True),
-    sa.Column('commission_type', sa.String(length=30), nullable=True),
-    sa.Column('generated_at', sa.DateTime(), nullable=True),
-    sa.Column('approved_at', sa.DateTime(), nullable=True),
-    sa.Column('paid_at', sa.DateTime(), nullable=True),
-    sa.Column('cancelled_at', sa.DateTime(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.Column('approved_by', sa.Integer(), nullable=True),
-    sa.Column('notes', sa.Text(), nullable=True),
-    sa.Column('metadata_json', sa.Text(), nullable=True),
-    sa.ForeignKeyConstraint(['agent_id'], ['agents.agent_id'], ),
-    sa.ForeignKeyConstraint(['approved_by'], ['users.user_id'], ),
-    sa.ForeignKeyConstraint(['booking_id'], ['bookings.booking_id'], ),
-    sa.ForeignKeyConstraint(['customer_id'], ['users.user_id'], ),
-    sa.ForeignKeyConstraint(['property_id'], ['properties.property_id'], ),
-    sa.PrimaryKeyConstraint('commission_id')
-    )
-    op.create_index(op.f('ix_commissions_agent_id'), 'commissions', ['agent_id'], unique=False)
-    op.create_index(op.f('ix_commissions_booking_id'), 'commissions', ['booking_id'], unique=True)
-    op.create_index(op.f('ix_commissions_commission_reference'), 'commissions', ['commission_reference'], unique=True)
-    op.create_index(op.f('ix_commissions_commission_status'), 'commissions', ['commission_status'], unique=False)
-    op.create_index(op.f('ix_commissions_created_at'), 'commissions', ['created_at'], unique=False)
-    op.create_index(op.f('ix_commissions_payment_reference'), 'commissions', ['payment_reference'], unique=True)
-    op.create_index(op.f('ix_commissions_referral_code'), 'commissions', ['referral_code'], unique=False)
     op.create_table('contact_messages',
     sa.Column('message_id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=120), nullable=False),
@@ -163,27 +77,6 @@ def upgrade():
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.PrimaryKeyConstraint('property_id')
     )
-    op.create_table('roles',
-    sa.Column('role_id', sa.Integer(), nullable=False),
-    sa.Column('role_name', sa.String(length=50), nullable=False),
-    sa.Column('description', sa.String(length=255), nullable=True),
-    sa.Column('hierarchy_level', sa.Integer(), nullable=False),
-    sa.Column('can_override', sa.Boolean(), nullable=True),
-    sa.Column('is_active', sa.Boolean(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.PrimaryKeyConstraint('role_id'),
-    sa.UniqueConstraint('role_name')
-    )
-    op.create_table('whatsapp_logs',
-    sa.Column('whatsapp_id', sa.Integer(), nullable=False),
-    sa.Column('recipient', sa.String(length=30), nullable=False),
-    sa.Column('message', sa.Text(), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=True),
-    sa.Column('delivered_at', sa.DateTime(), nullable=True),
-    sa.Column('error_message', sa.Text(), nullable=True),
-    sa.Column('sent_at', sa.DateTime(), nullable=True),
-    sa.PrimaryKeyConstraint('whatsapp_id')
-    )
     op.create_table('property_settings',
     sa.Column('settings_id', sa.Integer(), nullable=False),
     sa.Column('property_id', sa.Integer(), nullable=False),
@@ -197,6 +90,17 @@ def upgrade():
     sa.Column('account_name', sa.String(length=150), nullable=True),
     sa.ForeignKeyConstraint(['property_id'], ['properties.property_id'], ),
     sa.PrimaryKeyConstraint('settings_id')
+    )
+    op.create_table('roles',
+    sa.Column('role_id', sa.Integer(), nullable=False),
+    sa.Column('role_name', sa.String(length=50), nullable=False),
+    sa.Column('description', sa.String(length=255), nullable=True),
+    sa.Column('hierarchy_level', sa.Integer(), nullable=False),
+    sa.Column('can_override', sa.Boolean(), nullable=True),
+    sa.Column('is_active', sa.Boolean(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.PrimaryKeyConstraint('role_id'),
+    sa.UniqueConstraint('role_name')
     )
     op.create_table('users',
     sa.Column('user_id', sa.Integer(), nullable=False),
@@ -213,7 +117,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['role_id'], ['roles.role_id'], ),
     sa.PrimaryKeyConstraint('user_id')
     )
-    op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
     op.create_table('admin_action_logs',
     sa.Column('log_id', sa.Integer(), nullable=False),
     sa.Column('admin_id', sa.Integer(), nullable=False),
@@ -288,6 +191,36 @@ def upgrade():
     sa.ForeignKeyConstraint(['property_id'], ['properties.property_id'], ),
     sa.PrimaryKeyConstraint('apartment_id')
     )
+    op.create_table('apartment_amenities',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('apartment_id', sa.Integer(), nullable=False),
+    sa.Column('amenity_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['amenity_id'], ['amenities.amenity_id'], ),
+    sa.ForeignKeyConstraint(['apartment_id'], ['apartments.apartment_id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('apartment_facilities',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('apartment_id', sa.Integer(), nullable=False),
+    sa.Column('facility_id', sa.Integer(), nullable=False),
+    sa.Column('quantity', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['apartment_id'], ['apartments.apartment_id'], ),
+    sa.ForeignKeyConstraint(['facility_id'], ['facilities.facility_id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('apartment_images',
+    sa.Column('image_id', sa.Integer(), nullable=False),
+    sa.Column('apartment_id', sa.Integer(), nullable=False),
+    sa.Column('uploaded_by', sa.Integer(), nullable=True),
+    sa.Column('image_url', sa.String(length=255), nullable=False),
+    sa.Column('is_cover', sa.Boolean(), nullable=True),
+    sa.Column('caption', sa.String(length=150), nullable=True),
+    sa.Column('sort_order', sa.Integer(), nullable=True),
+    sa.Column('upload_date', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['apartment_id'], ['apartments.apartment_id'], ),
+    sa.ForeignKeyConstraint(['uploaded_by'], ['users.user_id'], ),
+    sa.PrimaryKeyConstraint('image_id')
+    )
     op.create_table('audit_logs',
     sa.Column('log_id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
@@ -300,6 +233,115 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
     sa.PrimaryKeyConstraint('log_id')
     )
+    op.create_table('availabilities',
+    sa.Column('availability_id', sa.Integer(), nullable=False),
+    sa.Column('apartment_id', sa.Integer(), nullable=False),
+    sa.Column('date', sa.Date(), nullable=False),
+    sa.Column('status', sa.String(length=20), nullable=True),
+    sa.Column('price_override', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['apartment_id'], ['apartments.apartment_id'], ),
+    sa.PrimaryKeyConstraint('availability_id')
+    )
+    op.create_table('bookings',
+    sa.Column('booking_id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('apartment_id', sa.Integer(), nullable=False),
+    sa.Column('agent_id', sa.Integer(), nullable=True),
+    sa.Column('check_in', sa.Date(), nullable=False),
+    sa.Column('check_out', sa.Date(), nullable=False),
+    sa.Column('guest_count', sa.Integer(), nullable=True),
+    sa.Column('total_price', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('discount_amount', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('final_amount', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('caution_fee_amount', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('caution_fee_status', sa.String(length=30), nullable=True),
+    sa.Column('booking_ref', sa.String(length=30), nullable=False),
+    sa.Column('status', sa.String(length=20), nullable=True),
+    sa.Column('apartment_fee', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('discount_percentage', sa.Numeric(precision=5, scale=2), nullable=True),
+    sa.Column('caution_fee', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('total_amount', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('payment_status', sa.String(length=30), nullable=True),
+    sa.Column('booking_status', sa.String(length=30), nullable=True),
+    sa.Column('refund_status', sa.String(length=30), nullable=True),
+    sa.Column('payment_reference', sa.String(length=100), nullable=True),
+    sa.Column('commission_generated', sa.Boolean(), nullable=True),
+    sa.Column('commission_id', sa.Integer(), nullable=True),
+    sa.Column('checked_in_at', sa.DateTime(), nullable=True),
+    sa.Column('checked_out_at', sa.DateTime(), nullable=True),
+    sa.Column('verified_at', sa.DateTime(), nullable=True),
+    sa.Column('inspection_status', sa.String(length=30), nullable=True),
+    sa.Column('guest_name', sa.String(length=120), nullable=True),
+    sa.Column('guest_email', sa.String(length=120), nullable=True),
+    sa.Column('guest_phone', sa.String(length=30), nullable=True),
+    sa.Column('special_requests', sa.Text(), nullable=True),
+    sa.Column('source', sa.String(length=30), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['agent_id'], ['agents.agent_id'], ),
+    sa.ForeignKeyConstraint(['apartment_id'], ['apartments.apartment_id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
+    sa.PrimaryKeyConstraint('booking_id'),
+    sa.UniqueConstraint('booking_ref')
+    )
+    op.create_table('agent_commissions',
+    sa.Column('commission_id', sa.Integer(), nullable=False),
+    sa.Column('agent_id', sa.Integer(), nullable=False),
+    sa.Column('booking_id', sa.Integer(), nullable=False),
+    sa.Column('booking_amount', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('commission_percentage', sa.Numeric(precision=5, scale=2), nullable=False),
+    sa.Column('commission_amount', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('payment_status', sa.String(length=20), nullable=True),
+    sa.Column('paid_date', sa.DateTime(), nullable=True),
+    sa.Column('payment_reference', sa.String(length=100), nullable=True),
+    sa.Column('notes', sa.Text(), nullable=True),
+    sa.Column('payment_verified', sa.Boolean(), nullable=True),
+    sa.Column('commission_rate', sa.Numeric(precision=5, scale=2), nullable=True),
+    sa.Column('payout_status', sa.String(length=30), nullable=True),
+    sa.Column('payout_date', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['agent_id'], ['agents.agent_id'], ),
+    sa.ForeignKeyConstraint(['booking_id'], ['bookings.booking_id'], ),
+    sa.PrimaryKeyConstraint('commission_id')
+    )
+    op.create_table('commissions',
+    sa.Column('commission_id', sa.Integer(), nullable=False),
+    sa.Column('commission_reference', sa.String(length=50), nullable=False),
+    sa.Column('booking_id', sa.Integer(), nullable=False),
+    sa.Column('agent_id', sa.Integer(), nullable=False),
+    sa.Column('referral_code', sa.String(length=50), nullable=False),
+    sa.Column('customer_id', sa.Integer(), nullable=True),
+    sa.Column('property_id', sa.Integer(), nullable=True),
+    sa.Column('payment_reference', sa.String(length=100), nullable=False),
+    sa.Column('payment_provider', sa.String(length=30), nullable=True),
+    sa.Column('booking_amount', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('discount_percentage', sa.Numeric(precision=5, scale=2), nullable=True),
+    sa.Column('discount_amount', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('net_booking_amount', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('commission_percentage', sa.Numeric(precision=5, scale=2), nullable=True),
+    sa.Column('commission_amount', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('currency', sa.String(length=10), nullable=True),
+    sa.Column('commission_status', sa.String(length=30), nullable=True),
+    sa.Column('payment_status', sa.String(length=30), nullable=True),
+    sa.Column('commission_type', sa.String(length=30), nullable=True),
+    sa.Column('generated_at', sa.DateTime(), nullable=True),
+    sa.Column('approved_at', sa.DateTime(), nullable=True),
+    sa.Column('paid_at', sa.DateTime(), nullable=True),
+    sa.Column('cancelled_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.Column('approved_by', sa.Integer(), nullable=True),
+    sa.Column('notes', sa.Text(), nullable=True),
+    sa.Column('metadata_json', sa.Text(), nullable=True),
+    sa.ForeignKeyConstraint(['agent_id'], ['agents.agent_id'], ),
+    sa.ForeignKeyConstraint(['approved_by'], ['users.user_id'], ),
+    sa.ForeignKeyConstraint(['booking_id'], ['bookings.booking_id'], ),
+    sa.ForeignKeyConstraint(['customer_id'], ['users.user_id'], ),
+    sa.ForeignKeyConstraint(['property_id'], ['properties.property_id'], ),
+    sa.PrimaryKeyConstraint('commission_id')
+    )
+    op.create_foreign_key('bookings_ibfk_4', 'bookings', 'commissions', ['commission_id'], ['commission_id'])
     op.create_table('commission_audit_logs',
     sa.Column('log_id', sa.Integer(), nullable=False),
     sa.Column('commission_id', sa.Integer(), nullable=False),
@@ -315,7 +357,75 @@ def upgrade():
     sa.ForeignKeyConstraint(['performed_by'], ['users.user_id'], ),
     sa.PrimaryKeyConstraint('log_id')
     )
-    op.create_index(op.f('ix_commission_audit_logs_commission_id'), 'commission_audit_logs', ['commission_id'], unique=False)
+    op.create_table('corporate_enquiries',
+    sa.Column('enquiry_id', sa.Integer(), nullable=False),
+    sa.Column('company_name', sa.String(length=150), nullable=False),
+    sa.Column('contact_person', sa.String(length=120), nullable=False),
+    sa.Column('phone', sa.String(length=30), nullable=False),
+    sa.Column('email', sa.String(length=120), nullable=False),
+    sa.Column('check_in', sa.Date(), nullable=False),
+    sa.Column('check_out', sa.Date(), nullable=False),
+    sa.Column('guest_count', sa.Integer(), nullable=True),
+    sa.Column('suite_count', sa.Integer(), nullable=True),
+    sa.Column('length_of_stay', sa.Integer(), nullable=True),
+    sa.Column('budget_range', sa.String(length=50), nullable=True),
+    sa.Column('special_requests', sa.Text(), nullable=True),
+    sa.Column('status', sa.String(length=30), nullable=True),
+    sa.Column('assigned_to', sa.Integer(), nullable=True),
+    sa.Column('apartment_id', sa.Integer(), nullable=True),
+    sa.Column('booking_id', sa.Integer(), nullable=True),
+    sa.Column('payment_status', sa.String(length=30), nullable=True),
+    sa.Column('payment_reference', sa.String(length=100), nullable=True),
+    sa.Column('quoted_amount', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('caution_fee', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('total_amount', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('internal_notes', sa.Text(), nullable=True),
+    sa.Column('approved_by', sa.Integer(), nullable=True),
+    sa.Column('rejected_by', sa.Integer(), nullable=True),
+    sa.Column('rejection_reason', sa.Text(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['apartment_id'], ['apartments.apartment_id'], ),
+    sa.ForeignKeyConstraint(['approved_by'], ['users.user_id'], ),
+    sa.ForeignKeyConstraint(['assigned_to'], ['users.user_id'], ),
+    sa.ForeignKeyConstraint(['booking_id'], ['bookings.booking_id'], ),
+    sa.ForeignKeyConstraint(['rejected_by'], ['users.user_id'], ),
+    sa.PrimaryKeyConstraint('enquiry_id')
+    )
+    op.create_table('corporate_audit_logs',
+    sa.Column('log_id', sa.Integer(), nullable=False),
+    sa.Column('enquiry_id', sa.Integer(), nullable=False),
+    sa.Column('action', sa.String(length=50), nullable=False),
+    sa.Column('old_status', sa.String(length=30), nullable=True),
+    sa.Column('new_status', sa.String(length=30), nullable=True),
+    sa.Column('performed_by', sa.Integer(), nullable=True),
+    sa.Column('ip_address', sa.String(length=50), nullable=True),
+    sa.Column('remarks', sa.Text(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['enquiry_id'], ['corporate_enquiries.enquiry_id'], ),
+    sa.ForeignKeyConstraint(['performed_by'], ['users.user_id'], ),
+    sa.PrimaryKeyConstraint('log_id')
+    )
+    op.create_table('corporate_quotes',
+    sa.Column('quote_id', sa.Integer(), nullable=False),
+    sa.Column('enquiry_id', sa.Integer(), nullable=False),
+    sa.Column('created_by', sa.Integer(), nullable=False),
+    sa.Column('quote_number', sa.String(length=40), nullable=False),
+    sa.Column('amount', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('discount', sa.Numeric(precision=10, scale=2), nullable=True),
+    sa.Column('final_amount', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('room_type', sa.String(length=100), nullable=False),
+    sa.Column('inclusions', sa.Text(), nullable=True),
+    sa.Column('terms', sa.Text(), nullable=True),
+    sa.Column('valid_until', sa.Date(), nullable=False),
+    sa.Column('status', sa.String(length=30), nullable=True),
+    sa.Column('sent_at', sa.DateTime(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['created_by'], ['users.user_id'], ),
+    sa.ForeignKeyConstraint(['enquiry_id'], ['corporate_enquiries.enquiry_id'], ),
+    sa.PrimaryKeyConstraint('quote_id'),
+    sa.UniqueConstraint('quote_number')
+    )
     op.create_table('inspections',
     sa.Column('inspection_id', sa.Integer(), nullable=False),
     sa.Column('booking_id', sa.Integer(), nullable=False),
@@ -360,13 +470,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['recipient_id'], ['users.user_id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_notifications_created_at'), 'notifications', ['created_at'], unique=False)
-    op.create_index(op.f('ix_notifications_dedup_key'), 'notifications', ['dedup_key'], unique=False)
-    op.create_index(op.f('ix_notifications_is_read'), 'notifications', ['is_read'], unique=False)
-    op.create_index(op.f('ix_notifications_notification_type'), 'notifications', ['notification_type'], unique=False)
-    op.create_index(op.f('ix_notifications_portal'), 'notifications', ['portal'], unique=False)
-    op.create_index(op.f('ix_notifications_recipient_id'), 'notifications', ['recipient_id'], unique=False)
-    op.create_index(op.f('ix_notifications_requires_action'), 'notifications', ['requires_action'], unique=False)
     op.create_table('payments',
     sa.Column('payment_id', sa.Integer(), nullable=False),
     sa.Column('booking_id', sa.Integer(), nullable=False),
@@ -391,136 +494,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
     sa.ForeignKeyConstraint(['verified_by'], ['users.user_id'], ),
     sa.PrimaryKeyConstraint('payment_id')
-    )
-    op.create_table('super_admins',
-    sa.Column('superadmin_id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('can_override_roles', sa.Boolean(), nullable=True),
-    sa.Column('can_delete_admins', sa.Boolean(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
-    sa.PrimaryKeyConstraint('superadmin_id'),
-    sa.UniqueConstraint('user_id')
-    )
-    op.create_table('superadmin_otps',
-    sa.Column('otp_id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('otp_hash', sa.String(length=255), nullable=False),
-    sa.Column('expires_at', sa.DateTime(), nullable=False),
-    sa.Column('attempts', sa.Integer(), nullable=False),
-    sa.Column('used', sa.Boolean(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('used_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
-    sa.PrimaryKeyConstraint('otp_id')
-    )
-    op.create_index(op.f('ix_superadmin_otps_user_id'), 'superadmin_otps', ['user_id'], unique=False)
-    op.create_table('user_profiles',
-    sa.Column('profile_id', sa.Integer(), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('address', sa.String(length=255), nullable=True),
-    sa.Column('city', sa.String(length=100), nullable=True),
-    sa.Column('state', sa.String(length=100), nullable=True),
-    sa.Column('newsletter_sub', sa.Boolean(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
-    sa.PrimaryKeyConstraint('profile_id'),
-    sa.UniqueConstraint('user_id')
-    )
-    op.create_table('agent_commissions',
-    sa.Column('commission_id', sa.Integer(), nullable=False),
-    sa.Column('agent_id', sa.Integer(), nullable=False),
-    sa.Column('booking_id', sa.Integer(), nullable=False),
-    sa.Column('booking_amount', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('commission_percentage', sa.Numeric(precision=5, scale=2), nullable=False),
-    sa.Column('commission_amount', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('payment_status', sa.String(length=20), nullable=True),
-    sa.Column('paid_date', sa.DateTime(), nullable=True),
-    sa.Column('payment_reference', sa.String(length=100), nullable=True),
-    sa.Column('notes', sa.Text(), nullable=True),
-    sa.Column('payment_verified', sa.Boolean(), nullable=True),
-    sa.Column('commission_rate', sa.Numeric(precision=5, scale=2), nullable=True),
-    sa.Column('payout_status', sa.String(length=30), nullable=True),
-    sa.Column('payout_date', sa.DateTime(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['agent_id'], ['agents.agent_id'], ),
-    sa.ForeignKeyConstraint(['booking_id'], ['bookings.booking_id'], ),
-    sa.PrimaryKeyConstraint('commission_id')
-    )
-    op.create_table('apartment_amenities',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('apartment_id', sa.Integer(), nullable=False),
-    sa.Column('amenity_id', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['amenity_id'], ['amenities.amenity_id'], ),
-    sa.ForeignKeyConstraint(['apartment_id'], ['apartments.apartment_id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('apartment_facilities',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('apartment_id', sa.Integer(), nullable=False),
-    sa.Column('facility_id', sa.Integer(), nullable=False),
-    sa.Column('quantity', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['apartment_id'], ['apartments.apartment_id'], ),
-    sa.ForeignKeyConstraint(['facility_id'], ['facilities.facility_id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('apartment_images',
-    sa.Column('image_id', sa.Integer(), nullable=False),
-    sa.Column('apartment_id', sa.Integer(), nullable=False),
-    sa.Column('uploaded_by', sa.Integer(), nullable=True),
-    sa.Column('image_url', sa.String(length=255), nullable=False),
-    sa.Column('is_cover', sa.Boolean(), nullable=True),
-    sa.Column('caption', sa.String(length=150), nullable=True),
-    sa.Column('sort_order', sa.Integer(), nullable=True),
-    sa.Column('upload_date', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['apartment_id'], ['apartments.apartment_id'], ),
-    sa.ForeignKeyConstraint(['uploaded_by'], ['users.user_id'], ),
-    sa.PrimaryKeyConstraint('image_id')
-    )
-    op.create_table('availabilities',
-    sa.Column('availability_id', sa.Integer(), nullable=False),
-    sa.Column('apartment_id', sa.Integer(), nullable=False),
-    sa.Column('date', sa.Date(), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=True),
-    sa.Column('price_override', sa.Numeric(precision=10, scale=2), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['apartment_id'], ['apartments.apartment_id'], ),
-    sa.PrimaryKeyConstraint('availability_id')
-    )
-    op.create_table('corporate_enquiries',
-    sa.Column('enquiry_id', sa.Integer(), nullable=False),
-    sa.Column('company_name', sa.String(length=150), nullable=False),
-    sa.Column('contact_person', sa.String(length=120), nullable=False),
-    sa.Column('phone', sa.String(length=30), nullable=False),
-    sa.Column('email', sa.String(length=120), nullable=False),
-    sa.Column('check_in', sa.Date(), nullable=False),
-    sa.Column('check_out', sa.Date(), nullable=False),
-    sa.Column('guest_count', sa.Integer(), nullable=True),
-    sa.Column('suite_count', sa.Integer(), nullable=True),
-    sa.Column('length_of_stay', sa.Integer(), nullable=True),
-    sa.Column('budget_range', sa.String(length=50), nullable=True),
-    sa.Column('special_requests', sa.Text(), nullable=True),
-    sa.Column('status', sa.String(length=30), nullable=True),
-    sa.Column('assigned_to', sa.Integer(), nullable=True),
-    sa.Column('apartment_id', sa.Integer(), nullable=True),
-    sa.Column('booking_id', sa.Integer(), nullable=True),
-    sa.Column('payment_status', sa.String(length=30), nullable=True),
-    sa.Column('payment_reference', sa.String(length=100), nullable=True),
-    sa.Column('quoted_amount', sa.Numeric(precision=10, scale=2), nullable=True),
-    sa.Column('caution_fee', sa.Numeric(precision=10, scale=2), nullable=True),
-    sa.Column('total_amount', sa.Numeric(precision=10, scale=2), nullable=True),
-    sa.Column('internal_notes', sa.Text(), nullable=True),
-    sa.Column('approved_by', sa.Integer(), nullable=True),
-    sa.Column('rejected_by', sa.Integer(), nullable=True),
-    sa.Column('rejection_reason', sa.Text(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['apartment_id'], ['apartments.apartment_id'], ),
-    sa.ForeignKeyConstraint(['approved_by'], ['users.user_id'], ),
-    sa.ForeignKeyConstraint(['assigned_to'], ['users.user_id'], ),
-    sa.ForeignKeyConstraint(['booking_id'], ['bookings.booking_id'], ),
-    sa.ForeignKeyConstraint(['rejected_by'], ['users.user_id'], ),
-    sa.PrimaryKeyConstraint('enquiry_id')
     )
     op.create_table('receipts',
     sa.Column('receipt_id', sa.Integer(), nullable=False),
@@ -558,8 +531,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['customer_id'], ['users.user_id'], ),
     sa.PrimaryKeyConstraint('referral_history_id')
     )
-    op.create_index(op.f('ix_referral_history_created_at'), 'referral_history', ['created_at'], unique=False)
-    op.create_index(op.f('ix_referral_history_referral_code'), 'referral_history', ['referral_code'], unique=False)
     op.create_table('refunds',
     sa.Column('refund_id', sa.Integer(), nullable=False),
     sa.Column('booking_id', sa.Integer(), nullable=False),
@@ -601,6 +572,27 @@ def upgrade():
     sa.PrimaryKeyConstraint('review_id'),
     sa.UniqueConstraint('booking_id')
     )
+    op.create_table('review_responses',
+    sa.Column('response_id', sa.Integer(), nullable=False),
+    sa.Column('review_id', sa.Integer(), nullable=False),
+    sa.Column('admin_id', sa.Integer(), nullable=False),
+    sa.Column('response', sa.Text(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['admin_id'], ['users.user_id'], ),
+    sa.ForeignKeyConstraint(['review_id'], ['reviews.review_id'], ),
+    sa.PrimaryKeyConstraint('response_id'),
+    sa.UniqueConstraint('review_id')
+    )
+    op.create_table('super_admins',
+    sa.Column('superadmin_id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('can_override_roles', sa.Boolean(), nullable=True),
+    sa.Column('can_delete_admins', sa.Boolean(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
+    sa.PrimaryKeyConstraint('superadmin_id'),
+    sa.UniqueConstraint('user_id')
+    )
     op.create_table('superadmin_action_logs',
     sa.Column('log_id', sa.Integer(), nullable=False),
     sa.Column('superadmin_id', sa.Integer(), nullable=False),
@@ -617,111 +609,82 @@ def upgrade():
     sa.ForeignKeyConstraint(['target_agent_id'], ['agents.agent_id'], ),
     sa.PrimaryKeyConstraint('log_id')
     )
-    op.create_table('corporate_audit_logs',
-    sa.Column('log_id', sa.Integer(), nullable=False),
-    sa.Column('enquiry_id', sa.Integer(), nullable=False),
-    sa.Column('action', sa.String(length=50), nullable=False),
-    sa.Column('old_status', sa.String(length=30), nullable=True),
-    sa.Column('new_status', sa.String(length=30), nullable=True),
-    sa.Column('performed_by', sa.Integer(), nullable=True),
-    sa.Column('ip_address', sa.String(length=50), nullable=True),
-    sa.Column('remarks', sa.Text(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['enquiry_id'], ['corporate_enquiries.enquiry_id'], ),
-    sa.ForeignKeyConstraint(['performed_by'], ['users.user_id'], ),
-    sa.PrimaryKeyConstraint('log_id')
+    op.create_table('superadmin_otps',
+    sa.Column('otp_id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('otp_hash', sa.String(length=255), nullable=False),
+    sa.Column('expires_at', sa.DateTime(), nullable=False),
+    sa.Column('attempts', sa.Integer(), nullable=False),
+    sa.Column('used', sa.Boolean(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('used_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
+    sa.PrimaryKeyConstraint('otp_id')
     )
-    op.create_table('corporate_quotes',
-    sa.Column('quote_id', sa.Integer(), nullable=False),
-    sa.Column('enquiry_id', sa.Integer(), nullable=False),
-    sa.Column('created_by', sa.Integer(), nullable=False),
-    sa.Column('quote_number', sa.String(length=40), nullable=False),
-    sa.Column('amount', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('discount', sa.Numeric(precision=10, scale=2), nullable=True),
-    sa.Column('final_amount', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('room_type', sa.String(length=100), nullable=False),
-    sa.Column('inclusions', sa.Text(), nullable=True),
-    sa.Column('terms', sa.Text(), nullable=True),
-    sa.Column('valid_until', sa.Date(), nullable=False),
-    sa.Column('status', sa.String(length=30), nullable=True),
+    op.create_table('user_profiles',
+    sa.Column('profile_id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('address', sa.String(length=255), nullable=True),
+    sa.Column('city', sa.String(length=100), nullable=True),
+    sa.Column('state', sa.String(length=100), nullable=True),
+    sa.Column('newsletter_sub', sa.Boolean(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
+    sa.PrimaryKeyConstraint('profile_id'),
+    sa.UniqueConstraint('user_id')
+    )
+    op.create_table('whatsapp_logs',
+    sa.Column('whatsapp_id', sa.Integer(), nullable=False),
+    sa.Column('recipient', sa.String(length=30), nullable=False),
+    sa.Column('message', sa.Text(), nullable=False),
+    sa.Column('status', sa.String(length=20), nullable=True),
+    sa.Column('delivered_at', sa.DateTime(), nullable=True),
+    sa.Column('error_message', sa.Text(), nullable=True),
     sa.Column('sent_at', sa.DateTime(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['created_by'], ['users.user_id'], ),
-    sa.ForeignKeyConstraint(['enquiry_id'], ['corporate_enquiries.enquiry_id'], ),
-    sa.PrimaryKeyConstraint('quote_id'),
-    sa.UniqueConstraint('quote_number')
-    )
-    op.create_table('review_responses',
-    sa.Column('response_id', sa.Integer(), nullable=False),
-    sa.Column('review_id', sa.Integer(), nullable=False),
-    sa.Column('admin_id', sa.Integer(), nullable=False),
-    sa.Column('response', sa.Text(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['admin_id'], ['users.user_id'], ),
-    sa.ForeignKeyConstraint(['review_id'], ['reviews.review_id'], ),
-    sa.PrimaryKeyConstraint('response_id'),
-    sa.UniqueConstraint('review_id')
+    sa.PrimaryKeyConstraint('whatsapp_id')
     )
     # ### end Alembic commands ###
 
 
 def downgrade():
-# ### commands auto generated by Alembic - please adjust! ###
-    op.drop_table('review_responses')
-    op.drop_table('corporate_quotes')
-    op.drop_table('corporate_audit_logs')
+    # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_constraint('bookings_ibfk_4', 'bookings', type_='foreignkey')
+    op.drop_table('whatsapp_logs')
+    op.drop_table('user_profiles')
+    op.drop_table('superadmin_otps')
     op.drop_table('superadmin_action_logs')
+    op.drop_table('super_admins')
+    op.drop_table('review_responses')
     op.drop_table('reviews')
     op.drop_table('refunds')
-    op.drop_index(op.f('ix_referral_history_referral_code'), table_name='referral_history')
-    op.drop_index(op.f('ix_referral_history_created_at'), table_name='referral_history')
     op.drop_table('referral_history')
     op.drop_table('receipts')
+    op.drop_table('payments')
+    op.drop_table('notifications')
+    op.drop_table('inspections')
+    op.drop_table('corporate_quotes')
+    op.drop_table('corporate_audit_logs')
     op.drop_table('corporate_enquiries')
+    op.drop_table('commission_audit_logs')
+    op.drop_table('commissions')
+    op.drop_table('agent_commissions')
+    op.drop_table('bookings')
     op.drop_table('availabilities')
+    op.drop_table('audit_logs')
     op.drop_table('apartment_images')
     op.drop_table('apartment_facilities')
     op.drop_table('apartment_amenities')
-    op.drop_table('agent_commissions')
-    op.drop_table('user_profiles')
-    op.drop_index(op.f('ix_superadmin_otps_user_id'), table_name='superadmin_otps')
-    op.drop_table('superadmin_otps')
-    op.drop_table('super_admins')
-    op.drop_table('payments')
-    op.drop_index(op.f('ix_notifications_requires_action'), table_name='notifications')
-    op.drop_index(op.f('ix_notifications_recipient_id'), table_name='notifications')
-    op.drop_index(op.f('ix_notifications_portal'), table_name='notifications')
-    op.drop_index(op.f('ix_notifications_notification_type'), table_name='notifications')
-    op.drop_index(op.f('ix_notifications_is_read'), table_name='notifications')
-    op.drop_index(op.f('ix_notifications_dedup_key'), table_name='notifications')
-    op.drop_index(op.f('ix_notifications_created_at'), table_name='notifications')
-    op.drop_table('notifications')
-    op.drop_table('inspections')
-    op.drop_index(op.f('ix_commission_audit_logs_commission_id'), table_name='commission_audit_logs')
-    op.drop_table('commission_audit_logs')
-    op.drop_table('audit_logs')
     op.drop_table('apartments')
     op.drop_table('agents')
     op.drop_table('admins')
     op.drop_table('admin_action_logs')
-    op.drop_index(op.f('ix_users_email'), table_name='users')
     op.drop_table('users')
-    op.drop_table('property_settings')
-    op.drop_table('whatsapp_logs')
     op.drop_table('roles')
+    op.drop_table('property_settings')
     op.drop_table('properties')
     op.drop_table('facilities')
     op.drop_table('email_logs')
     op.drop_table('contact_messages')
-    op.drop_index(op.f('ix_commissions_referral_code'), table_name='commissions')
-    op.drop_index(op.f('ix_commissions_payment_reference'), table_name='commissions')
-    op.drop_index(op.f('ix_commissions_created_at'), table_name='commissions')
-    op.drop_index(op.f('ix_commissions_commission_status'), table_name='commissions')
-    op.drop_index(op.f('ix_commissions_commission_reference'), table_name='commissions')
-    op.drop_index(op.f('ix_commissions_booking_id'), table_name='commissions')
-    op.drop_index(op.f('ix_commissions_agent_id'), table_name='commissions')
-    op.drop_table('commissions')
     op.drop_table('categories')
-    op.drop_table('bookings')
     op.drop_table('amenities')
     # ### end Alembic commands ###
