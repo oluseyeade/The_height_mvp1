@@ -84,7 +84,7 @@
         {% for apt in apartments %}
           <div class="col-lg-4 col-md-6">
             <div class="room-card h-100 cursor-pointer"
-                 onclick="window.location.href="{{ url_for('apartments.detail', apartment_id=apt.apartment_id) }}';">            
+                 onclick="window.location.href='{{ url_for('apartments.detail', apartment_id=apt.apartment_id) }}';">            
               <!-- Property Image with Price / Status Badge Overlay -->
               <div class="room-card-img-wrapper position-relative">
                 <img src="{{ url_for('static', filename=apt.cover_image) if not apt.cover_image.startswith('http') else apt.cover_image }}" alt="{{ apt.title }}">
@@ -118,7 +118,7 @@
 
                 <div class="d-flex justify-content-between align-items-center pt-2 border-top border-secondary border-opacity-25">
                   <span class="small text-muted"><i class="fas fa-bed text-gold me-1"></i> {{ apt.bedrooms }} Bed(s)</span>
-                  <a href="{{ url_for('apartments.detail', apartment_id=apt.apartment_id) }}" class="btn btn-sm btn-gold">View Details <i class="fas fa-arrow-right ms-1"></i></a>
+                  <a href="{{ url_for('apartments.detail', apartment_id=apt.apartment_id) }}" class="btn btn-sm btn-gold">View Details &amp; Reserve <i class="fas fa-arrow-right ms-1"></i></a>
                 </div>
               </div>
 
