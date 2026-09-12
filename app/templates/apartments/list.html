@@ -17,7 +17,7 @@
       {% if showcase %}
         {% for item in showcase %}
           <div class="col-lg-4 col-md-6">
-            <div class="room-card h-100 cursor-pointer" onclick="window.location.href='{{ url_for(&#34;apartments.detail&#34;, apartment_id=item.apartment_id) }}';">
+            <div class="room-card h-100 cursor-pointer" onclick="window.location.href='{{ url_for('apartments.detail', apartment_id=item.apartment_id) }}';">
               
               <!-- Property Image with Price / Status Badge Overlay -->
               <div class="room-card-img-wrapper position-relative">
