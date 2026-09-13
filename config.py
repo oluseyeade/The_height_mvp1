@@ -182,6 +182,7 @@ class Config:
     PAYSTACK_WEBHOOK_SECRET = os.environ.get('PAYSTACK_WEBHOOK_SECRET', '')
     PAYSTACK_INITIALIZE_URL = os.environ.get('PAYSTACK_INITIALIZE_URL', 'https://api.paystack.co/transaction/initialize')
     PAYSTACK_VERIFY_URL = os.environ.get('PAYSTACK_VERIFY_URL', 'https://api.paystack.co/transaction/verify')
+    PENDING_BOOKING_TIMEOUT_MINUTES = int(os.environ.get('PENDING_BOOKING_TIMEOUT_MINUTES', 30))
 
     # Redis & Background Tasks configuration
     REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')

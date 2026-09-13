@@ -146,4 +146,13 @@ def create_app(config_name=None):
     from app.routes import init_routes
     init_routes(app)
 
+    # Register CLI command for periodic background/cron execution
+    @app.cli.command("expire-stale-bookings")
+    def expire_stale_bookings_cli():
+        """Expire stale pending bookings older than timeout (default 30 mins)."""
+        from app.services import BookingService
+        bs = BookingService()
+        bs.expire_stale_pending_bookings()
+        print("[OK] Stale pending bookings expiration task completed.")
+
     return app

@@ -194,10 +194,17 @@ class ApartmentService:
         return apartment, f"Price for '{apartment.title}' updated successfully to ₦{price_val:,.2f} per night."
 
 class BookingService:
-    def expire_stale_pending_bookings(self, timeout_minutes=30):
+    def expire_stale_pending_bookings(self, timeout_minutes=None):
+        if timeout_minutes is None:
+            if has_request_context():
+                timeout_minutes = current_app.config.get('PENDING_BOOKING_TIMEOUT_MINUTES', 30)
+            else:
+                timeout_minutes = 30
+
         cutoff_time = datetime.utcnow() - timedelta(minutes=timeout_minutes)
         stale_bookings = Booking.query.filter(
             Booking.status == 'pending',
+            Booking.payment_status.in_(['PENDING_PAYMENT', 'pending', 'PENDING']),
             Booking.created_at < cutoff_time
         ).all()
 
@@ -617,8 +624,9 @@ class PaymentService:
         if not is_valid_paystack:
             payment.status = 'failed'
             payment.verification_status = 'failed'
-            booking.status = 'pending'
+            booking.status = 'EXPIRED'
             booking.payment_status = 'PAYMENT_FAILED'
+            booking.booking_status = 'Payment Failed'
             db.session.commit()
 
             NotificationService.create_notification(

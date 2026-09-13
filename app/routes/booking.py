@@ -121,6 +121,7 @@ def init_booking_routes(app):
 
     @app.route('/bookings/detail/<booking_ref>', methods=['GET', 'POST'], endpoint='bookings.detail')
     def booking_detail(booking_ref):
+        booking_service.expire_stale_pending_bookings()
         booking = booking_service.get_booking_by_ref(booking_ref)
         if not booking:
             flash('Booking reference not found.', 'danger')
@@ -231,11 +232,11 @@ def init_booking_routes(app):
 
         # Mandatory Security Guard: Block access to success page if payment is not verified!
         is_verified = (
-            booking.payment_status in ['VERIFIED', 'verified', 'SUCCESS', 'success'] or 
-            booking.status in ['confirmed', 'CONFIRMED', 'active', 'ACTIVE']
+            (booking.payment_status and booking.payment_status.upper() in ['VERIFIED', 'PAID', 'SUCCESS']) and
+            (booking.status and booking.status.upper() in ['CONFIRMED', 'ACTIVE', 'CHECKED_IN', 'COMPLETED'])
         )
         if not is_verified:
-            flash('Payment verification pending or incomplete. Please complete payment or check status.', 'warning')
+            flash('Payment verification pending or incomplete. Please complete payment to view receipt.', 'warning')
             return redirect(url_for('bookings.detail', booking_ref=booking_ref))
 
         latest_payment = Payment.query.filter_by(booking_id=booking.booking_id).order_by(Payment.created_at.desc()).first()

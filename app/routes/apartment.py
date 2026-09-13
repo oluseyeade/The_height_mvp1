@@ -1,12 +1,14 @@
 from flask import render_template, request, flash, redirect, url_for
-from app.services import ApartmentService
+from app.services import ApartmentService, BookingService
 from app.utils import update_booking_session, get_booking_session
 
 apt_service = ApartmentService()
+booking_service = BookingService()
 
 def init_apartment_routes(app):
     @app.route('/apartments/', endpoint='apartments.list_apartments')
     def list_apartments():
+        booking_service.expire_stale_pending_bookings()
         check_in = request.args.get('check_in')
         check_out = request.args.get('check_out')
         guests = request.args.get('guests')
@@ -22,6 +24,7 @@ def init_apartment_routes(app):
 
     @app.route('/apartments/<int:apartment_id>', endpoint='apartments.detail')
     def detail(apartment_id):
+        booking_service.expire_stale_pending_bookings()
         apartment = apt_service.get_apartment_by_id(apartment_id)
         if not apartment:
             flash('Apartment not found.', 'danger')
